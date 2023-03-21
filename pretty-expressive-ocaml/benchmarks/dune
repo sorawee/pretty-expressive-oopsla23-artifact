@@ -1,0 +1,23 @@
+(executables
+ (names yelland_sup_linear
+        yelland_dag
+        flatten
+        wadler_opt
+        concat
+        json
+        sexp_full
+        sexp_random
+        fill_sep)
+ (public_names yelland_sup_linear
+               yelland_dag
+               flatten
+               wadler_opt
+               concat
+               json
+               sexp_full
+               sexp_random
+               fill_sep)
+ (libraries pretty
+            yojson
+            benchtool
+            stdio))

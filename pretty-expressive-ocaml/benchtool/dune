@@ -1,0 +1,7 @@
+(library
+ (name benchtool)
+ (libraries pretty
+            core
+            core_unix.command_unix
+            core_unix.sys_unix)
+ (preprocess (pps ppx_jane)))

@@ -1,0 +1,66 @@
+cabal-version:      3.4
+name:               pretty-artifact
+version:            0.1.0.0
+license:            MIT
+build-type:         Simple
+
+Library
+  exposed-modules:
+    Text.PrettyPrint.Compact
+    Text.PrettyPrint.Compact.Core
+    TextPatched.PrettyPrint.Compact
+    TextPatched.PrettyPrint.Compact.Core
+    Constants.Values
+    PrinterPaper.BernardyPaper
+    PrinterPaper.BernardyCustomizableWidth
+    Lib.BenchTool
+    Lib.JSONTool
+    Lib.SExpTool
+  build-depends:
+    base >= 3 && < 5,
+    base-compat >= 0.9.3 && <0.13,
+    containers,
+    wl-pprint == 1.2.1,
+    optparse-applicative == 0.17.0.0,
+    bytestring,
+    aeson == 2.1.2.1,
+    attoparsec == 0.14.4,
+    time,
+    cryptonite,
+    text
+
+common warnings
+    ghc-options: -Wall
+
+common deps
+    import:           warnings
+    build-depends:    base,
+                      aeson == 2.1.2.1,
+                      wl-pprint == 1.2.1,
+                      text,
+                      pretty-artifact
+    hs-source-dirs:   benchmarks
+
+executable fill-sep
+    import: deps
+    main-is:          FillSep.hs
+
+executable sexp-full
+    import: deps
+    main-is:          SExpFull.hs
+
+executable sexp-random
+    import: deps
+    main-is:          SExpRandom.hs
+
+executable json
+    import: deps
+    main-is:          JSON.hs
+
+executable flatten
+    import: deps
+    main-is:          Flatten.hs
+
+executable concat
+    import: deps
+    main-is:          Concat.hs

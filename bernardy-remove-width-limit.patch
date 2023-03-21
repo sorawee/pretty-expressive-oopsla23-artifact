@@ -1,0 +1,96 @@
+diff --git a/Text/PrettyPrint/Compact.hs b/Text/PrettyPrint/Compact.hs
+index 0fc4ff0..b6b7ad4 100644
+--- a/Text/PrettyPrint/Compact.hs
++++ b/Text/PrettyPrint/Compact.hs
+@@ -60,7 +60,7 @@
+ -- ((ABCDE ((A B C D) (A B C D) (A B C D) (A B C D)))
+ --  (ABCDEFGH ((A B C D) (A b c d) (A b c d) (A b c d))))
+ --
+-module Text.PrettyPrint.Compact (
++module TextPatched.PrettyPrint.Compact (
+    -- * Documents
+    Doc,
+ 
+@@ -105,8 +105,8 @@ module Text.PrettyPrint.Compact (
+ import Data.Monoid
+ import Data.List (intersperse)
+ 
+-import Text.PrettyPrint.Compact.Core as Text.PrettyPrint.Compact
+-import Text.PrettyPrint.Compact.Core (singleLine)
++import TextPatched.PrettyPrint.Compact.Core as TextPatched.PrettyPrint.Compact
++import TextPatched.PrettyPrint.Compact.Core (singleLine)
+ 
+ 
+ -- | Render the 'Doc' into 'String' omitting all annotations.
+diff --git a/Text/PrettyPrint/Compact/Core.hs b/Text/PrettyPrint/Compact/Core.hs
+index b5bdf9e..4c955af 100644
+--- a/Text/PrettyPrint/Compact/Core.hs
++++ b/Text/PrettyPrint/Compact/Core.hs
+@@ -1,5 +1,5 @@
+ {-# LANGUAGE ScopedTypeVariables, TypeSynonymInstances, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, ViewPatterns, DeriveFunctor, DeriveFoldable, DeriveTraversable #-}
+-module Text.PrettyPrint.Compact.Core(Layout(..),Render(..),Options(..),Document(..),Doc(..),annotate) where
++module TextPatched.PrettyPrint.Compact.Core(Layout(..),Render(..),Options(..),Document(..),Doc(..),annotate) where
+ 
+ import Prelude ()
+ import Prelude.Compat as P
+@@ -11,6 +11,8 @@ import Data.Sequence (singleton, Seq, viewl, viewr, ViewL(..), ViewR(..), (|>))
+ import Data.String
+ import Data.Foldable (toList)
+ 
++import Constants.Values (widthlimit)
++
+ -- | Annotated string, which consists of segments with separate (or no) annotations.
+ --
+ -- We keep annotated segments in a container (list).
+@@ -153,12 +155,12 @@ paretoOn' m acc (x:xs) = if any ((≺ m x) . m) acc
+ -- list sorted by lexicographic order for the first component
+ -- function argument is the page width
+ -- TODO: add a boolean to filter out multiline layouts.
+-newtype Doc a = MkDoc {fromDoc :: Int -> [(M a,L a)]}
++newtype Doc a = MkDoc {fromDoc :: [(M a,L a)]}
+ 
+ instance Monoid a => Semigroup (Doc a) where
+-  MkDoc xs <> MkDoc ys = MkDoc $ \w -> bestsOn fst [ discardInvalid w [x <> y | y <- ys w] | x <- xs w]
++  MkDoc xs <> MkDoc ys = MkDoc $ bestsOn fst [ discardInvalid widthlimit [x <> y | y <- ys] | x <- xs]
+ 
+-discardInvalid w = quasifilter (fits w . fst)
++discardInvalid w = quasifilter (fits widthlimit . fst)
+ 
+ quasifilter _ [] = []
+ quasifilter p zs = let fzs = filter p zs
+@@ -175,21 +177,20 @@ fits :: Int -> M a -> Bool
+ fits w x = maxWidth x <= w
+ 
+ instance Monoid a => Layout (Doc a) where
+-  flush (MkDoc xs) = MkDoc $ \w -> bestsOn fst $ map (sortOn fst) $ groupBy ((==) `on` (height . fst)) $ (map flush (xs w))
++  flush (MkDoc xs) = MkDoc $ bestsOn fst $ map (sortOn fst) $ groupBy ((==) `on` (height . fst)) $ (map flush xs)
+   -- flush xs = paretoOn' fst [] $ sort $ (map flush xs)
+-  text s = MkDoc $ return [text s]
++  text s = MkDoc $ [text s]
+ 
+ instance Render Doc where
+   renderWith opts (MkDoc g) = case xs of
+       [] -> error "No suitable layout found."
+       ((_,x):_) -> renderWith opts x
+     where
+-      pageWidth = optsPageWidth opts
+-      xs = discardInvalid pageWidth (g pageWidth)
++      xs = discardInvalid widthlimit g
+ 
+ instance Monoid a => Document (Doc a) where
+-  MkDoc m1 <|> MkDoc m2 = MkDoc $ \w -> bestsOn fst [m1 w,m2 w]
+-  singleLine (MkDoc m) = MkDoc $ \w -> takeWhile ((== 0). height . fst) (m w)
++  MkDoc m1 <|> MkDoc m2 = MkDoc $ bestsOn fst [m1,m2]
++  singleLine (MkDoc m) = MkDoc $ takeWhile ((== 0). height . fst) m
+ 
+ 
+ instance (Layout a, Layout b) => Layout (a,b) where
+@@ -209,7 +210,7 @@ instance Monoid a => IsString (Doc a) where
+ -- WORLD
+ --
+ annotate :: forall a. Monoid a => a -> Doc a -> Doc a
+-annotate a (MkDoc xs) = MkDoc $ (fmap . fmap . fmap) annotateL xs
++annotate a (MkDoc xs) = MkDoc $ (fmap . fmap) annotateL xs
+   where
+     annotateL :: L a -> L a
+     annotateL (L s) = L (fmap annotateAS s)

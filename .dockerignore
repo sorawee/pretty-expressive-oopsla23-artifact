@@ -1,0 +1,7 @@
+lean/build
+lean/lake-packages
+other-artifacts/Text
+other-artifacts/TextPatched
+pretty-expressive-racket
+fmt
+benchmark-results/*.dat
