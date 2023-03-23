@@ -1,7 +1,7 @@
 open Printer
 open Test_lib
 
-let (page_limit, com_limit) = setup ~size:15 ()
+let {page_limit; com_limit; _} = setup ~size:1 ()
 
 module P = Printer (Cost (struct
                       let limit = com_limit
@@ -22,6 +22,15 @@ let rec pp v =
   | List xs -> lparen <+> sep (List.map pp xs) <+> rparen
   | Atom x -> text x
 
-let () = measure_time (fun size ->
-    let t = Atom "a" in
-    render (pp t))
+let rec convert v =
+  match v with
+  | `String s -> Atom s
+  | `List xs -> List (List.map convert xs)
+  | _ -> failwith "bad"
+
+let () =
+  measure_time (fun size ->
+      let json = Yojson.Basic.from_file
+          ("../artifacts/benchdata/random-tree-" ^ (string_of_int size) ^ ".sexp") in
+      let t = convert json in
+      render (pp t))

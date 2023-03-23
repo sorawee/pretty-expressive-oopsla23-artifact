@@ -31,7 +31,7 @@ data Config = Config
     size  :: Int,
     iter  :: Int,
     target :: String,
-    viewLayout :: Bool,
+    outputPath :: Maybe String,
     viewLines :: Bool
   } deriving Show
 
@@ -39,15 +39,15 @@ defaultConfig = Config { width = 80
                        , size = 0
                        , iter = 0
                        , target = bernardyPatchedTarget
-                       , viewLayout = False
+                       , outputPath = Nothing
                        , viewLines = False
                        }
 
 validateConfig :: (Config -> Maybe String) ->
-                  Int -> Int -> Int -> String -> Bool -> Bool ->
+                  Int -> Int -> Int -> String -> Maybe String -> Bool ->
                   Config
-validateConfig validate w s i t vlay vli =
-  let conf = Config w s i t vlay vli in
+validateConfig validate w s i t out vli =
+  let conf = Config w s i t out vli in
   case validate conf of
     Nothing -> conf
     Just x -> error $ "error: " <> x
@@ -64,10 +64,10 @@ type TestingFun = Config -> IO C.Benchmarkable
 instrument :: TestingProc -> TestingProc
 instrument f conf = do
   s <- f conf
-  if viewLayout conf then
-    putStrLn s
-  else
-    return ()
+  case outputPath conf of
+    Nothing -> return ()
+    Just path | path == "-" -> putStrLn s
+              | otherwise -> writeFile path s
   if viewLines conf then
     printf "(lines %d)\n" $ length $ lines s
   else
@@ -112,9 +112,9 @@ getConfig def = Config
         <> help "target printer"
         <> showDefault
         <> value (target def))
-        <*> switch
-        ( long "view-layout"
-        <> help "view layout")
+        <*> (optional $ strOption
+        ( long "out"
+        <> help "Output the actual layout to a specified path; - means stdout"))
         <*> switch
         ( long "view-lines"
         <> help "view number of lines")

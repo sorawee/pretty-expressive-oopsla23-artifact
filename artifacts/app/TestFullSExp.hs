@@ -11,6 +11,16 @@ import qualified TextPatched.PrettyPrint.Compact as PCP
 data SExpr = SExpr [SExpr] | Atom String
   deriving Show
 
+foldD :: Monoid a => (a -> a -> a) -> [a] -> a
+foldD _ []       = mempty
+foldD f ds       = foldr1 f ds
+
+hsepPC = foldD (PC.<+>)
+hsepPCP = foldD (PCP.<+>)
+
+sepPC xs = hsepPC xs PC.<|> PC.vcat xs
+sepPCP xs = hsepPCP xs PCP.<|> PCP.vcat xs
+
 testExpr 0 c = (Atom $ show c, c + 1)
 testExpr n c = (SExpr [t1, t2], c2)
   where (t1, c1) = testExpr (n-1) c
@@ -19,13 +29,13 @@ testExpr n c = (SExpr [t1, t2], c2)
 prettyPC ::  SExpr -> PC.Doc ()
 prettyPC  (Atom s)    = PC.text s
 prettyPC  (SExpr xs)  =   PC.text "(" PC.<>
-                        (PC.sep $ map prettyPC xs) PC.<>
+                        (sepPC $ map prettyPC xs) PC.<>
                         PC.text ")"
 
 prettyPCP ::  SExpr -> PCP.Doc ()
 prettyPCP  (Atom s)    = PCP.text s
 prettyPCP  (SExpr xs)  =   PCP.text "(" PCP.<>
-                        (PCP.sep $ map prettyPCP xs) PCP.<>
+                        (sepPCP $ map prettyPCP xs) PCP.<>
                         PCP.text ")"
 
 pretty :: Doc d => SExpr -> d

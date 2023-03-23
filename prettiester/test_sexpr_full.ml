@@ -1,7 +1,7 @@
 open Printer
 open Test_lib
 
-let (page_limit, com_limit) = setup ~size:15 ()
+let {page_limit; com_limit; _} = setup ~size:15 ()
 
 module P = Printer (Cost (struct
                       let limit = com_limit
@@ -30,6 +30,7 @@ let rec test_expr n c =
     let (t2 , c2) = test_expr (n - 1) c1 in
     (List [t1; t2], c2)
 
-let () = measure_time (fun size ->
-    let (t, _) = test_expr size 0 in
-    render (pp t))
+let () =
+  measure_time (fun size ->
+      let (t, _) = test_expr size 0 in
+      render (pp t))

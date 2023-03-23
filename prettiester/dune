@@ -6,7 +6,8 @@
         test_json
         test_sexpr_full
         test_sexpr_random
-        test_fill_sep)
+        test_fill_sep
+        test)
  (libraries yojson core core_bench
             core_unix.command_unix
             core_unix.sys_unix

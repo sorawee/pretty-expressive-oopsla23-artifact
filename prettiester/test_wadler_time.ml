@@ -1,7 +1,7 @@
 open Printer
 open Test_lib
 
-let (page_limit, com_limit) = setup ~size:1000 ()
+let {page_limit; com_limit; _} = setup ~size:1000 ()
 
 module P = Printer (Cost (struct
                       let limit = com_limit
@@ -11,10 +11,7 @@ module P = Printer (Cost (struct
 open P
 
 let rec quadratic (n : int): doc =
-  if n = 0 then
-    text "line"
-  else
-    group (quadratic (n - 1)) <> nl <> text "line"
+  if n = 0 then text "line"
+  else group (quadratic (n - 1)) <> nl <> text "line"
 
-
-let () = measure_time (fun i -> render (quadratic i))
+let () = measure_time (fun size -> render (quadratic size))

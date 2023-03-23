@@ -2,17 +2,18 @@ open Core_bench
 
 module Command = Core.Command
 
-let print_layout (s: string): unit =
-  print_string s;
-  print_string "\n"
+let print_layout oc (s: string): unit =
+  Printf.fprintf oc "%s\n" s
 
-let param_view_layout = ref false
+let param_out = ref None
 let param_view_lines = ref false
 let param_iter = ref 0
 let param_series = ref false
 let param_size = ref 0
 
-let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): int * int =
+type config = { size: int; page_limit: int; com_limit: int }
+
+let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): config =
   let param_width = ref width in
   let param_limit = ref limit in
   param_size := size;
@@ -39,15 +40,13 @@ let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): int * int =
          flag
            "--size"
            (optional_with_default size int)
-           ~doc: ("int Document size\n" ^
-                  (Printf.sprintf
-                     "(default: %d; 0 as a default value implies unused)"
-                     size))
-       and view_layout =
+           ~doc: (Printf.sprintf "int Document size (default: %d)" size)
+       and out =
          flag
-           "--view-layout"
-           no_arg
-           ~doc: " Output the actual layout (default: no)"
+           "--out"
+           (optional string)
+           ~doc: ("path Output the actual layout to a specified path;\n" ^
+                  "- means stdout (default: do not output)")
 
        and view_lines =
          flag
@@ -83,7 +82,7 @@ let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): int * int =
        fun () ->
          Sys_unix.override_argv [| Sys.argv.(0) |];
          param_view_lines := view_lines;
-         param_view_layout := view_layout;
+         param_out := out;
          param_iter := iter;
          param_series := series;
          Printer.param_memo_limit := memo_limit;
@@ -94,18 +93,33 @@ let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): int * int =
          param_size := size)
   in
   Command_unix.run main_command;
-  (!param_width, !param_limit)
+  { page_limit = !param_width;
+    com_limit = !param_limit;
+    size = !param_size }
 
 let cnt_runs = ref 0
 
 let instrument f () =
   cnt_runs := !cnt_runs + 1;
   let out = f () in
-  if !param_view_layout then print_layout out;
-  if !param_view_lines then
+  begin
+    match !param_out with
+    | None -> ()
+    | Some path ->
+      begin
+        if path = "-" then print_layout stdout out
+        else
+          let oc = open_out path in
+          print_layout oc out;
+          close_out oc
+      end;
+      Stdlib.flush_all ()
+  end;
+  if !param_view_lines then begin
     Printf.printf "(lines %d)\n"
       (1 + (Core.String.count out ~f:(fun x -> x = '\n')));
-  Stdlib.flush_all ()
+    Stdlib.flush_all ()
+  end
 
 let measure_time_int f =
   let f = instrument f in

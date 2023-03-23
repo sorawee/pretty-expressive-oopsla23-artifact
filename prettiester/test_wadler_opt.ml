@@ -1,7 +1,11 @@
 open Printer
 open Test_lib
 
-let (page_limit, com_limit) = setup ~width:5 ()
+let {page_limit; com_limit; size; _} = setup ~width:5 ~size:0 ()
+
+let () =
+  if not (size = 0) then
+    raise (Arg.Bad "bad size")
 
 module P = Printer (Cost (struct
                       let limit = com_limit
@@ -17,4 +21,4 @@ let doc =
             text "B" <> nl <>
             text "B"))
 
-let () = print_layout (render doc)
+let () = print_string (render doc)

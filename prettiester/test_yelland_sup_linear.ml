@@ -5,7 +5,11 @@ open Test_lib
 (*       when the size is large. *)
 (*       E.g., the size could be as large as `500` with *)
 (*       `ulimit -s 65520` *)
-let (page_limit, com_limit) = setup ~size:500 ~width:0 ()
+let {page_limit; com_limit; size; _} = setup ~size:100 ~width:0 ()
+
+let () =
+  if not (size > 500) then
+    raise (Arg.Bad "bad size")
 
 module P = Printer(Cost(struct
                      let limit = com_limit

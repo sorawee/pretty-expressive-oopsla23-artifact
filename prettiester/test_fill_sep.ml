@@ -1,7 +1,7 @@
 open Printer
 open Test_lib
 
-let (page_limit, com_limit) = setup ~size:20000 ()
+let {page_limit; com_limit; _} = setup ~size:20000 ()
 
 module P = Printer (Cost (struct
                       let limit = com_limit
@@ -23,5 +23,4 @@ let fill_sep xs =
 
 let () =
   let lines = Stdio.In_channel.read_lines "/usr/share/dict/words" in
-  measure_time (fun size ->
-      render (fill_sep (Core.List.take lines size)))
+  measure_time (fun size -> render (fill_sep (Core.List.take lines size)))

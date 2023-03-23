@@ -1,7 +1,11 @@
 open Printer
 open Test_lib
 
-let (page_limit, com_limit) = setup ~size:2 ()
+let {page_limit; com_limit; size; _} = setup ~size:2 ()
+
+let () =
+  if not (size = 1 || size = 2) then
+    raise (Arg.Bad "bad size")
 
 module P = Printer (Cost (struct
                       let limit = com_limit
@@ -31,10 +35,7 @@ let rec pp v =
   | _ -> failwith "bad"
 
 let () =
-  let json_big = Yojson.Basic.from_file "../artifacts/benchdata/10k.json" in
-  let json_small = Yojson.Basic.from_file "../artifacts/benchdata/1k.json" in
-  measure_time (fun size ->
-      if size = 1 || size = 2 then
-        render (pp (if size = 1 then json_small else json_big))
-      else
-        raise (Arg.Bad "bad size"))
+  let smallJson = Yojson.Basic.from_file "../artifacts/benchdata/1k.json" in
+  let bigJson = Yojson.Basic.from_file "../artifacts/benchdata/10k.json" in
+  measure_time (fun _ ->
+      render (pp (if size = 1 then smallJson else bigJson)))
