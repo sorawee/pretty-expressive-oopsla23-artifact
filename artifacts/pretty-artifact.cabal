@@ -28,6 +28,7 @@ common deps
                       bytestring,
                       attoparsec,
                       wl-pprint,
+                      text,
                       pretty-artifact
     other-modules:    BernardyPaper, BernardyCustomizableWidth,
                       LibTest
@@ -42,6 +43,10 @@ executable test-fill-sep
 executable test-full-sexp
     import: deps
     main-is:          TestFullSExp.hs
+
+executable test-random-sexp
+    import: deps
+    main-is:          TestRandomSExp.hs
 
 executable test-json
     import: deps

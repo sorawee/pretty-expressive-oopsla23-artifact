@@ -1,0 +1,18 @@
+(executables
+ (names test_yelland_sup_linear
+        test_yelland_dag
+        test_wadler_time
+        test_wadler_opt
+        test_json
+        test_sexpr_full
+        test_sexpr_random
+        test_fill_sep)
+ (libraries yojson core core_bench
+            core_unix.command_unix
+            core_unix.sys_unix
+            stdio)
+ (preprocess (pps ppx_jane)))
+
+(env
+ (dev
+  (flags (:standard -w -27))))

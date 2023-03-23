@@ -1,5 +1,3 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
 module Main where
 
 import Prelude hiding ((<>))
@@ -36,6 +34,10 @@ benchmark linesFromFile conf = do
         | target conf == bernardyLibTarget = PC.render $ fillSepPC linesFromFile
         | target conf == bernardyPatchedTarget = PCP.render $ fillSepPCP linesFromFile
         | target conf == wadlerTarget = wlRender $ WL.fillSep $ map WL.text linesFromFile
+        -- NOTE: this fillSep from Bernardy's library doesn't
+        -- implement fillSep correctly. Use --view-layout to see what it prints
+        | target conf == extraTarget = PCP.render
+            (PCP.fillSep (map PCP.text linesFromFile) :: PCP.Doc ())
   return s
 
 core :: TestingFun
@@ -53,6 +55,7 @@ main =
       , bernardyPaperTarget
       , bernardyLibTarget
       , bernardyPatchedTarget
+      , extraTarget
       , wadlerTarget]
       (\conf -> Nothing))
     core

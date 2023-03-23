@@ -24,6 +24,7 @@ bernardyMeasureTarget = "bernardy-measure"
 bernardyPaperTarget = "bernardy-paper"
 bernardyPatchedTarget = "bernardy-patched"
 bernardyLibTarget = "bernardy-lib"
+extraTarget = "extra"
 
 data Config = Config
   { width :: Int,
