@@ -40,13 +40,13 @@ executable test-fill-sep
     import: deps
     main-is:          TestFillSep.hs
 
-executable test-full-sexp
+executable test-sexp-full
     import: deps
-    main-is:          TestFullSExp.hs
+    main-is:          TestSExpFull.hs
 
-executable test-random-sexp
+executable test-sexp-random
     import: deps
-    main-is:          TestRandomSExp.hs
+    main-is:          TestSExpRandom.hs
 
 executable test-json
     import: deps
