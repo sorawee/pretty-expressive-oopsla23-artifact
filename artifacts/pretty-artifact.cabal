@@ -1,4 +1,4 @@
-cabal-version:      3.0
+cabal-version:      3.4
 name:               pretty-artifact
 version:            0.1.0.0
 license:            MIT
@@ -20,6 +20,7 @@ common warnings
     ghc-options: -Wall
 
 common deps
+    import:           warnings
     build-depends:    base,
                       optparse-applicative,
                       criterion,
@@ -31,10 +32,8 @@ common deps
                       text,
                       pretty-artifact
     other-modules:    BernardyPaper, BernardyCustomizableWidth,
-                      LibTest
-    import:           warnings
+                      LibTest, LibJSON, LibSExp
     hs-source-dirs:   app
-    default-language: Haskell2010
 
 executable test-fill-sep
     import: deps
@@ -51,3 +50,11 @@ executable test-sexp-random
 executable test-json
     import: deps
     main-is:          TestJSON.hs
+
+executable test-repeated-flatten
+    import: deps
+    main-is:          TestRepeatedFlatten.hs
+
+executable test-concat
+    import: deps
+    main-is:          TestConcat.hs

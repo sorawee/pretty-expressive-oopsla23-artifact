@@ -21,11 +21,9 @@ let rec pp v =
   match v with
   | `Bool b -> if b then text "true" else text "false"
   | `Float f -> text (string_of_float f)
-  | `Int n -> text (string_of_int n)
+  | `Int n -> text ((string_of_int n) ^ ".0")
   | `Null -> text "null"
-  | `String s ->
-    (* We are being very crude here and don't care about escaping *)
-    dquote <+> text s <+> dquote
+  | `String s -> dquote <+> text s <+> dquote
   | `List xs ->
     let xs = List.map pp xs in enclose_sep lbrack rbrack comma xs
   | `Assoc obj ->
@@ -35,7 +33,7 @@ let rec pp v =
   | _ -> failwith "bad"
 
 let () =
-  let smallJson = Yojson.Basic.from_file "../artifacts/benchdata/1k.json" in
-  let bigJson = Yojson.Basic.from_file "../artifacts/benchdata/10k.json" in
+  let smallJson = Yojson.Basic.from_file "../benchdata/1k.json" in
+  let bigJson = Yojson.Basic.from_file "../benchdata/10k.json" in
   measure_time (fun _ ->
       render (pp (if size = 1 then smallJson else bigJson)))

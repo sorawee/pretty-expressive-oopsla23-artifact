@@ -1,32 +1,19 @@
 module Main where
 
 import Prelude hiding ((<>))
-import BernardyPaper
 import qualified Criterion.Main as C
-import Text.Printf
-import LibTest
-import qualified Text.PrettyPrint.Compact as PC
-import qualified TextPatched.PrettyPrint.Compact as PCP
 
 import qualified Data.Text as TXT
-import Data.Aeson.Parser
 import Data.Aeson.Types
 import Data.Foldable (toList)
-import qualified Data.ByteString as BS
-import Data.Attoparsec.ByteString
 
-data SExpr = SExpr [SExpr] | Atom String
-  deriving Show
+import qualified Text.PrettyPrint.Compact as PC
+import qualified TextPatched.PrettyPrint.Compact as PCP
+import BernardyPaper
 
-foldD :: Monoid a => (a -> a -> a) -> [a] -> a
-foldD _ []       = mempty
-foldD f ds       = foldr1 f ds
-
-hsepPC = foldD (PC.<+>)
-hsepPCP = foldD (PCP.<+>)
-
-sepPC xs = hsepPC xs PC.<|> PC.vcat xs
-sepPCP xs = hsepPCP xs PCP.<|> PCP.vcat xs
+import LibTest
+import LibJSON
+import LibSExp
 
 prettyPC ::  SExpr -> PC.Doc ()
 prettyPC  (Atom s)    = PC.text s
@@ -52,6 +39,7 @@ bench t conf = do
         | target conf == bernardyPaperTarget = render (pretty t :: CDoc)
         | target conf == bernardyLibTarget = PC.render (prettyPC t)
         | target conf == bernardyPatchedTarget = PCP.render (prettyPCP t)
+        | otherwise = error "impossible"
   return s
 
 convert :: Value -> SExpr
@@ -61,17 +49,13 @@ convert _ = error "impossible"
 
 core :: TestingFun
 core conf = do
-  let fname | size conf == -1 = "benchdata/tmp.sexp"
-            | otherwise = "benchdata/random-tree-" ++ (show $ size conf) ++ ".sexp"
+  let fname | size conf == -1 = "../benchdata/tmp.sexp"
+            | otherwise = "../benchdata/random-tree-" ++ (show $ size conf) ++ ".sexp"
 
   tree <- readJSONValue fname
   return $ C.nfAppIO (instrument (bench $ convert tree)) conf
 
-readJSONValue fname = do
-  inptxt <- BS.readFile fname
-  let Right inpJson = parseOnly json' inptxt
-  return inpJson
-
+main :: IO ()
 main = do
   runIt
     "TestRandomSExp"
@@ -81,5 +65,5 @@ main = do
       , bernardyPaperTarget
       , bernardyLibTarget
       , bernardyPatchedTarget]
-      (\conf -> Nothing))
+      (\_ -> Nothing))
     core

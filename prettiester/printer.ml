@@ -378,7 +378,7 @@ module Printer (C : CostFactory): PrinterT = struct
     | [] -> left <+> right
     | [d] -> left <+> d <+> right
     | d :: ds ->
-      ((hcat (left :: Core.List.intersperse ~sep: (sep <+> space) (d :: ds)))
+      ((hcat (left :: Core.List.intersperse ~sep: sep (d :: ds)))
        <|> (vcat ((left <+> d) :: List.map ((<+>) sep) ds)))
       <+> right
 

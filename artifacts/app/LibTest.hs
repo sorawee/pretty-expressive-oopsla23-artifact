@@ -1,30 +1,26 @@
 module LibTest where
 
 import Options.Applicative
-import Data.Semigroup ((<>))
-import Data.List (intercalate)
-
 import Constants.Values
 import Data.IORef
-
 import qualified Criterion.Main as C
 import qualified Criterion.Measurement as M
 import System.Environment
-import Constants.Values (widthlimit)
-
 import Text.Printf
-
 import qualified Text.PrettyPrint.Leijen   as WL
 
 wlRender :: WL.Doc -> String
 wlRender d = WL.displayS (WL.renderPretty 1 widthlimit d) ""
 
+wadlerTarget, bernardyMeasureTarget, bernardyPaperTarget,
+  bernardyPatchedTarget, bernardyLibTarget, extraTarget, extra2Target :: String
 wadlerTarget = "wadler"
 bernardyMeasureTarget = "bernardy-measure"
 bernardyPaperTarget = "bernardy-paper"
 bernardyPatchedTarget = "bernardy-patched"
 bernardyLibTarget = "bernardy-lib"
 extraTarget = "extra"
+extra2Target = "extra-2"
 
 data Config = Config
   { width :: Int,
@@ -35,6 +31,7 @@ data Config = Config
     viewLines :: Bool
   } deriving Show
 
+defaultConfig :: Config
 defaultConfig = Config { width = 80
                        , size = 0
                        , iter = 0
@@ -52,6 +49,8 @@ validateConfig validate w s i t out vli =
     Nothing -> conf
     Just x -> error $ "error: " <> x
 
+
+validateTargets :: [String] -> (Config -> Maybe String) -> Config -> Maybe String
 validateTargets allowedTargets validate conf =
   if not $ target conf `elem` allowedTargets then
     Just $ "target not allowed: available options are " <> show allowedTargets
@@ -68,10 +67,9 @@ instrument f conf = do
     Nothing -> return ()
     Just path | path == "-" -> putStrLn s
               | otherwise -> writeFile path s
-  if viewLines conf then
-    printf "(lines %d)\n" $ length $ lines s
-  else
-    return ()
+  if viewLines conf
+    then printf "(lines %d)\n" $ length $ lines s
+    else return ()
   return s
 
 run :: (Config -> Maybe String) -> TestingFun -> Config -> IO ()

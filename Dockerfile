@@ -62,8 +62,6 @@ RUN cabal install --lib \
 #      On the other hand, if we will edit stuff above,
 #      make sure to clean all things up!
 
-RUN cabal install --lib xml-1.3.14
-
 COPY artifacts/ artifacts
 WORKDIR /workspace/artifacts
 

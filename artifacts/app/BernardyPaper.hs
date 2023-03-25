@@ -3,7 +3,7 @@
 module BernardyPaper where
 
 import Prelude hiding ((<>))
-import Data.List (intercalate, minimumBy, intersperse)
+import Data.List (intercalate, minimumBy)
 import Data.Function
 import Constants.Values
 
@@ -70,11 +70,8 @@ instance Poset M where
               lastWidth  m1 <= lastWidth  m2
 
 pareto :: Poset a => [a]  -> [a]
--- pareto xs = trace (show $ length result) result
-pareto xs = result
-  where  l = length result
-         result = loop [] xs
-         loop acc  []      = acc
+pareto = loop []
+  where  loop acc  []      = acc
          loop acc  (x:xs)  = if  any (≺ x) acc
                                  then  loop acc xs
                                  else  loop (x:filter (not . (x ≺)) acc) xs
@@ -143,18 +140,5 @@ foldDoc f (x:xs)  = f x (foldDoc f xs)
 sep :: Doc d => [d] -> d
 sep []  = empty
 sep xs  = hsep xs <|> vcat xs
-
-hcat_with :: Doc d => [d] -> d -> d
-hcat_with [] s = empty
-hcat_with [x] s = x
-hcat_with (x:xs) s = x <> s <> hcat_with xs s
-
-encloseSep :: Doc d => d -> d -> d -> [d] -> d
-encloseSep left right sep ds
-    = case ds of
-        []  -> left <> right
-        [d] -> left <> d <> right
-        (d:ds) -> (left <> (hcat_with (d : ds) (sep <> text " ")) <> right) <|>
-                  ((vcat ((left <> d) : (map (\d -> sep <> d) ds))) <> right)
 
 --------------------------------------------------------------------------------

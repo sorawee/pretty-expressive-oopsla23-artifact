@@ -1,26 +1,16 @@
 module Main where
 
 import Prelude hiding ((<>))
-import BernardyPaper
 import qualified Criterion.Main as C
-import Text.Printf
-import LibTest
+
+import BernardyPaper
 import qualified Text.PrettyPrint.Compact as PC
 import qualified TextPatched.PrettyPrint.Compact as PCP
 
-data SExpr = SExpr [SExpr] | Atom String
-  deriving Show
+import LibTest
+import LibSExp
 
-foldD :: Monoid a => (a -> a -> a) -> [a] -> a
-foldD _ []       = mempty
-foldD f ds       = foldr1 f ds
-
-hsepPC = foldD (PC.<+>)
-hsepPCP = foldD (PCP.<+>)
-
-sepPC xs = hsepPC xs PC.<|> PC.vcat xs
-sepPCP xs = hsepPCP xs PCP.<|> PCP.vcat xs
-
+testExpr :: Int -> Int -> (SExpr, Int)
 testExpr 0 c = (Atom $ show c, c + 1)
 testExpr n c = (SExpr [t1, t2], c2)
   where (t1, c1) = testExpr (n-1) c
@@ -50,6 +40,7 @@ bench t conf = do
         | target conf == bernardyPaperTarget = render (pretty t :: CDoc)
         | target conf == bernardyLibTarget = PC.render (prettyPC t)
         | target conf == bernardyPatchedTarget = PCP.render (prettyPCP t)
+        | otherwise = error "impossible"
   return s
 
 core :: TestingFun
@@ -57,6 +48,7 @@ core conf = do
   let (t, _) = testExpr (size conf) 0
   return $ C.nfAppIO (instrument $ bench t) conf
 
+main :: IO ()
 main = do
   runIt
     "TestFullSExp"
@@ -66,5 +58,5 @@ main = do
       , bernardyPaperTarget
       , bernardyLibTarget
       , bernardyPatchedTarget]
-      (\conf -> Nothing))
+      (\_ -> Nothing))
     core

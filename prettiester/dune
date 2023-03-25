@@ -1,11 +1,12 @@
 (executables
  (names test_yelland_sup_linear
         test_yelland_dag
-        test_wadler_time
+        test_repeated_flatten
         test_wadler_opt
+        test_concat
         test_json
-        test_sexpr_full
-        test_sexpr_random
+        test_sexp_full
+        test_sexp_random
         test_fill_sep
         test)
  (libraries yojson core core_bench
