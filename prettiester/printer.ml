@@ -318,12 +318,8 @@ module Printer (C : CostFactory): PrinterT = struct
             let { id = a_idp; _ } as ap = flatten a in
             let { id = b_idp; _ } as bp = flatten b in
             if a_idp = a_id && b_idp = b_id then d else ap <|> bp
-          | Nest (n, ({ id; _ } as a)) ->
-            let { id = idp; _ } as ap = flatten a in
-            if idp = id then d else nest n ap
-          | Align ({ id; _ } as a) ->
-            let { id = idp; _ } as ap = flatten a in
-            if idp = id then d else align ap in
+          | Nest (_, d) | Align d -> flatten d
+        in
         Hashtbl.add cache id out;
         out
     in flatten
@@ -345,12 +341,8 @@ module Printer (C : CostFactory): PrinterT = struct
             let { id = a_idp; _ } as ap = flat a in
             let { id = b_idp; _ } as bp = flat b in
             if a_idp = a_id && b_idp = b_id then d else ap <|> bp
-          | Nest (n, ({ id; _ } as a)) ->
-            let { id = idp; _ } as ap = flat a in
-            if idp = id then d else nest n ap
-          | Align ({ id; _ } as a) ->
-            let { id = idp; _ } as ap = flat a in
-            if idp = id then d else align ap in
+          | Nest (_, d) | Align d -> flat d
+        in
         Hashtbl.add cache id out;
         out
     in flat
