@@ -54,8 +54,7 @@ module CorePrinter (C : CostFactory) = struct
 
   let calc2 d1 d2 =
     let max_weight = max d1.memo_weight d2.memo_weight in
-    if max_weight >= !param_memo_limit then 0
-    else max_weight + 1
+    if max_weight >= !param_memo_limit then 0 else max_weight + 1
 
   (* constants (next_id is evaluated only once) *)
   let fail = { dc = Fail;
@@ -157,15 +156,18 @@ module CorePrinter (C : CostFactory) = struct
           | [] -> List.rev (current_best :: result)
           | m2 :: ms2 ->
             let current = m1 ++ m2 in
-            if current <== current_best then loop ms2 result current
+            if C.le current.cost current_best.cost then loop ms2 result current
             else loop ms2 (current_best :: result) current
         in match process_left m1 with
         | Tainted m2 -> Tainted (fun () -> m1 ++ m2 ())
         | MeasureSet (m2 :: ms2) -> MeasureSet (loop ms2 [] (m1 ++ m2))
-        | _ -> failwith "unreachable"
-      in match ms1 with
-      | [] -> failwith "unreachable"
-      | m1 :: tl -> List.fold_left merge (do_one m1) (List.map do_one tl)
+        | _ -> failwith "unreachable" in
+      let rec fold_right (ms: measure list): measure_set =
+        match ms with
+        | [] -> failwith "unreachable"
+        | [m] -> do_one m
+        | m :: ms -> merge (do_one m) (fold_right ms)
+      in fold_right ms1
 
   let memoize f: doc -> int -> int -> measure_set =
     let all_slots = C.limit + 1 in
