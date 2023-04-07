@@ -2,6 +2,18 @@ let param_memo_limit = ref 6
 let param_view_cost = ref false
 let param_view_memo = ref false
 
+type 's treeof =
+  | One of 's
+  | Cons of ('s treeof) * ('s treeof)
+
+let flatten (t: 's treeof): 's list =
+  let rec loop (t: 's treeof) (acc: 's list) =
+    match t with
+    | One v -> v :: acc
+    | Cons (x, y) -> loop x (loop y acc)
+  in
+  loop t []
+
 module type CostFactory =
 sig
   type t
@@ -38,11 +50,11 @@ module CorePrinter (C : CostFactory) = struct
     { dc: doc_case;
       id: int;
       memo_weight: int;
-      nl_cnt: int option;
+      nl_cnt: int;
       mutable table: ((int, measure_set) Hashtbl.t) option }
   and doc_case =
     | Fail
-    | Text of string
+    | Text of (string treeof) * int
     | Newline
     | Concat of doc * doc
     | Nest of int * doc
@@ -60,49 +72,59 @@ module CorePrinter (C : CostFactory) = struct
   let fail = { dc = Fail;
                id = next_id ();
                memo_weight = 1;
-               nl_cnt = None;
+               nl_cnt = 0;
                table = None }
   let nl = { dc = Newline;
              id = next_id ();
              memo_weight = 1;
-             nl_cnt = Some 1;
+             nl_cnt = 1;
              table = None }
 
   (* functions *)
-  let text s = { dc = Text s;
+  let text s = { dc = Text (One s, String.length s);
                  id = next_id ();
                  memo_weight = 1;
-                 nl_cnt = Some 0;
+                 nl_cnt = 0;
                  table = None }
 
   let (<>) (d1 : doc) (d2 : doc) =
-    (* We can partially evaluate text concatenation, *)
-    (* but this requires a better representation of text *)
-    (* to avoid O(n^2) from repeated concatenation *)
-    if d1 == fail || d2 == fail then fail
-    else { dc = Concat (d1, d2);
-           id = next_id ();
-           memo_weight = calc2 d1 d2;
-           nl_cnt = Option.bind d1.nl_cnt (fun nl1 ->
-               Option.bind d2.nl_cnt (fun nl2 ->
-                   Some (nl1 + nl2))) ;
-           table = None }
+    match (d1.dc, d2.dc) with
+    | (Fail, _) -> fail
+    | (_, Fail) -> fail
+    | (Text (_, 0), _) -> d2
+    | (_, Text (_, 0)) -> d1
+    | (Text (s1, l1), Text (s2, l2)) ->
+      { dc = Text (Cons (s1, s2), l1 + l2);
+        id = next_id ();
+        memo_weight = 1;
+        nl_cnt = 0;
+        table = None }
+    | _ ->
+      { dc = Concat (d1, d2);
+        id = next_id ();
+        memo_weight = calc2 d1 d2;
+        nl_cnt = d1.nl_cnt + d2.nl_cnt;
+        table = None }
 
   let nest (n : int) (d : doc) =
-    if d == fail then fail
-    else { dc = Nest (n, d);
-           id = next_id ();
-           memo_weight = calc1 d;
-           nl_cnt = d.nl_cnt;
-           table = None }
+    match d.dc with
+    | Fail | Align _ | Text _ -> d
+    | _ ->
+      { dc = Nest (n, d);
+        id = next_id ();
+        memo_weight = calc1 d;
+        nl_cnt = d.nl_cnt;
+        table = None }
 
   let align d =
-    if d == fail then fail
-    else { dc = Align(d);
-           id = next_id ();
-           memo_weight = calc1 d;
-           nl_cnt = d.nl_cnt;
-           table = None }
+    match d.dc with
+    | Fail | Align _ | Text _ -> d
+    | _ ->
+      { dc = Align d;
+        id = next_id ();
+        memo_weight = calc1 d;
+        nl_cnt = d.nl_cnt;
+        table = None }
 
   let (<|>) d1 d2 =
     if d1 == fail then d2
@@ -110,9 +132,7 @@ module CorePrinter (C : CostFactory) = struct
     else { dc = Choice (d1, d2);
            id = next_id ();
            memo_weight = calc2 d1 d2;
-           nl_cnt = Option.bind d1.nl_cnt (fun nl1 ->
-               Option.bind d2.nl_cnt (fun nl2 ->
-                   Some (max nl1 nl2)));
+           nl_cnt = max d1.nl_cnt d2.nl_cnt;
            table = None }
 
   let merge (ml1 : measure_set) (ml2 : measure_set): measure_set =
@@ -198,11 +218,10 @@ module CorePrinter (C : CostFactory) = struct
       let core () =
         match dc with
         | Fail -> failwith "fails to render"
-        | Text s ->
-          let len_s = String.length s in
+        | Text (s, len_s) ->
           MeasureSet [{ last = c + len_s;
                         cost = C.place c len_s;
-                        layout = fun ss -> s :: ss }]
+                        layout = fun ss -> (flatten s) @ ss }]
         | Newline ->
           MeasureSet [{ last = i;
                         cost = (C.combine C.newline (C.place 0 i));
@@ -215,7 +234,7 @@ module CorePrinter (C : CostFactory) = struct
           if d1.nl_cnt < d2.nl_cnt then merge (self d2 c i) (self d1 c i)
           else merge (self d1 c i) (self d2 c i) in
       let exceeds = match dc with
-        | Text s -> (c + String.length s > C.limit) || (i > C.limit)
+        | Text (_, len) -> (c + len > C.limit) || (i > C.limit)
         | _ -> (c > C.limit) || (i > C.limit) in
       if exceeds then
         Tainted
