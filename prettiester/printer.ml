@@ -6,25 +6,21 @@ type 's treeof =
   | One of 's
   | Cons of ('s treeof) * ('s treeof)
 
-let flatten (t: 's treeof): 's list =
+let tree_flatten (t: 's treeof): 's list =
   let rec loop (t: 's treeof) (acc: 's list) =
     match t with
     | One v -> v :: acc
     | Cons (x, y) -> loop x (loop y acc)
-  in
-  loop t []
+  in loop t []
 
 module type CostFactory =
 sig
   type t
-
   val place : int -> int -> t
   val newline : t
   val combine : t -> t -> t
   val le : t -> t -> bool
-
   val limit: int
-
   val debug : t -> string
 end
 
@@ -35,9 +31,7 @@ module CorePrinter (C : CostFactory) = struct
     global_id := id + 1;
     id
 
-  type measure = { last: int;
-                   cost: C.t;
-                   layout: string list -> string list }
+  type measure = { last: int; cost: C.t; layout: string list -> string list }
 
   let (<==) (m1 : measure) (m2 : measure): bool =
     m1.last <= m2.last && C.le m1.cost m2.cost
@@ -49,7 +43,7 @@ module CorePrinter (C : CostFactory) = struct
   type doc =
     { dc: doc_case;
       id: int;
-      memo_weight: int;
+      memo_w: int;
       nl_cnt: int;
       mutable table: ((int, measure_set) Hashtbl.t) option }
   and doc_case =
@@ -61,77 +55,67 @@ module CorePrinter (C : CostFactory) = struct
     | Align of doc
     | Choice of doc * doc
 
-  let calc1 d =
-    if d.memo_weight >= !param_memo_limit then 0 else d.memo_weight + 1
+  let calc1 d = if d.memo_w >= !param_memo_limit then 0 else d.memo_w + 1
 
   let calc2 d1 d2 =
-    let max_weight = max d1.memo_weight d2.memo_weight in
+    let max_weight = max d1.memo_w d2.memo_w in
     if max_weight >= !param_memo_limit then 0 else max_weight + 1
 
-  (* constants (next_id is evaluated only once) *)
   let fail = { dc = Fail;
                id = next_id ();
-               memo_weight = 1;
+               memo_w = 1;
                nl_cnt = 0;
                table = None }
   let nl = { dc = Newline;
              id = next_id ();
-             memo_weight = 1;
+             memo_w = 1;
              nl_cnt = 1;
              table = None }
 
-  (* functions *)
-  let text s = { dc = Text (One s, String.length s);
-                 id = next_id ();
-                 memo_weight = 1;
-                 nl_cnt = 0;
-                 table = None }
+  let make_text s l = { dc = Text (s, l);
+                      id = next_id ();
+                      memo_w = 1;
+                      nl_cnt = 0;
+                      table = None }
+
+  let text s = make_text (One s) (String.length s)
 
   let (<>) (d1 : doc) (d2 : doc) =
     match (d1.dc, d2.dc) with
-    | (Fail, _) -> fail
-    | (_, Fail) -> fail
+    | (Fail, _) | (_, Fail) -> fail
     | (Text (_, 0), _) -> d2
     | (_, Text (_, 0)) -> d1
-    | (Text (s1, l1), Text (s2, l2)) ->
-      { dc = Text (Cons (s1, s2), l1 + l2);
-        id = next_id ();
-        memo_weight = 1;
-        nl_cnt = 0;
-        table = None }
-    | _ ->
-      { dc = Concat (d1, d2);
-        id = next_id ();
-        memo_weight = calc2 d1 d2;
-        nl_cnt = d1.nl_cnt + d2.nl_cnt;
-        table = None }
+    | (Text (s1, l1), Text (s2, l2)) -> make_text (Cons (s1, s2)) (l1 + l2)
+    | _ -> { dc = Concat (d1, d2);
+             id = next_id ();
+             memo_w = calc2 d1 d2;
+             nl_cnt = d1.nl_cnt + d2.nl_cnt;
+             table = None }
 
   let nest (n : int) (d : doc) =
     match d.dc with
     | Fail | Align _ | Text _ -> d
-    | _ ->
-      { dc = Nest (n, d);
-        id = next_id ();
-        memo_weight = calc1 d;
-        nl_cnt = d.nl_cnt;
-        table = None }
+    | _ -> { dc = Nest (n, d);
+             id = next_id ();
+             memo_w = calc1 d;
+             nl_cnt = d.nl_cnt;
+             table = None }
 
   let align d =
     match d.dc with
     | Fail | Align _ | Text _ -> d
-    | _ ->
-      { dc = Align d;
-        id = next_id ();
-        memo_weight = calc1 d;
-        nl_cnt = d.nl_cnt;
-        table = None }
+    | _ -> { dc = Align d;
+             id = next_id ();
+             memo_w = calc1 d;
+             nl_cnt = d.nl_cnt;
+             table = None }
 
   let (<|>) d1 d2 =
     if d1 == fail then d2
     else if d2 == fail then d1
     else { dc = Choice (d1, d2);
            id = next_id ();
-           memo_weight = calc2 d1 d2;
+           memo_w = calc2 d1 d2;
            nl_cnt = max d1.nl_cnt d2.nl_cnt;
            table = None }
 
@@ -148,8 +132,7 @@ module CorePrinter (C : CostFactory) = struct
           else if m2 <== m1 then loop ms1p ms2
           else if m1.last > m2.last then m1 :: loop ms1p ms2
           else (* m2.last < m1.last *) m2 :: loop ms1 ms2p
-      in
-      MeasureSet (loop ms1 ms2)
+      in MeasureSet (loop ms1 ms2)
 
   let (++) (m1 : measure) (m2 : measure): measure =
     { last = m2.last;
@@ -161,14 +144,12 @@ module CorePrinter (C : CostFactory) = struct
       (ml1 : measure_set) =
     match ml1 with
     | Tainted mt1 ->
-      Tainted
-        (fun () ->
-           let m1 = mt1 () in
-           match process_left m1 with
-           | Tainted mt2 -> m1 ++ mt2 ()
-           | MeasureSet (m2 :: _) -> m1 ++ m2
-           | _ -> failwith "impossible")
-
+      Tainted (fun () ->
+          let m1 = mt1 () in
+          match process_left m1 with
+          | Tainted mt2 -> m1 ++ mt2 ()
+          | MeasureSet (m2 :: _) -> m1 ++ m2
+          | _ -> failwith "impossible")
     | MeasureSet ms1 ->
       let do_one (m1 : measure): measure_set =
         let rec loop ms2 result current_best =
@@ -191,11 +172,8 @@ module CorePrinter (C : CostFactory) = struct
 
   let memoize f: doc -> int -> int -> measure_set =
     let all_slots = C.limit + 1 in
-    let rec g
-        ({ memo_weight; table; _ } as d)
-        (c : int)
-        (i : int) =
-      if c <= C.limit && i <= C.limit && memo_weight = 0 then
+    let rec g ({ memo_w; table; _ } as d) (c : int) (i : int) =
+      if c <= C.limit && i <= C.limit && memo_w = 0 then
         let key = i * all_slots + c in
         match table with
         | None ->
@@ -221,7 +199,7 @@ module CorePrinter (C : CostFactory) = struct
         | Text (s, len_s) ->
           MeasureSet [{ last = c + len_s;
                         cost = C.place c len_s;
-                        layout = fun ss -> (flatten s) @ ss }]
+                        layout = fun ss -> (tree_flatten s) @ ss }]
         | Newline ->
           MeasureSet [{ last = i;
                         cost = (C.combine C.newline (C.place 0 i));
@@ -237,12 +215,11 @@ module CorePrinter (C : CostFactory) = struct
         | Text (_, len) -> (c + len > C.limit) || (i > C.limit)
         | _ -> (c > C.limit) || (i > C.limit) in
       if exceeds then
-        Tainted
-          (fun () ->
-             match core () with
-             | Tainted mt -> mt ()
-             | MeasureSet (m :: _) -> m
-             | _ -> failwith "impossible")
+        Tainted (fun () ->
+            match core () with
+            | Tainted mt -> mt ()
+            | MeasureSet (m :: _) -> m
+            | _ -> failwith "impossible")
       else core () in
     let m = match memoize render d 0 0 with
       | MeasureSet (m :: ms) -> m
@@ -250,6 +227,9 @@ module CorePrinter (C : CostFactory) = struct
         if !param_view_cost then Printf.printf "tainted\n";
         m ()
       | _ -> failwith "impossible" in
+    let s = String.concat "" (m.layout []) in
+
+    (* For debugging *)
     if !param_view_cost then
       Printf.printf "last: %d, cost: %s\n" m.last (C.debug m.cost);
     if !param_view_memo then begin
@@ -269,15 +249,13 @@ module CorePrinter (C : CostFactory) = struct
           | Nest (_, d) | Align d -> current +++ count d
         end in
       let (num_entries, num_memo, num_all) = count d in
-      print_newline ();
-      Printf.printf "all entries: %d\n" num_entries;
+      Printf.printf "\nall entries: %d\n" num_entries;
       Printf.printf "average entries per node: %f\n"
         ((Float.of_int num_entries) /. (Float.of_int num_memo));
       Printf.printf "nodes with memoization = %d\n" num_memo;
       Printf.printf "all nodes = %d\n" num_all
     end;
-
-    String.concat "" (m.layout [])
+    s
 end
 
 (* ----------------------------------------------------------------------0---- *)
