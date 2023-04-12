@@ -390,24 +390,26 @@ sig
 end
 
 module Cost (C: Config): CostFactory = struct
-  type t = int * int * int
+  type t = int * int
   let limit = C.limit
 
   let place pos len =
     let stop = pos + len in
-    if pos + len > C.width_limit then (stop, stop - max C.width_limit pos, 0)
-    else (0, 0, 0)
+    if stop > C.width_limit then
+      let start = max C.width_limit pos in
+      let a = start - C.width_limit in
+      let b = stop - C.width_limit in
+      (b * (2*a + b), 0)
+    else
+      (0, 0)
 
-  let newline = (0, 0, 1)
+  let newline = (0, 1)
 
-  let combine (maxl1, o1, h1) (maxl2, o2, h2) =
-    (max maxl1 maxl2, o1 + o2, h1 + h2)
+  let combine (o1, h1) (o2, h2) =
+    (o1 + o2, h1 + h2)
 
-  let le (maxl1, o1, h1) (maxl2, o2, h2) =
-    if maxl1 = maxl2 then
-      if o1 = o2 then h1 <= h2
-      else o1 < o2
-    else maxl1 < maxl2
+  let le (o1, h1) (o2, h2) =
+    if o1 = o2 then h1 <= h2 else o1 < o2
 
-  let debug (maxl, o, h) = Printf.sprintf "{maxl: %d, o: %d, h: %d}" maxl o h
+  let debug (o, h) = Printf.sprintf "{o: %d, h: %d}" o h
 end
