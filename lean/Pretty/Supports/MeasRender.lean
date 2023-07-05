@@ -65,11 +65,11 @@ lemma MeasRender_doc (h_render : MeasRender F d c i m) (h : Choiceless d) : m.do
   let ⟨⟨s, ss⟩, h⟩ := @Render_total d c i h
   cases ss 
   case nil => 
-    let ⟨cost, ⟨y, h_render'⟩⟩ := MeasRender_single_line_correct F h
+    let ⟨cost, ⟨y, h_render'⟩⟩ := MeasRender_single_correct F h
     cases MeasRender_deterministic h_render h_render'
     simp
   case cons hd tl => 
-    let ⟨cost, ⟨y, h_render'⟩⟩ := MeasRender_multi_line_correct F h (by simp)
+    let ⟨cost, ⟨y, h_render'⟩⟩ := MeasRender_multi_correct F h (by simp)
     cases MeasRender_deterministic h_render h_render'
     simp
 }

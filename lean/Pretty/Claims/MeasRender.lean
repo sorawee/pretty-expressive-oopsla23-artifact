@@ -25,7 +25,7 @@ theorem MeasRender_deterministic {F : Factory α} {m₁ m₂ : Meas}
 Correctness of the measure computation relation 
 when rendering results in one line (Theorem 5.3)
 -/
-theorem MeasRender_single_line_correct (F : Factory α) 
+theorem MeasRender_single_correct (F : Factory α) 
     (h_render : Render d c i ⟨s, []⟩) : 
     ∃ cost y, MeasRender F d c i ⟨c + s.length, cost, d, c + s.length, y⟩ := by
   induction d generalizing c i s
@@ -82,7 +82,7 @@ theorem MeasRender_single_line_correct (F : Factory α)
 Correctness of the measure computation relation 
 when rendering results in multiple lines (Theorem 5.3)
 -/
-theorem MeasRender_multi_line_correct (F : Factory α) 
+theorem MeasRender_multi_correct (F : Factory α) 
     (h_render : Render d c i ⟨s, ss⟩) (h_non_empty : ss ≠ []) : 
     ∃ cost y, MeasRender F d c i ⟨(List.getLast ss h_non_empty).length,
                                   cost, d, 
@@ -119,7 +119,7 @@ theorem MeasRender_multi_line_correct (F : Factory α)
   case concat ih₁ ih₂ => 
     cases h_render 
     case concat_one s t h₁ h₂ => 
-      let ⟨cost₁, ⟨y₁, _⟩⟩ := MeasRender_single_line_correct F h₁
+      let ⟨cost₁, ⟨y₁, _⟩⟩ := MeasRender_single_correct F h₁
       let ⟨cost₂, ⟨y₂, _⟩⟩ := ih₂ h₂ h_non_empty
       exists F.concat cost₁ cost₂, max y₁ y₂
       have h_x : Layout.max_with_offset c ⟨s ++ t, ss⟩ = 
@@ -136,7 +136,7 @@ theorem MeasRender_multi_line_correct (F : Factory α)
         simp [List.dropLast_append_getLast]
       cases ts
       case nil => 
-        let ⟨cost₂, ⟨y₂, _⟩⟩ := MeasRender_single_line_correct F h₂
+        let ⟨cost₂, ⟨y₂, _⟩⟩ := MeasRender_single_correct F h₂
         exists F.concat cost₁ cost₂, max y₁ y₂
         have h_x : Layout.max_with_offset c ⟨s, List.dropLast ss ++ [slast ++ t] ++ []⟩ = 
             max (Layout.max_with_offset c ⟨s, ss⟩) (slast.length + t.length) := by {
@@ -187,9 +187,9 @@ theorem MeasRender_total (F : Factory α) (d : Doc) (c i : ℕ) (h : Choiceless 
   let ⟨⟨s, ss⟩, h⟩ := Render_total c i h
   cases ss 
   case nil => 
-    let ⟨cost, ⟨y, _⟩⟩ := MeasRender_single_line_correct F h 
+    let ⟨cost, ⟨y, _⟩⟩ := MeasRender_single_correct F h 
     exists ⟨c + s.length, cost, d, c + s.length, y⟩
   case cons hd tl => 
-    let ⟨cost, ⟨y, _⟩⟩ := MeasRender_multi_line_correct F h (by simp)
+    let ⟨cost, ⟨y, _⟩⟩ := MeasRender_multi_correct F h (by simp)
     exists ⟨(List.getLast (hd :: tl) (by simp)).length, cost, 
             d, Layout.max_with_offset c (Layout.mk s (hd :: tl)), y⟩
