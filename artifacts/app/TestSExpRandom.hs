@@ -9,6 +9,7 @@ import Data.Foldable (toList)
 
 import qualified Text.PrettyPrint.Compact as PC
 import qualified TextPatched.PrettyPrint.Compact as PCP
+import qualified Text.PrettyPrint.Leijen   as WL
 import BernardyPaper
 
 import LibTest
@@ -33,12 +34,17 @@ pretty  (SExpr xs)  =   text "(" <>
                         (sep $ map pretty xs) <>
                         text ")"
 
+prettyWL :: SExpr -> WL.Doc
+prettyWL  (Atom s)  = WL.text s
+prettyWL  (SExpr xs)  = WL.text "(" WL.<> (WL.align (WL.sep $ map prettyWL xs)) WL.<> WL.text ")"
+
 bench :: SExpr -> TestingProc
 bench t conf = do
   let s | target conf == bernardyMeasureTarget = render (pretty t :: DM)
         | target conf == bernardyPaperTarget = render (pretty t :: CDoc)
         | target conf == bernardyLibTarget = PC.render (prettyPC t)
         | target conf == bernardyPatchedTarget = PCP.render (prettyPCP t)
+        | target conf == wadlerTarget = wlRender (prettyWL t)
         | otherwise = error "impossible"
   return s
 
@@ -64,6 +70,7 @@ main = do
       [ bernardyMeasureTarget
       , bernardyPaperTarget
       , bernardyLibTarget
+      , wadlerTarget
       , bernardyPatchedTarget]
       (\_ -> Nothing))
     core
