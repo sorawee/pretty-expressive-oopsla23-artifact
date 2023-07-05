@@ -1,5 +1,5 @@
-import Pretty.Def
-import Pretty.DominationLemma
+import Pretty.Defs.Basic
+import Pretty.Supports.Domination
 
 lemma merge_not_empty (h : ms₁ ≠ [] ∨ ms₂ ≠ []) : 
     @merge _ F ⟨ms₁, ms₂⟩ ≠ [] := by 

@@ -1,11 +1,17 @@
-import Pretty.ResolveDef
-import Pretty.MeasRenderThm
-import Pretty.ResolveLemma
-import Pretty.ResolveParetoLemma
-import Pretty.ResolveOptimalityLemma
-import Pretty.WidenThm
+import Pretty.Defs.Resolve
+import Pretty.Supports.MeasRender
+import Pretty.Supports.ResolvePareto
+import Pretty.Supports.ResolveOptimality
+import Pretty.Claims.Widen
+
+/-!
+## Optimality theorems
+-/
 
 mutual
+  /--
+  The optimality theorem (Theorem 5.7)
+  -/
   theorem Resolve_optimal 
       (h_print : Resolve F d c i ml)
       (h_widen : Widen d D) (h_mem : d_choiceless ∈ D) 

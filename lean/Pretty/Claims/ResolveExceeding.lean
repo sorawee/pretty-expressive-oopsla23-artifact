@@ -1,8 +1,13 @@
-import Pretty.ResolveDef
-import Pretty.MeasRenderThm
-import Pretty.ParetoThm
+import Pretty.Defs.Resolve
+import Pretty.Claims.MeasRender
+import Pretty.Supports.Pareto
 
-lemma bad_taint_mode_always_tainted 
+/--
+If resolving happens at a printing context that 
+exceeds $W_\mathcal{F}$, the result will always 
+be tainted (Lemma 5.10)
+-/
+lemma exceeds_tainted
   (h : Resolve F d c i ms) 
   (h_bad : c > F.W ∨ i > F.W) : ∃ m, ms = MeasureSet.tainted m := by 
   induction d generalizing c i ms

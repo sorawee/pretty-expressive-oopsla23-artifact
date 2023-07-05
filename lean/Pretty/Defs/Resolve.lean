@@ -1,6 +1,6 @@
-import Pretty.Def
-import Pretty.MeasureSetOpDef
-import Pretty.DedupLemma
+import Pretty.Defs.Basic
+import Pretty.Defs.MeasureSetOp
+import Pretty.Supports.Dedup
 
 section Resolve 
 

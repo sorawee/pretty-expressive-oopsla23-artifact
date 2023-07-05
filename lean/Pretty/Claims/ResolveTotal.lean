@@ -1,42 +1,14 @@
-import Pretty.ResolveDetThm
-import Pretty.DocSizeLemma
+import Pretty.Claims.ResolveDet
+import Pretty.Supports.DocSize
 
 /-!
-Totality of resolving (Page 19, Section 5.6)
+## Totality of resolving theorems
 -/
 
 mutual 
-  theorem ResolveConcatOne_total (F : Factory α) (d : Doc) (m : Meas) (i : ℕ) : ∃ msr, ResolveConcatOne F d m i msr := by 
-    let ⟨ms, h⟩ := Resolve_total F d m.lw i
-    cases ms 
-    case set ms h' =>
-      exists MeasureSet.set (dedup F (ms.map (fun m' => Meas.concat F m m'))) (by {
-        apply dedup_not_empty
-        simp [h']
-      })
-      constructor <;> assumption
-    case tainted m' => 
-      exists MeasureSet.tainted (Meas.concat F m m')
-      constructor
-      assumption
-
-  theorem ResolveConcat_total  (F : Factory α) (ms : List Meas) (d : Doc)
-      (i : ℕ)
-      (h_non_empty : ms ≠ []) : 
-      ∃ msr, ResolveConcat F ms d i msr := by 
-    match ms with 
-    | [] => contradiction
-    | [m] => 
-      let ⟨msr, h⟩ := ResolveConcatOne_total F d m i
-      exists msr 
-      constructor
-      assumption
-    | m :: hd :: tl => 
-      let ⟨msr, h⟩ := ResolveConcat_total F (hd :: tl) d i (by simp)
-      let ⟨msr', h'⟩ := ResolveConcatOne_total F d m i 
-      exists MeasureSet.union F msr' msr
-      dwi { constructor }
-
+  /--
+  The totality of resolving (Page 19, Section 5.6)
+  -/
   theorem Resolve_total (F : Factory α) (d : Doc) (c i : ℕ) : ∃ ms, Resolve F d c i ms := by 
     match d with
     | Doc.text s => 
@@ -114,6 +86,37 @@ mutual
         let ⟨msr, h'⟩ := ResolveConcat_total F ms d₂ i h_non_empty
         exists msr
         constructor <;> assumption
+
+  theorem ResolveConcatOne_total (F : Factory α) (d : Doc) (m : Meas) (i : ℕ) : ∃ msr, ResolveConcatOne F d m i msr := by 
+    let ⟨ms, h⟩ := Resolve_total F d m.lw i
+    cases ms 
+    case set ms h' =>
+      exists MeasureSet.set (dedup F (ms.map (fun m' => Meas.concat F m m'))) (by {
+        apply dedup_not_empty
+        simp [h']
+      })
+      constructor <;> assumption
+    case tainted m' => 
+      exists MeasureSet.tainted (Meas.concat F m m')
+      constructor
+      assumption
+
+  theorem ResolveConcat_total  (F : Factory α) (ms : List Meas) (d : Doc)
+      (i : ℕ)
+      (h_non_empty : ms ≠ []) : 
+      ∃ msr, ResolveConcat F ms d i msr := by 
+    match ms with 
+    | [] => contradiction
+    | [m] => 
+      let ⟨msr, h⟩ := ResolveConcatOne_total F d m i
+      exists msr 
+      constructor
+      assumption
+    | m :: hd :: tl => 
+      let ⟨msr, h⟩ := ResolveConcat_total F (hd :: tl) d i (by simp)
+      let ⟨msr', h'⟩ := ResolveConcatOne_total F d m i 
+      exists MeasureSet.union F msr' msr
+      dwi { constructor }
 end
 termination_by 
   ResolveConcatOne_total => (d.size, 1, 0)

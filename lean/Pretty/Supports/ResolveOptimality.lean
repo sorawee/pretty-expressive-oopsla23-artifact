@@ -1,7 +1,6 @@
-import Pretty.ResolveDef
-import Pretty.MeasRenderThm
-import Pretty.ResolveLemma
-import Pretty.ResolveParetoLemma
+import Pretty.Defs.Resolve
+import Pretty.Claims.MeasRender
+import Pretty.Supports.ResolvePareto
 
 theorem Resolve_optimal_text
       (h_print : Resolve F (Doc.text s) c i ml)

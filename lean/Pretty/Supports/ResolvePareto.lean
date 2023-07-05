@@ -1,6 +1,6 @@
-import Pretty.ResolveLemma
-import Pretty.MergeLemma
-import Pretty.DocSizeLemma
+import Pretty.Supports.Merge
+import Pretty.Supports.DocSize
+import Pretty.Defs.Resolve
 
 mutual
   lemma ResolveConcatOne_pareto 

@@ -1,4 +1,4 @@
-import Pretty.ResolveParetoLemma 
+import Pretty.Supports.ResolvePareto
 
 /-!
 This set of lemmas states that a measure set from resolving will consist of 

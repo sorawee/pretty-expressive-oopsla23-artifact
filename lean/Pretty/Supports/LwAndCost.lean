@@ -1,7 +1,7 @@
-import Pretty.Def
-import Pretty.Basic
-import Pretty.FactoryMathLemma
-import Pretty.DominationLemma
+import Pretty.Defs.Basic
+import Pretty.Supports.Basic
+import Pretty.Supports.FactoryMath
+import Pretty.Supports.Domination
 
 /-!
 Various lemmas about list of measures when 

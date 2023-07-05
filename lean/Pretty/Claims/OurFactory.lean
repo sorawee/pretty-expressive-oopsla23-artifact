@@ -1,15 +1,15 @@
-import Pretty.FactoryDef
+import Pretty.Defs.Factory
 import Pretty.Tactic
 
 /-!
-The cost factory for SnowWhite (Section 6)
+## The cost factory for SnowWhite
 -/
 
 def maxw : ℕ := 80 
 
 /--
 The cost factory for SnowWhite (Section 6) along with proofs that 
-the operations satisfy the contract imposed by the cost factory interface.
+the operations satisfy the contracts imposed by the cost factory interface.
 -/
 def ourFactory : Factory (ℕ × ℕ) := 
   {

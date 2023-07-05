@@ -1,7 +1,6 @@
-import Pretty.Def
-import Pretty.ParetoThm
-import Mathlib.Data.List.Basic
-import Pretty.MergeBasicLemma
+import Pretty.Defs.Basic
+import Pretty.Supports.Pareto
+import Pretty.Supports.MergeBasic
 
 lemma merge_first_dom (ms₁ : List Meas) 
     (h_pareto₂ : pareto F (m₂ :: ms₂))

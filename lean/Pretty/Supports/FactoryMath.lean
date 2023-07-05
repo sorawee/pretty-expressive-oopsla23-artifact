@@ -1,4 +1,4 @@
-import Pretty.FactoryDef
+import Pretty.Defs.Factory
 import Pretty.Tactic
 
 /-!

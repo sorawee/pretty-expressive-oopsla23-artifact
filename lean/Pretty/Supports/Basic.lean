@@ -1,9 +1,11 @@
 import Mathlib.Tactic.Linarith.Frontend
 import Mathlib.Tactic.LibrarySearch
 import Mathlib.Tactic.ClearExcept
+import Mathlib.Data.List.Basic
+import Mathlib.Data.String.Lemmas
 
 /-!
-Basic lemmas about built-in types
+## Basic lemmas about built-in types
 -/
 
 lemma List.fold_max_max_eq_max_fold_max : 

@@ -1,5 +1,5 @@
-import Pretty.Def
-import Pretty.MergeBasicLemma
+import Pretty.Defs.Basic
+import Pretty.Supports.MergeBasic
 
 /-!
 Various measure set operations (Figure 12), which consist of:

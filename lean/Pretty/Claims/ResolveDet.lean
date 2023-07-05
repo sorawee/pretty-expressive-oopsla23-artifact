@@ -1,44 +1,15 @@
-import Pretty.ResolveLemma
-import Pretty.DocSizeLemma
+import Pretty.Supports.DocSize
+import Pretty.Defs.Resolve
+import Pretty.Claims.MeasRender
 
 /-!
-Determinism of resolving (Page 19, Section 5.6)
+## Determinism of resolving theorems
 -/
 
 mutual 
-  theorem ResolveConcatOne_deterministic 
-      (h₁ : ResolveConcatOne F d m i msr₁)
-      (h₂ : ResolveConcatOne F d m i msr₂) : 
-      msr₁ = msr₂ := by
-    cases h₁
-    case tainted h₁ => 
-      cases h₂
-      case tainted h₂ => 
-        cases Resolve_deterministic h₁ h₂
-        simp
-      case set h₂ => cases Resolve_deterministic h₁ h₂
-    case set h₁ => 
-      cases h₂
-      case tainted h₂ => cases Resolve_deterministic h₁ h₂
-      case set h₂ => 
-        cases Resolve_deterministic h₁ h₂
-        simp
-
-  theorem ResolveConcat_deterministic {ms : List Meas}
-      (h₁ : ResolveConcat F ms d i msr₁)
-      (h₂ : ResolveConcat F ms d i msr₂) : 
-      msr₁ = msr₂ := by
-    cases h₁ 
-    case one => 
-      dwi { cases h₂ }
-      case one => apply ResolveConcatOne_deterministic <;> assumption
-    case cons h_rest₁ h_current₁ => 
-      dwi { cases h₂ } 
-      case cons h_current₂ h_rest₂ => 
-        cases ResolveConcatOne_deterministic h_current₁ h_current₂
-        cases ResolveConcat_deterministic h_rest₁ h_rest₂
-        simp
-
+  /--
+  The determinism of resolving (Page 19, Section 5.6)
+  -/
   theorem Resolve_deterministic (h₁ : Resolve F d c i ms₁) (h₂ : Resolve F d c i ms₂) : ms₁ = ms₂ := by {
     match d with 
     | Doc.text _ => 
@@ -147,6 +118,39 @@ mutual
           cases ResolveConcat_deterministic h_right₁ h_right₂ 
           simp         
   }
+
+  theorem ResolveConcatOne_deterministic 
+      (h₁ : ResolveConcatOne F d m i msr₁)
+      (h₂ : ResolveConcatOne F d m i msr₂) : 
+      msr₁ = msr₂ := by
+    cases h₁
+    case tainted h₁ => 
+      cases h₂
+      case tainted h₂ => 
+        cases Resolve_deterministic h₁ h₂
+        simp
+      case set h₂ => cases Resolve_deterministic h₁ h₂
+    case set h₁ => 
+      cases h₂
+      case tainted h₂ => cases Resolve_deterministic h₁ h₂
+      case set h₂ => 
+        cases Resolve_deterministic h₁ h₂
+        simp
+
+  theorem ResolveConcat_deterministic {ms : List Meas}
+      (h₁ : ResolveConcat F ms d i msr₁)
+      (h₂ : ResolveConcat F ms d i msr₂) : 
+      msr₁ = msr₂ := by
+    cases h₁ 
+    case one => 
+      dwi { cases h₂ }
+      case one => apply ResolveConcatOne_deterministic <;> assumption
+    case cons h_rest₁ h_current₁ => 
+      dwi { cases h₂ } 
+      case cons h_current₂ h_rest₂ => 
+        cases ResolveConcatOne_deterministic h_current₁ h_current₂
+        cases ResolveConcat_deterministic h_rest₁ h_rest₂
+        simp
 end
 termination_by 
   ResolveConcatOne_deterministic => (d.size, 1, 0)

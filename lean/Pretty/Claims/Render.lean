@@ -1,4 +1,4 @@
-import Pretty.Def
+import Pretty.Defs.Basic
 import Pretty.Tactic
 
 /--

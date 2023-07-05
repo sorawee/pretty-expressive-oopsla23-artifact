@@ -1,8 +1,8 @@
-import Pretty.Def
-import Pretty.FactoryMathLemma
+import Pretty.Defs.Basic
+import Pretty.Supports.FactoryMath
 
 /-! 
-Various lemmas about domination
+## Various lemmas about domination
 -/
 
 lemma dominates_refl (F : Factory α) : dominates F m m := by {
@@ -21,22 +21,6 @@ lemma dominates_trans {F : Factory α} (h : dominates F m₁ m₂) (h' : dominat
     . apply h.right
     . apply h'.right
 }
-
-lemma dominates_concat₁ (h : dominates F m₁ m₂) : dominates F (Meas.concat F m m₁) (Meas.concat F m m₂) := by 
-  simp [dominates] at * 
-  constructor 
-  case left => 
-    simp [h]
-  case right => 
-    apply F.concat_monotonic 
-    . apply F.le_refl 
-    . simp [h]
-
-lemma dominates_concat₂ (h : dominates F m₁ m₂) : dominates F (Meas.concat F m₁ m) (Meas.concat F m₂ m) := by 
-  simp [dominates] at * 
-  apply F.concat_monotonic
-  . simp [h]
-  . apply F.le_refl
 
 inductive FourCases (F : Factory α) (m₁ m₂ : Meas) : Prop where 
   | first_dom  (h_dom : dominates F m₁ m₂)
@@ -143,12 +127,4 @@ lemma four_cases (F : Factory α) (m₁ m₂ : Meas) : FourCases F m₁ m₂ := 
           intro 
           simp at h
           assumption
-}
-
-lemma eq_lw_implies_domination {F : Factory α} (m₁ m₂ : Meas) 
-    (h : m₁.lw = m₂.lw) : dominates F m₁ m₂ ∨ dominates F m₂ m₁ := by {
-  simp [dominates]
-  cases F.le_total m₁.cost m₂.cost <;> 
-    [left, right] <;>
-    simp [*]
 }

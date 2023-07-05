@@ -1,7 +1,7 @@
-import Pretty.LwAndCostLemma
+import Pretty.Supports.LwAndCost
 
 /-! 
-Various lemmas related to the `dedup` operation
+## Various lemmas related to the `dedup` operation
 -/
 
 lemma dedup_not_empty (h : ms ≠ []) : dedup F ms ≠ [] := by 

@@ -1,9 +1,9 @@
-import Pretty.Def
-import Pretty.Basic
-import Pretty.FactoryMathLemma
-import Pretty.DominationLemma
-import Pretty.LwAndCostLemma
-import Pretty.DedupLemma
+import Pretty.Defs.Basic
+import Pretty.Supports.Basic
+import Pretty.Supports.FactoryMath
+import Pretty.Supports.Domination
+import Pretty.Supports.LwAndCost
+import Pretty.Supports.Dedup
 
 /-!
 Various lemmas about `pareto`.
@@ -129,49 +129,3 @@ lemma pareto_map_lift_nest (n : ℕ) (h : pareto F ms) :
       case h_lw | h_cost => 
         replace h := pareto_head h 
         simp [Meas.adjust_nest, h]
-
-/--
-The traditional definition of Pareto frontier (Figure 12)
--/
-def pareto_nondom (F : Factory α) (ms : List (@Meas α)) : Prop := 
-  ∀ (i j : ℕ) (h_i : i < ms.length) (h_j : j < ms.length), 
-    i ≠ j → 
-    ¬ (dominates F (ms.get ⟨i, by assumption⟩) (ms.get ⟨j, by assumption⟩) ∨ 
-       dominates F (ms.get ⟨j, by assumption⟩) (ms.get ⟨i, by assumption⟩))
-
-/--
-Our definition of Pareto frontier implies the traditional definition.
--/
-theorem pareto_nondom_of_pareto (h : pareto F ms) : 
-    pareto_nondom F ms := by 
-  simp [pareto_nondom]
-  intro i j hi hj h_neq h_dom_either
-  simp only [pareto] at h 
-  replace h_lw := lw_decreasing_strong h.left 
-  replace h_cost := cost_increasing_strong h.right
-  simp [dominates] at h_dom_either 
-  have h_tri := Nat.lt_trichotomy i j 
-  cases h_tri 
-  case inl h_tri => 
-    cases h_dom_either
-    case inl h_dom => 
-      specialize h_lw i j hi hj h_tri
-      replace h_lw := Nat.not_le_of_lt h_lw
-      simp [h_dom.left] at h_lw
-    case inr h_dom => 
-      specialize h_cost i j hi hj h_tri
-      cases F.invalid_inequality h_dom.right h_cost (Factory.le_refl _)
-  case inr h_tri => 
-    cases h_tri
-    case inl h_tri => 
-      simp [h_neq] at h_tri
-    case inr h_tri => 
-      cases h_dom_either
-      case inl h_dom => 
-        simp at h_tri 
-        specialize h_cost j i hj hi h_tri
-        cases F.invalid_inequality h_dom.right h_cost (Factory.le_refl _)
-      case inr h_dom => 
-        specialize h_lw j i hj hi h_tri
-        replace h_lw := Nat.not_le_of_lt h_lw
-        simp [h_dom.left] at h_lw

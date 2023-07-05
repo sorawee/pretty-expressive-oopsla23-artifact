@@ -1,8 +1,9 @@
-import Pretty.ResolveLastLemma 
-import Pretty.ResolveParetoLemma
-  
+import Pretty.Supports.ResolveLast 
+import Pretty.Supports.ResolvePareto
+
 /--
-A measure set from resolving will have size at most F.W + 1 (Lemma 5.9) 
+A measure set from resolving will have size 
+at most $W_\mathcal{F} + 1$ (Lemma 5.9) 
 -/
 lemma Resolve_bound
     {h_not_empty : ms ≠ []}

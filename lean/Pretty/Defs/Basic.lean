@@ -1,5 +1,9 @@
-import Pretty.FactoryDef
-import Pretty.FactoryMathLemma
+import Pretty.Defs.Factory
+import Pretty.Supports.FactoryMath
+
+/-!
+## Basic definitions
+-/
 
 /--
 Layout definition. We encode it as a pair of `String` and `List String` 
@@ -170,7 +174,7 @@ A predicate that a list of measures form a Pareto frontier (Section 5.4)
 We use this definition of Pareto frontier because it is easier to work with
 (and more strict) than the definition based on non-domination given in the paper.
 However, we proved that this definition implies 
-the non-domination-based definition at `pareto_nondom_of_pareto` in `ParetoThm.lean`.
+the non-domination-based definition at `pareto_nondom_of_pareto` in `Pretty.Thm.ParetoThm`.
 -/
 def pareto (ms : List (@Meas α)) : Prop := 
   lw_decreasing ms ∧ cost_increasing F ms
@@ -208,9 +212,9 @@ def merge : List (@Meas α) × List (@Meas α) → List (@Meas α)
     else m₂ :: merge ⟨m₁ :: ms₁, ms₂⟩ 
 
 /--
-Measure set definition (Figure 12)
-Unlike the paper, we carry the proof that `ms` is non-empty instead of 
-relying on the implicit non-empty assumption everywhere
+Measure set definition (Figure 12).
+Unlike the definition in the paper, we carry the proof that `ms` is non-empty 
+instead of relying on the implicit non-empty assumption everywhere.
 -/
 inductive MeasureSet : Type where 
   | tainted (m : @Meas α) : MeasureSet

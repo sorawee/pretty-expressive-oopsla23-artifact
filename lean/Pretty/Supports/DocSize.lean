@@ -1,8 +1,10 @@
-import Pretty.Def
+import Pretty.Defs.Basic
 
 /-!
-Various lemmas about size of `Doc`, which will be helpful for termination proofs. 
-They will be used implicitly, as we mark them with @[simp].
+## Various lemmas about size of `Doc`
+
+These will be helpful for termination proofs. 
+They will be used implicitly, as we mark them with `@[simp]`.
 -/
 
 @[simp]

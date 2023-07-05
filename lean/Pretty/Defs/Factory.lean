@@ -1,4 +1,4 @@
-import Pretty.Basic
+import Pretty.Supports.Basic
 
 /--
 Cost factory interface definition (Figure 8)
