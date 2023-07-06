@@ -2,7 +2,7 @@ import Pretty.Defs.Basic
 import Pretty.Supports.Basic
 import Pretty.Supports.FactoryMath
 import Pretty.Supports.Domination
-import Pretty.Supports.LwAndCost
+import Pretty.Supports.LastAndCost
 import Pretty.Supports.Dedup
 
 /-!
@@ -10,15 +10,15 @@ Various lemmas about `pareto`.
 -/
 
 lemma pareto_head (h : pareto F (m :: m' :: ms)) : 
-    m.lw > m'.lw ∧ F.lt m.cost m'.cost := by 
+    m.last > m'.last ∧ F.lt m.cost m'.cost := by 
   constructor 
-  case left => exact lw_decreasing_head h.left
+  case left => exact last_decreasing_head h.left
   case right => exact cost_increasing_head h.right
 
 lemma pareto_rest {ms : List Meas} {m : Meas} 
     (h : pareto F (m :: ms)) : pareto F ms := by 
   constructor
-  case left => exact lw_decreasing_rest h.left
+  case left => exact last_decreasing_rest h.left
   case right => exact cost_increasing_rest h.right
 
 lemma pareto_drop (n : ℕ) (h : pareto F ms) : pareto F (ms.drop n) := by 
@@ -29,7 +29,7 @@ lemma pareto_drop (n : ℕ) (h : pareto F ms) : pareto F (ms.drop n) := by
     case succ n => exact ih n (pareto_rest h)
 
 lemma pareto_rest' (h : pareto F (m :: m' :: ms)) : pareto F (m :: ms) := by 
-  simp [pareto, cost_increasing, lw_decreasing] at *
+  simp [pareto, cost_increasing, last_decreasing] at *
   constructor
   case left => 
     intros i hi hj 
@@ -65,18 +65,18 @@ lemma pareto_rest' (h : pareto F (m :: m' :: ms)) : pareto F (m :: ms) := by
         simpa 
 
 lemma pareto_one (m : Meas) : pareto F [m] := by 
-  simp [pareto, cost_increasing_one, lw_decreasing_one]
+  simp [pareto, cost_increasing_one, last_decreasing_one]
 
 lemma pareto_cons (ms : List Meas) (x y : Meas) 
-    (h_lw : x.lw > y.lw)
+    (h_last : x.last > y.last)
     (h_cost : F.lt x.cost y.cost)
     (h : pareto F (y :: ms)) : 
     pareto F (x :: y :: ms) := by
   simp only [pareto] at *
   constructor
   case left => 
-    apply lw_decreasing_cons 
-    case h_lw => simp [h_lw]
+    apply last_decreasing_cons 
+    case h_last => simp [h_last]
     case h => simp [h]
   case right =>
     apply cost_increasing_cons 
@@ -88,8 +88,8 @@ lemma pareto_concat (m : Meas) (h : pareto F ms) :
   simp only [pareto] at * 
   constructor
   case left => 
-    apply dedup_lw_decreasing
-    apply lw_decreasing_concat
+    apply dedup_last_decreasing
+    apply last_decreasing_concat
     apply h.left
   case right => 
     apply dedup_cost_increasing
@@ -109,7 +109,7 @@ lemma pareto_map_lift_align (n : ℕ) (h : pareto F ms) :
         apply ih
         apply pareto_rest 
         assumption
-      case h_lw | h_cost => 
+      case h_last | h_cost => 
         replace h := pareto_head h 
         simp [Meas.adjust_align, h]
 
@@ -126,6 +126,6 @@ lemma pareto_map_lift_nest (n : ℕ) (h : pareto F ms) :
         apply ih
         apply pareto_rest 
         assumption
-      case h_lw | h_cost => 
+      case h_last | h_cost => 
         replace h := pareto_head h 
         simp [Meas.adjust_nest, h]

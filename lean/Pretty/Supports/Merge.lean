@@ -7,7 +7,7 @@ lemma merge_first_dom (ms₁ : List Meas)
     (h_dom : dominates F m₁ m₂) :
     ∃ n, merge F ⟨m₁ :: ms₁, m₂ :: ms₂⟩ = m₁ :: merge F ⟨ms₁, ms₂.drop n⟩ ∧ 
          ∀ (m : Meas), m ∈ ms₂.take n → dominates F m₁ m := by 
-  -- Let (x,y) be a measure with lw x and cost y
+  -- Let (x,y) be a measure with last x and cost y
   -- (5,6) ..... union (6,7) (5,8) ... 
   
   -- Looks like a weird thing to induct on, but it works...
@@ -37,12 +37,12 @@ lemma merge_first_dom (ms₁ : List Meas)
       simp at h_pareto₂
       simp [dominates] at h_bad h_dom
       cases F.invalid_inequality h_dom.right h_pareto₂.right h_bad.right
-    case first_lw h_non_dom₁ h_non_dom₂ h_lw => 
+    case first_last h_non_dom₁ h_non_dom₂ h_last => 
       -- (5,6) ..... union [(10,7)] (1,9) ...
-      simp [merge, h_non_dom₁, h_non_dom₂, h_lw, h_dom]
+      simp [merge, h_non_dom₁, h_non_dom₂, h_last, h_dom]
       exists 0
       simp
-    case second_lw h_non_dom₁ _ _ => 
+    case second_last h_non_dom₁ _ _ => 
       -- (5,6) ..... union [(10,7)] (8,3) ... impossible
       --  m₁                   m₂    hd
       simp [dominates] at h_dom h_non_dom₁ 
@@ -89,12 +89,12 @@ lemma merge_second_dom (ms₂ : List Meas)
         simp [h_dom_hd]
         intros m h
         exact h_right _ h
-    case first_lw h_non_dom₁ h_non_dom₂ h_lw => 
+    case first_last h_non_dom₁ h_non_dom₂ h_last => 
       --  (10,20) (7,1) ...  union (5,6) ......
       simp [dominates] at h_dom h_non_dom₂
       specialize h_non_dom₂ (by {
         apply Nat.le_of_lt
-        simp [h_lw]
+        simp [h_last]
       })
       replace h_pareto₁ := pareto_head h_pareto₁
       have h' := @Factory.not_le_iff_lt _ F
@@ -104,8 +104,8 @@ lemma merge_second_dom (ms₂ : List Meas)
       rw [←Factory.not_le_iff_lt] at h_trans
       replace h_trans := h_trans h_dom.right
       contradiction
-    case second_lw h_non_dom₁ h_non_dom₂ h_lw => 
-      replace h_lw := Nat.not_lt_of_lt h_lw
+    case second_last h_non_dom₁ h_non_dom₂ h_last => 
+      replace h_last := Nat.not_lt_of_lt h_last
       simp [merge, *]
       exists 0
       simp
@@ -128,9 +128,9 @@ lemma merge_head_either
     rw [← List.get_zero_eq_head, List.get_of_eq]
     case h.h => assumption
     case h => simp [merge]
-  case first_lw => simp [merge, *]
-  case second_lw => 
-    have : ¬ (m₁.lw > m₂.lw) := by linarith
+  case first_last => simp [merge, *]
+  case second_last => 
+    have : ¬ (m₁.last > m₂.last) := by linarith
     simp [merge, *]
 }
 
@@ -157,8 +157,8 @@ lemma merge_preserves_pareto
         case h_pareto₁ => 
           apply pareto_rest
           assumption
-      case first_lw h_non_dom₁ h_non_dom₂ h_lw => 
-        simp [h_non_dom₁, h_non_dom₂, h_lw]
+      case first_last h_non_dom₁ h_non_dom₂ h_last => 
+        simp [h_non_dom₁, h_non_dom₂, h_last]
         cases ms₁
         case nil => 
           simp [merge]
@@ -166,13 +166,13 @@ lemma merge_preserves_pareto
           case h_cost => 
             rw [←Factory.not_le_iff_lt]
             simp [dominates] at h_non_dom₂
-            simp [h_non_dom₂ (Nat.le_of_lt h_lw)]
+            simp [h_non_dom₂ (Nat.le_of_lt h_last)]
         case cons hd tl => 
           cases h_merge : merge F (hd :: tl, m₂ :: ms₂)
           case nil => apply pareto_one 
           case cons => 
             apply pareto_cons 
-            case h_lw => 
+            case h_last => 
               have h_pareto₁' := pareto_rest h_pareto₁
               cases merge_head_either h_pareto₁' h_pareto₂
               case inl h => 
@@ -197,15 +197,15 @@ lemma merge_preserves_pareto
                 simp [h_merge] at h
                 subst h
                 simp [dominates] at h_non_dom₂
-                simp [h_non_dom₂ (Nat.le_of_lt h_lw)]
+                simp [h_non_dom₂ (Nat.le_of_lt h_last)]
             case h => 
               rw [← h_merge] 
               dwi { apply ih₁ }
               case h_pareto₁ => 
                 apply pareto_rest
                 assumption
-      case second_lw h_non_dom₁ h_non_dom₂ h_lw => 
-        have : ¬ (m₁.lw > m₂.lw) := by linarith
+      case second_last h_non_dom₁ h_non_dom₂ h_last => 
+        have : ¬ (m₁.last > m₂.last) := by linarith
         simp [h_non_dom₁, h_non_dom₂, this]
         cases ms₂
         case nil => 
@@ -214,13 +214,13 @@ lemma merge_preserves_pareto
           case h_cost => 
             rw [←Factory.not_le_iff_lt]
             simp [dominates] at h_non_dom₁
-            simp [h_non_dom₁ (Nat.le_of_lt h_lw)]
+            simp [h_non_dom₁ (Nat.le_of_lt h_last)]
         case cons hd tl => 
           cases h_merge : merge F (m₁ :: ms₁, hd :: tl)
           case nil => apply pareto_one
           case cons => 
             apply pareto_cons 
-            case h_lw => 
+            case h_last => 
               have h_pareto₂' := pareto_rest h_pareto₂
               cases merge_head_either h_pareto₁ h_pareto₂'
               case inl h => 
@@ -239,7 +239,7 @@ lemma merge_preserves_pareto
                 simp [h_merge] at h
                 simp [← h]
                 simp [dominates] at h_non_dom₁
-                simp [h_non_dom₁ (Nat.le_of_lt h_lw)]
+                simp [h_non_dom₁ (Nat.le_of_lt h_last)]
               case inr h => 
                 simp [h_merge] at h
                 subst h
@@ -334,7 +334,7 @@ lemma merge_pareto_subset (h_in : m ∈ merge F ⟨ms₁, ms₂⟩)
               apply List.Mem.tail
               assumption
               
-          case first_lw h_non_dom₁ h_non_dom₂ h_lw => 
+          case first_last h_non_dom₁ h_non_dom₂ h_last => 
             simp [merge, *] at h
             cases ih (pareto_rest h_pareto₁) h_pareto₂ (by simp [h]) h'
             case inl => 
@@ -345,8 +345,8 @@ lemma merge_pareto_subset (h_in : m ∈ merge F ⟨ms₁, ms₂⟩)
               right
               assumption
 
-          case second_lw => 
-            have : ¬ m₁.lw > m₂.lw := by {
+          case second_last => 
+            have : ¬ m₁.last > m₂.last := by {
               simp
               apply Nat.le_of_lt
               assumption
@@ -428,7 +428,7 @@ lemma merge_dom₁ (h_pareto₁ : pareto F ms₁)
               case left => 
                 apply List.Mem.tail
                 assumption
-        case first_lw h_non_dom₁ h_non_dom₂ h_lw =>
+        case first_last h_non_dom₁ h_non_dom₂ h_last =>
           simp [merge, *] at h_merge
           cases h 
           case head => 
@@ -438,8 +438,8 @@ lemma merge_dom₁ (h_pareto₁ : pareto F ms₁)
             let ⟨m_better, h⟩ := ih (pareto_rest h_pareto₁) h_pareto₂ h_mem (by simp [h_merge])
             exists m_better
             simp [h]
-        case second_lw h_lw => 
-          replace h_lw := Nat.not_lt_of_lt h_lw
+        case second_last h_last => 
+          replace h_last := Nat.not_lt_of_lt h_last
           simp [merge, *] at h_merge
           let ⟨m_better, h⟩ := ih h_pareto₁ (pareto_rest h_pareto₂) h (by simp [h_merge])
           exists m_better
@@ -507,13 +507,13 @@ lemma merge_dom₂ (h_pareto₁ : pareto F ms₁)
             let ⟨h_better, ih⟩ := @ih (ms₁.drop n) ms₂ (pareto_drop _ (pareto_rest h_pareto₁)) (pareto_rest h_pareto₂) h (by simp [h'])
             exists h_better 
             simp [ih]
-        case first_lw h_non_dom₁ h_non_dom₂ h_lw =>
+        case first_last h_non_dom₁ h_non_dom₂ h_last =>
           simp [merge, *] at h_merge
           let ⟨m_better, h⟩ := ih (pareto_rest h_pareto₁) h_pareto₂ h (by simp [h_merge])
           exists m_better
           simp [h]
-        case second_lw h_lw => 
-          replace h_lw := Nat.not_lt_of_lt h_lw
+        case second_last h_last => 
+          replace h_last := Nat.not_lt_of_lt h_last
           simp [merge, *] at h_merge
           cases h 
           case head => 

@@ -89,7 +89,7 @@ variable (F : Factory α)
 Measure definition (Figure 10)
 -/ 
 structure Meas where
-  lw : ℕ
+  last : ℕ
   cost : α  
   doc : Doc 
   x : ℕ
@@ -103,27 +103,27 @@ Various measure operations (Figure 10), which consist of:
 - adjustAlign;
 -/ 
 def Meas.adjust_align (i : ℕ): @Meas α → @Meas α
-| ⟨lw, cost, doc, x, y⟩ => ⟨lw, cost, Doc.align doc, x, max i y⟩
+| ⟨last, cost, doc, x, y⟩ => ⟨last, cost, Doc.align doc, x, max i y⟩
 
 /--
 - adjustNest;
 -/ 
 def Meas.adjust_nest (n : ℕ): @Meas α → @Meas α
-| ⟨lw, cost, doc, x, y⟩ => ⟨lw, cost, Doc.nest n doc, x, y⟩
+| ⟨last, cost, doc, x, y⟩ => ⟨last, cost, Doc.nest n doc, x, y⟩
 
 /--
 - concatenation (∘); and
 -/ 
 @[reducible]
 def Meas.concat : @Meas α → @Meas α → @Meas α
-  | ⟨_, cost₁, d₁, x₁, y₁⟩, ⟨lw₂, cost₂, d₂, x₂, y₂⟩ => 
-    ⟨lw₂, F.concat cost₁ cost₂, Doc.concat d₁ d₂, max x₁ x₂, max y₁ y₂⟩ 
+  | ⟨_, cost₁, d₁, x₁, y₁⟩, ⟨last₂, cost₂, d₂, x₂, y₂⟩ => 
+    ⟨last₂, F.concat cost₁ cost₂, Doc.concat d₁ d₂, max x₁ x₂, max y₁ y₂⟩ 
 
 /--
 - domination (≼)
 -/ 
 def dominates (m₁ m₂ : @Meas α) : Bool := 
-  m₁.lw ≤ m₂.lw ∧ F.le m₁.cost m₂.cost
+  m₁.last ≤ m₂.last ∧ F.le m₁.cost m₂.cost
 
 /--
 Measure computation definition (Figure 11)
@@ -135,13 +135,13 @@ inductive MeasRender : Doc → ℕ → ℕ → Meas → Prop where
   | nl : MeasRender Doc.nl c i (Meas.mk i (F.nl i) Doc.nl (max c i) i)
   | concat
       (h₁ : MeasRender d₁ c i m₁) 
-      (h₂ : MeasRender d₂ m₁.lw i m₂)
+      (h₂ : MeasRender d₂ m₁.last i m₂)
       (h : m = Meas.concat F m₁ m₂) : 
       MeasRender (Doc.concat d₁ d₂) c i m
-  | nest (h : MeasRender d c (i + n) (Meas.mk lw cost d x y)) :
-      MeasRender (Doc.nest n d) c i (Meas.mk lw cost (Doc.nest n d) x y)
-  | align (h : MeasRender d c c (Meas.mk lw cost d x y)) :
-      MeasRender (Doc.align d) c i (Meas.mk lw cost (Doc.align d) x (max i y))
+  | nest (h : MeasRender d c (i + n) (Meas.mk last cost d x y)) :
+      MeasRender (Doc.nest n d) c i (Meas.mk last cost (Doc.nest n d) x y)
+  | align (h : MeasRender d c c (Meas.mk last cost d x y)) :
+      MeasRender (Doc.align d) c i (Meas.mk last cost (Doc.align d) x (max i y))
 end Meas 
 
 section Pareto
@@ -165,9 +165,9 @@ def cost_increasing_non_strict (ms : List (@Meas α)) : Prop :=
 /--
 A list of measures is strictly decreasing in length of last line
 -/
-def lw_decreasing (ms : List (@Meas α)) : Prop := 
+def last_decreasing (ms : List (@Meas α)) : Prop := 
   ∀ i (hi : i < ms.length) (hj : i + 1 < ms.length), 
-    (ms.get ⟨i, hi⟩).lw > (ms.get ⟨i + 1, hj⟩).lw
+    (ms.get ⟨i, hi⟩).last > (ms.get ⟨i + 1, hj⟩).last
 
 /--
 A predicate that a list of measures form a Pareto frontier (Section 5.4)
@@ -177,7 +177,7 @@ However, we proved that this definition implies
 the non-domination-based definition at `pareto_nondom_of_pareto` in `Pretty.Thm.ParetoThm`.
 -/
 def pareto (ms : List (@Meas α)) : Prop := 
-  lw_decreasing ms ∧ cost_increasing F ms
+  last_decreasing ms ∧ cost_increasing F ms
 
 end Pareto
 
@@ -208,7 +208,7 @@ def merge : List (@Meas α) × List (@Meas α) → List (@Meas α)
   | ⟨m₁ :: ms₁, m₂ :: ms₂⟩ => 
     if dominates F m₁ m₂ then merge ⟨m₁ :: ms₁, ms₂⟩ 
     else if dominates F m₂ m₁ then merge ⟨ms₁, m₂ :: ms₂⟩ 
-    else if m₁.lw > m₂.lw then m₁ :: merge ⟨ms₁, m₂ :: ms₂⟩ 
+    else if m₁.last > m₂.last then m₁ :: merge ⟨ms₁, m₂ :: ms₂⟩ 
     else m₂ :: merge ⟨m₁ :: ms₁, ms₂⟩ 
 
 /--

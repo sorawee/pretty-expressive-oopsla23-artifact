@@ -8,31 +8,31 @@ Various lemmas about list of measures when
 they are decreasing in last length and increasing in cost.
 -/
 
-lemma lw_decreasing_head (h : lw_decreasing (x :: y :: xs)) :
-    x.lw > y.lw := by
+lemma last_decreasing_head (h : last_decreasing (x :: y :: xs)) :
+    x.last > y.last := by
   exact h 0 (by simp) (by simp)
 
-lemma lw_decreasing_rest (h : lw_decreasing (x :: xs)) :
-    lw_decreasing xs := by
+lemma last_decreasing_rest (h : last_decreasing (x :: xs)) :
+    last_decreasing xs := by
   intro i _ _ 
   exact h (i + 1) (by { simp_arith; linarith }) 
     (by { simp_arith; linarith })
 
-lemma lw_decreasing_empty : @lw_decreasing α [] := by 
+lemma last_decreasing_empty : @last_decreasing α [] := by 
   intro _ _ _ 
   contradiction
 
-lemma lw_decreasing_one : lw_decreasing [x] := by 
+lemma last_decreasing_one : last_decreasing [x] := by 
   intro _ _ _ 
   contradiction
 
-lemma lw_decreasing_cons {α : Type} (x y : @Meas α) (xs : List Meas)
-    (h_lw : x.lw > y.lw)
-    (h : lw_decreasing (y :: xs)) : 
-    lw_decreasing (x :: y :: xs) := by
+lemma last_decreasing_cons {α : Type} (x y : @Meas α) (xs : List Meas)
+    (h_last : x.last > y.last)
+    (h : last_decreasing (y :: xs)) : 
+    last_decreasing (x :: y :: xs) := by
   intro i _ _ 
   cases i 
-  case zero => simp [h_lw]
+  case zero => simp [h_last]
   case succ i _ _ => 
     exact h i (by {
       simp_arith at *
@@ -42,16 +42,16 @@ lemma lw_decreasing_cons {α : Type} (x y : @Meas α) (xs : List Meas)
       assumption
     })
 
-lemma lw_decreasing_strong (h : lw_decreasing ms) : 
+lemma last_decreasing_strong (h : last_decreasing ms) : 
   ∀ (i j : ℕ) (h_i : i < ms.length) (h_j : j < ms.length),
     i < j →
-    (ms.get ⟨i, by assumption⟩).lw > (ms.get ⟨j, by assumption⟩).lw := by
+    (ms.get ⟨i, by assumption⟩).last > (ms.get ⟨j, by assumption⟩).last := by
   intro i j hi hj h_lt
   induction ms generalizing i j
   case nil => 
     simp at hi 
   case cons hd tl ih => 
-    specialize ih (lw_decreasing_rest h)
+    specialize ih (last_decreasing_rest h)
     cases i 
     case zero => 
       cases j
@@ -62,9 +62,9 @@ lemma lw_decreasing_strong (h : lw_decreasing ms) :
         case cons hd2 tl => 
           cases j 
           case zero => 
-            simp [lw_decreasing_head h]
+            simp [last_decreasing_head h]
           case succ j => 
-            have := lw_decreasing_head h
+            have := last_decreasing_head h
             simp at hj
             specialize ih 0 (j + 1) (by simp) (by {
               simp
@@ -186,17 +186,17 @@ lemma cost_increasing_non_strict_cons (x y : Meas) (xs : List Meas)
       assumption
     })
 
-lemma lw_decreasing_concat (F : Factory α) (m : Meas) (h : lw_decreasing ms) : lw_decreasing (ms.map (fun m' => Meas.concat F m m')) := by 
+lemma last_decreasing_concat (F : Factory α) (m : Meas) (h : last_decreasing ms) : last_decreasing (ms.map (fun m' => Meas.concat F m m')) := by 
   induction ms 
-  case nil => apply lw_decreasing_empty
+  case nil => apply last_decreasing_empty
   case cons hd tl ih => 
-    specialize ih (lw_decreasing_rest h)
+    specialize ih (last_decreasing_rest h)
     cases tl 
-    case nil => simp [lw_decreasing_one]
+    case nil => simp [last_decreasing_one]
     case cons => 
-      apply lw_decreasing_cons
-      case h_lw => 
-        replace h := lw_decreasing_head h 
+      apply last_decreasing_cons
+      case h_last => 
+        replace h := last_decreasing_head h 
         simp [h]
       case h => assumption 
 
@@ -218,7 +218,7 @@ lemma cost_increasing_non_strict_concat (m : Meas) (h : cost_increasing F ms) : 
           assumption
       case h => assumption 
 
-lemma lw_decreasing_bound (h : lw_decreasing ms) (i : ℕ) (hi : ms.length - 1 - i < ms.length) (h_bound : i < ms.length) : (ms.get ⟨ms.length - 1 - i, hi⟩).lw ≥ i := by 
+lemma last_decreasing_bound (h : last_decreasing ms) (i : ℕ) (hi : ms.length - 1 - i < ms.length) (h_bound : i < ms.length) : (ms.get ⟨ms.length - 1 - i, hi⟩).last ≥ i := by 
   induction i
   case zero => simp
   case succ i ih => 
@@ -234,7 +234,7 @@ lemma lw_decreasing_bound (h : lw_decreasing ms) (i : ℕ) (hi : ms.length - 1 -
       })
       simp_arith at ih
       
-      have := lw_decreasing_strong h _ ((hd :: tl).length - 1 - i) hi (by simp_arith) (by {
+      have := last_decreasing_strong h _ ((hd :: tl).length - 1 - i) hi (by simp_arith) (by {
         simp
         generalize h_gen : tl.length = n
         simp [h_gen] at h_bound 
@@ -247,7 +247,7 @@ lemma lw_decreasing_bound (h : lw_decreasing ms) (i : ℕ) (hi : ms.length - 1 -
           dwi { apply Nat.sub_lt_sub_right }
       })
       simp at this
-      have : i < ((hd :: tl).get ⟨(hd :: tl).length - 1 - Nat.succ i, hi⟩).lw := by {
+      have : i < ((hd :: tl).get ⟨(hd :: tl).length - 1 - Nat.succ i, hi⟩).last := by {
         simp
         linarith
       }

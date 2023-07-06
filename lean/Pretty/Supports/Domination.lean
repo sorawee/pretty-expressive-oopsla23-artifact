@@ -26,12 +26,12 @@ inductive FourCases (F : Factory α) (m₁ m₂ : Meas) : Prop where
   | first_dom  (h_dom : dominates F m₁ m₂)
   | second_dom (h_non_dom : ¬ (dominates F m₁ m₂)) 
                (h_dom : dominates F m₂ m₁) 
-  | first_lw (h_non_dom₁ : ¬ (dominates F m₁ m₂)) 
+  | first_last (h_non_dom₁ : ¬ (dominates F m₁ m₂)) 
              (h_non_dom₂ : ¬ (dominates F m₂ m₁))
-             (h : m₁.lw > m₂.lw) 
-  | second_lw (h_non_dom₁ : ¬ (dominates F m₁ m₂)) 
+             (h : m₁.last > m₂.last) 
+  | second_last (h_non_dom₁ : ¬ (dominates F m₁ m₂)) 
               (h_non_dom₂ : ¬ (dominates F m₂ m₁))
-              (h : m₂.lw > m₁.lw) 
+              (h : m₂.last > m₁.last) 
 
 /--
 In the `merge` operation, there are four possible cases
@@ -39,7 +39,7 @@ based on domination of two measures.
 This lemma creates an exhaustive case analysis for these four cases.
 -/
 lemma four_cases (F : Factory α) (m₁ m₂ : Meas) : FourCases F m₁ m₂ := by {
-  cases lt_trichotomy m₁.lw m₂.lw
+  cases lt_trichotomy m₁.last m₂.last
   case inl h => 
     simp [h, le_of_lt h]
     by_cases F.le m₁.cost m₂.cost = true
@@ -55,7 +55,7 @@ lemma four_cases (F : Factory α) (m₁ m₂ : Meas) : FourCases F m₁ m₂ := 
           apply le_of_lt
           assumption
     case neg h' => 
-      dwi { apply FourCases.second_lw } 
+      dwi { apply FourCases.second_last } 
       case h_non_dom₁ => 
         simp only [
           dominates, Bool.decide_and, Bool.decide_coe, 
@@ -116,7 +116,7 @@ lemma four_cases (F : Factory α) (m₁ m₂ : Meas) : FourCases F m₁ m₂ := 
             apply le_of_lt 
             assumption
       case neg => 
-        dwi { apply FourCases.first_lw } 
+        dwi { apply FourCases.first_last } 
         case h_non_dom₁ => 
           simp [dominates]
           intro

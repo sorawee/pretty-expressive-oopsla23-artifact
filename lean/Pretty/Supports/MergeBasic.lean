@@ -14,8 +14,8 @@ lemma merge_not_empty (h : ms₁ ≠ [] ∨ ms₂ ≠ []) :
       cases four_cases F m₁ m₂
       case first_dom | second_dom => 
         simp [merge, *]
-      case first_lw => 
+      case first_last => 
         simp [merge, *]
-      case second_lw =>
-        have : ¬ m₁.lw > m₂.lw := by linarith
+      case second_last =>
+        have : ¬ m₁.last > m₂.last := by linarith
         simp [merge, *]

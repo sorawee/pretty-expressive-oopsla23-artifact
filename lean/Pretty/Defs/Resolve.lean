@@ -23,7 +23,7 @@ mutual
     | nest (h : Resolve d c (i + n) ms) : Resolve (Doc.nest n d) c i (ms.lift (Meas.adjust_nest n))
     | choice (h_left : Resolve d c i ms) (h_right : Resolve d' c i ms') : 
         Resolve (Doc.choice d d') c i (MeasureSet.union F ms ms')
-    | concat_taint (h_left : Resolve d c i (MeasureSet.tainted m)) (h_right : Resolve d' m.lw i ms') (h_taint : ms'.taint = MeasureSet.tainted m') : (Resolve (Doc.concat d d') c i (MeasureSet.tainted (Meas.concat F m m')))
+    | concat_taint (h_left : Resolve d c i (MeasureSet.tainted m)) (h_right : Resolve d' m.last i ms') (h_taint : ms'.taint = MeasureSet.tainted m') : (Resolve (Doc.concat d d') c i (MeasureSet.tainted (Meas.concat F m m')))
     | concat_set (h_left : Resolve d c i (MeasureSet.set ms h_non_empty)) 
         (h : ResolveConcat ms d' i msr) : 
         Resolve (Doc.concat d d') c i msr
@@ -35,9 +35,9 @@ mutual
            ResolveConcat (m :: ms) d i (MeasureSet.union F msr' msr)
   
   inductive ResolveConcatOne : Doc → Meas → ℕ → MeasureSet → Prop where
-    | tainted (h : Resolve d m.lw i (MeasureSet.tainted m')) : 
+    | tainted (h : Resolve d m.last i (MeasureSet.tainted m')) : 
         ResolveConcatOne d m i (MeasureSet.tainted (Meas.concat F m m'))
-    | set (h : Resolve d m.lw i (MeasureSet.set ms h_non_empty)) : 
+    | set (h : Resolve d m.last i (MeasureSet.set ms h_non_empty)) : 
         ResolveConcatOne d m i (MeasureSet.set (dedup F (ms.map (fun m' => Meas.concat F m m'))) (by {
             apply dedup_not_empty 
             simp [h_non_empty]

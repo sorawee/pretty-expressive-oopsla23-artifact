@@ -12,7 +12,7 @@ theorem MeasRender_deterministic {F : Factory α} {m₁ m₂ : Meas}
   case nest ih | align ih => 
     rename Doc => d
     cases h₂
-    rename_i lw₂ cost₂ x₂ y₂ h₂ 
+    rename_i last₂ cost₂ x₂ y₂ h₂ 
     dwi { cases ih h₂ }
   case concat ihₗ ihᵣ => 
     cases h₂ 
@@ -56,16 +56,16 @@ theorem MeasRender_single_correct (F : Factory α)
       let ⟨cost₁, y₁, _⟩ := ih₁ h₁
       let ⟨cost₂, y₂, _⟩ := ih₂ h₂
       exists F.concat cost₁ cost₂, max y₁ y₂
-      have h_ans : { lw := c + String.length (s₁ ++ s₂), 
+      have h_ans : { last := c + String.length (s₁ ++ s₂), 
                      cost := F.concat cost₁ cost₂, 
                      doc := Doc.concat d₁ d₂,
                      x := c + String.length (s₁ ++ s₂), y := max y₁ y₂ } = 
        Meas.concat F 
-         { lw := c + String.length s₁, 
+         { last := c + String.length s₁, 
            cost := cost₁, 
            doc := d₁, x := c + String.length s₁,
            y := y₁ } 
-         { lw := c + String.length s₁ + String.length s₂, 
+         { last := c + String.length s₁ + String.length s₂, 
            cost := cost₂,
            doc := d₂, 
            x := c + String.length s₁ + String.length s₂, 

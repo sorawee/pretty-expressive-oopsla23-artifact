@@ -1,4 +1,4 @@
-import Pretty.Supports.LwAndCost
+import Pretty.Supports.LastAndCost
 
 /-! 
 ## Various lemmas related to the `dedup` operation
@@ -42,9 +42,9 @@ lemma dedup_member (h : m ∈ dedup F ms) : m ∈ ms := by
           right 
           assumption  
 
-lemma dedup_lw_first (h : dedup F (m :: ms) = m' :: ms')
-    (h_lw : lw_decreasing (m :: ms)) : 
-    m.lw ≥ m'.lw := by 
+lemma dedup_last_first (h : dedup F (m :: ms) = m' :: ms')
+    (h_last : last_decreasing (m :: ms)) : 
+    m.last ≥ m'.last := by 
   induction ms generalizing m
   case nil => 
     simp [dedup] at h 
@@ -53,15 +53,15 @@ lemma dedup_lw_first (h : dedup F (m :: ms) = m' :: ms')
     simp [dedup] at h 
     split_ifs at h
     case inl h_if => 
-      specialize ih h (lw_decreasing_rest h_lw)
-      replace h_lw := lw_decreasing_head h_lw
-      clear * - h_lw ih
+      specialize ih h (last_decreasing_rest h_last)
+      replace h_last := last_decreasing_head h_last
+      clear * - h_last ih
       linarith
     case inr => 
       simp at h
       simp [h]
       
-lemma dedup_lw_decreasing (h : lw_decreasing ms) : lw_decreasing (dedup F ms) := by 
+lemma dedup_last_decreasing (h : last_decreasing ms) : last_decreasing (dedup F ms) := by 
   induction ms 
   case nil => simpa [dedup]
   case cons x tl ih => 
@@ -72,28 +72,28 @@ lemma dedup_lw_decreasing (h : lw_decreasing ms) : lw_decreasing (dedup F ms) :=
       split_ifs
       case inl => 
         apply ih 
-        apply lw_decreasing_rest
+        apply last_decreasing_rest
         assumption
       case inr => 
         cases h_case : dedup F (x' :: tl')
-        case nil => apply lw_decreasing_one 
+        case nil => apply last_decreasing_one 
         case cons => 
           rw [h_case] at ih
-          apply lw_decreasing_cons 
-          case h_lw => 
-            replace h_case := dedup_lw_first h_case (lw_decreasing_rest h)
+          apply last_decreasing_cons 
+          case h_last => 
+            replace h_case := dedup_last_first h_case (last_decreasing_rest h)
             simp at h_case ⊢ 
-            replace h := lw_decreasing_head h
+            replace h := last_decreasing_head h
             simp at h
             clear * - h_case h
             linarith
           case h => 
             apply ih 
-            apply lw_decreasing_rest  
+            apply last_decreasing_rest  
             assumption
 
 lemma dedup_cost_first (h : dedup F (m :: ms) = m' :: ms')
-    (h_lw : cost_increasing_non_strict F (m :: ms)) : 
+    (h_last : cost_increasing_non_strict F (m :: ms)) : 
     m.cost = m'.cost := by 
   induction ms generalizing m
   case nil => 
@@ -103,9 +103,9 @@ lemma dedup_cost_first (h : dedup F (m :: ms) = m' :: ms')
     simp [dedup] at h 
     split_ifs at h
     case inl h_if => 
-      specialize ih h (cost_increasing_non_strict_rest h_lw)
-      replace h_lw := cost_increasing_non_strict_head h_lw
-      have := F.le_antisymm h_lw h_if 
+      specialize ih h (cost_increasing_non_strict_rest h_last)
+      replace h_last := cost_increasing_non_strict_head h_last
+      have := F.le_antisymm h_last h_if 
       rw [this, ih]
     case inr => 
       simp at h
@@ -155,7 +155,7 @@ lemma dedup_cons (m' : Meas) (h : m ∈ dedup F ms) : m ∈ dedup F (m' :: ms) :
       apply List.Mem.tail 
       assumption
 
-lemma dedup_dom (h : m ∈ ms) (h_lw : lw_decreasing ms) (h_cost : cost_increasing_non_strict F ms) : ∃ m_better, m_better ∈ dedup F ms ∧ dominates F m_better m := by {
+lemma dedup_dom (h : m ∈ ms) (h_last : last_decreasing ms) (h_cost : cost_increasing_non_strict F ms) : ∃ m_better, m_better ∈ dedup F ms ∧ dominates F m_better m := by {
   induction ms
   case nil => contradiction
   case cons x ms ih => 
@@ -177,20 +177,20 @@ lemma dedup_dom (h : m ∈ ms) (h_lw : lw_decreasing ms) (h_cost : cost_increasi
           case cons hd tl => 
             exists hd 
             simp 
-            have h_lw' := dedup_lw_first h_case (lw_decreasing_rest h_lw)
+            have h_last' := dedup_last_first h_case (last_decreasing_rest h_last)
             have h_cost' := dedup_cost_first h_case (cost_increasing_non_strict_rest h_cost)
             simp [dominates]
             constructor 
             case left => 
-              have h_lw'' := lw_decreasing_head h_lw 
-              clear * - h_lw' h_lw''
+              have h_last'' := last_decreasing_head h_last 
+              clear * - h_last' h_last''
               linarith
             case right => 
               rw [←h_cost']
               assumption
         case inr => simp [dominates_refl]
     case tail h => 
-      let ⟨m_better, h, h_dom⟩ := ih h (lw_decreasing_rest h_lw) (cost_increasing_non_strict_rest h_cost)
+      let ⟨m_better, h, h_dom⟩ := ih h (last_decreasing_rest h_last) (cost_increasing_non_strict_rest h_cost)
       exists m_better
       replace h := dedup_cons x h
       simp [h, h_dom]     

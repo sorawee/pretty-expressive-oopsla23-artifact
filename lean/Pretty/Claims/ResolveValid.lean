@@ -174,7 +174,7 @@ mutual
               apply List.mem_cons_self
             })
             let ⟨d_choiceless_left, ⟨_, _⟩⟩ := this
-            let ⟨d_choiceless_right, ⟨_, _⟩⟩ := @Resolve_valid _ F d₂ m₁.lw i _ h_non_empty _ m_right h_current h_widen₂ h_in
+            let ⟨d_choiceless_right, ⟨_, _⟩⟩ := @Resolve_valid _ F d₂ m₁.last i _ h_non_empty _ m_right h_current h_widen₂ h_in
             exists Doc.concat d_choiceless_left d_choiceless_right 
             simp [*]
             constructor

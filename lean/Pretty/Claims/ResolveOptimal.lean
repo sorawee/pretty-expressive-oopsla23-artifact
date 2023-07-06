@@ -173,7 +173,7 @@ mutual
       (h_print: ResolveConcat F ms d₂ i ml)
       (h_widen: Widen d₂ L₂)
       (h_choiceless: d_right ∈ L₂)
-      (h_render: MeasRender F d_right m₁.lw i m₂)
+      (h_render: MeasRender F d_right m₁.last i m₂)
       (h_x: m₁.x ≤ F.W ∧ m₂.x ≤ F.W)
       (h_y: m₁.y ≤ F.W ∧ m₂.y ≤ F.W)
       (h_dom: dominates F m_better_left m₁)
@@ -241,13 +241,13 @@ mutual
       (h_widen: Widen d₂ L₂)
       (h_choiceless: d_right ∈ L₂)
       (h_print: ResolveConcatOne F d₂ m_better i ml)
-      (h_render: MeasRender F d_right m₁.lw i m₂)
+      (h_render: MeasRender F d_right m₁.last i m₂)
       (h_x: m₁.x ≤ F.W ∧ m₂.x ≤ F.W)
       (h_y: m₁.y ≤ F.W ∧ m₂.y ≤ F.W)
       (h_dom: dominates F m_better m₁) :
          ∃ ms h, ml = MeasureSet.set ms h ∧ ∃ m_better, m_better ∈ ms ∧ dominates F m_better (Meas.concat F m₁ m₂) := by 
     have h_is_choiceless := Widen_choiceless h_widen h_choiceless
-    let ⟨m_result_better, h_render_better⟩ := MeasRender_total F d_right m_better.lw i h_is_choiceless 
+    let ⟨m_result_better, h_render_better⟩ := MeasRender_total F d_right m_better.last i h_is_choiceless 
     have h_dom_better := MeasRender_dom_monotonic h_render_better h_render (by {
       simp [dominates] at h_dom
       simp [h_dom]
@@ -272,10 +272,10 @@ mutual
       simp
       have h_pareto := Resolve_pareto h_print
       have h_cost := cost_increasing_non_strict_concat m_better h_pareto.right
-      have h_lw := lw_decreasing_concat F m_better h_pareto.left
+      have h_last := last_decreasing_concat F m_better h_pareto.left
       let ⟨m_ult, h_mem_ult, h_dom_ult⟩ := dedup_dom 
         (List.mem_map_of_mem (fun m' => Meas.concat F m_better m')
-        h_better_right.left) h_lw h_cost
+        h_better_right.left) h_last h_cost
       exists m_ult 
       simp [h_mem_ult]
       clear * - h_dom_ult h_dom h_dom_better h_better_right

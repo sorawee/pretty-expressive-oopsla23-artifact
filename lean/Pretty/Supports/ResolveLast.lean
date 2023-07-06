@@ -9,7 +9,7 @@ mutual
   lemma ResolveConcatOne_last
       (h : ResolveConcatOne F d m_left i (MeasureSet.set ms h_not_empty))
       (h_in : m ∈ ms) : 
-      m.lw ≤ F.W := by
+      m.last ≤ F.W := by
     cases h 
     case set h => 
       have := dedup_member h_in 
@@ -23,7 +23,7 @@ mutual
       {h_not_empty : ms ≠ []}
       (h : ResolveConcat F ms_in d i (MeasureSet.set ms h_not_empty))
       (h_in : m ∈ ms) : 
-      m.lw ≤ F.W := by 
+      m.last ≤ F.W := by 
     generalize h_meas : MeasureSet.set ms h_not_empty = ml at h
     cases h 
     case one h_current => 
@@ -59,7 +59,7 @@ mutual
       {h_not_empty : ms ≠ []}
       (h : Resolve F d c i (MeasureSet.set ms h_not_empty)) 
       (h_in : m ∈ ms) : 
-      m.lw ≤ F.W := by 
+      m.last ≤ F.W := by 
     cases d
     case text => 
       cases h 

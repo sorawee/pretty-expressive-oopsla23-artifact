@@ -74,7 +74,7 @@ mutual
       let ⟨ms₁, h₁⟩ := Resolve_total F d₁ c i
       cases ms₁ 
       case tainted m₁ => 
-        let ⟨ms₂, h₂⟩ := Resolve_total F d₂ m₁.lw i
+        let ⟨ms₂, h₂⟩ := Resolve_total F d₂ m₁.last i
         have : ∃ m₂, ms₂.taint = MeasureSet.tainted m₂ := by {
           cases ms₂
           all_goals { simp [MeasureSet.taint] }
@@ -88,7 +88,7 @@ mutual
         constructor <;> assumption
 
   theorem ResolveConcatOne_total (F : Factory α) (d : Doc) (m : Meas) (i : ℕ) : ∃ msr, ResolveConcatOne F d m i msr := by 
-    let ⟨ms, h⟩ := Resolve_total F d m.lw i
+    let ⟨ms, h⟩ := Resolve_total F d m.last i
     cases ms 
     case set ms h' =>
       exists MeasureSet.set (dedup F (ms.map (fun m' => Meas.concat F m m'))) (by {
