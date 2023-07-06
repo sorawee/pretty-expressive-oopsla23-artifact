@@ -23,28 +23,22 @@ We will provide an updated artifact that is consistent with the camera ready ver
 
 Our paper introduces a pretty printer that is expressive, optimal, and practically efficient. 
 The pretty printer is formalized and proven correct in the Lean theorem prover. 
-We implement the pretty printer in OCaml and Racket that we call SnowWhite, 
+We implement the pretty printer in OCaml and Racket which we call SnowWhite, 
 and create a Racket code formatter that is powered by the Racket SnowWhite. 
-Furthermore, we run experiments on our benchmarks to show that the OCaml SnowWhite is practically efficient 
-relative to other existing pretty printers, and that the Racket code formatter is effective.
+Furthermore, we run experiments on our benchmarks to show that 
+(1) the OCaml SnowWhite is practically efficient; 
+(2) the layout quality from the OCaml SnowWhite is higher than that from other pretty printers; and
+(3) the Racket code formatter is effective.
 The artifact aims to support the paper by providing the implementations, Lean formalization, and benchmarks.
 
 More elaboratedly, following are all claims in the paper.
 
-### Implementations 
-
-There are three implementations in the artifact:
-
-1. OCaml SnowWhite
-2. Racket SnowWhite
-3. The code formatter for Racket
-
 ### Formalization and proofs
 
 All proofs in this paper are either formalized in Lean or sketched in the paper's Appendix B.
-We include the Lean formalization (definitions and correctness proofs) in the artifact under 
-the directory `/workspace/lean/Pretty`. Following are the descriptions, following the format at 
-https://proofartifacts.github.io/guidelines/
+In particular, the correctness proofs are formalized in Lean, and included in the artifact
+under the directory `/workspace/lean/Pretty`. 
+Below descriptions follow the format at https://proofartifacts.github.io/guidelines/
 
 | Definition / Theorem                                                      | Paper                | File                           | Name in Lean                                                              | Notation in paper                                 |
 |---------------------------------------------------------------------------|----------------------|--------------------------------|---------------------------------------------------------------------------|---------------------------------------------------|
@@ -71,12 +65,55 @@ https://proofartifacts.github.io/guidelines/
 | Validity of resolving theorems                                            | Page 20, Theorem 5.8 | `Claims/ResolveValid.lean`     | `Resolve_valid`<br>`Resolve_tainted_valid`                                |                                                   |
 | Measure set size bound lemma                                              | Page 20, Lemma 5.9   | `Claims/ResolveEfficient.lean` | `Resolve_bound`                                                           |                                                   |
 | Taintedness when resolving exceeds the limit                              | Page 20, Lemma 5.10  | `Claims/ResolveEfficient.lean` | `Resolve_exceeding_tainted`                                               |                                                   |
-| Conformance of SnowWhite's cost factory to <br>the cost factory interface | Page 20, Section 6   | `Claims/OurFactory.lean`       | `ourFactory`                                                              |                                                   |
+| Conformance of SnowWhite's cost factory to the cost factory interface | Page 20, Section 6   | `Claims/OurFactory.lean`       | `ourFactory`                                                              |                                                   |
+
+### Implementations 
+
+As detailed in Page 20, Section 6, we implemented the OCaml and Racket SnowWhite, and then implemented 
+the Racket code formatter which uses the Racket SnowWhite as its foundation.
+The artifact contains all three implementations.
+
+| Name                            | Path                           | Internal name       |
+|---------------------------------|--------------------------------|---------------------|
+| OCaml SnowWhite pretty printer  | `/workspace/snow-white`        | `snow-white`        |
+| Racket SnowWhite pretty printer | `/workspace/pretty-expressive` | `pretty-expressive` |
+| Racket code formatter           | `/workspace/fmt`               | `fmt`               |
 
 
-### Benchmarks
+### Benchmarks 
 
-TODO(sorawee)
+In Section 7, we aim to answer the following questions:
+
+1. Does SnowWhite run fast in practice? 
+2. Does SnowWhite produce pretty layouts in practice? 
+
+To answer these questions, we run two experiments. The first experiment compares OCaml SnowWhite against popular pretty printers 
+(Bernardy's and Wadler/Leijen's pretty printer). The second experiment evaluates our Racket code formatter.
+
+#### Comparison of pretty printers 
+
+The benchmarks in Page 22, Table 2 is for testing OCaml SnowWhite against popular pretty printers.
+The description on each benchmark can be found in Page 21, Section 7.1.
+The symbol ^^^ indicates that the content is the same as the previous row.
+
+| Benchmark   | ID                 | Size  | Allowed targets                                    | Note                                                          |
+|-------------|--------------------|-------|----------------------------------------------------|---------------------------------------------------------------|
+| Concat10k   | `test-concat`      | 10000 | `wadler`<br>`bernardy-patched`                     |                                                               |
+| Concat50k   | ^^^                | 50000 | ^^^                                                |                                                               |
+| FillSep5k   | `test-fill-sep`    | 5000  | `wadler`<br>`bernardy-paper`<br>`bernardy-patched` |                                                               |
+| FillSep50k  | ^^^                | 50000 | ^^^                                                |                                                               |
+| Flatten8k   | `test-flatten`     | 8000  | `wadler`                                           |                                                               |
+| Flatten16k  | ^^^                | 16000 | ^^^                                                |                                                               |
+| SExpFull15  | `test-sexp-full`   | 15    | `wadler`<br>`bernardy-paper`<br>`bernardy-patched` |                                                               |
+| SExpFull16  | ^^^                | 16    | ^^^                                                |                                                               |
+| RandFit1k   | `test-sexp-random` | 1     | `wadler`<br>`bernardy-paper`<br>`bernardy-patched` |                                                               |
+| RandFit10k  | ^^^                | 2     | ^^^                                                |                                                               |
+| RandOver1k  | ^^^                | 3     | ^^^                                                |                                                               |
+| RandOver10k | ^^^                | 4     | ^^^                                                |                                                               |
+| JSON1k      | `test-json`        | 1     | `wadler`<br>`bernardy-patched`                     |                                                               |
+| JSON10k     | ^^^                | 2     | ^^^                                                |                                                               |
+| JSONW       | ^^^                | 1     | ^^^                                                | With page width limit of 50 and computation width limit of 60 |
+
 
 ## Getting Started Guide 
 

@@ -1,7 +1,7 @@
 (executables
  (names test_yelland_sup_linear
         test_yelland_dag
-        test_repeated_flatten
+        test_flatten
         test_wadler_opt
         test_concat
         test_json

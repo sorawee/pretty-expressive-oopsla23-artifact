@@ -51,9 +51,9 @@ executable test-json
     import: deps
     main-is:          TestJSON.hs
 
-executable test-repeated-flatten
+executable test-flatten
     import: deps
-    main-is:          TestRepeatedFlatten.hs
+    main-is:          TestFlatten.hs
 
 executable test-concat
     import: deps
