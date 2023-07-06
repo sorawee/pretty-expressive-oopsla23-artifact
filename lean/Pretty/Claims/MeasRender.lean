@@ -2,6 +2,10 @@ import Pretty.Defs.Basic
 import Pretty.Claims.Render
 import Pretty.Supports.FactoryMath
 
+/-!
+## Theorems about the measure computation/rendering relation ($⇓_\mathbb{M}$)
+-/
+
 /--
 Determinism of the measure computation relation (Section 5.3)
 -/
@@ -23,7 +27,7 @@ theorem MeasRender_deterministic {F : Factory α} {m₁ m₂ : Meas}
 
 /--
 Correctness of the measure computation relation 
-when rendering results in one line (Theorem 5.3)
+when it results in one line (first part of Theorem 5.3)
 -/
 theorem MeasRender_single_correct (F : Factory α) 
     (h_render : Render d c i ⟨s, []⟩) : 
@@ -80,7 +84,7 @@ theorem MeasRender_single_correct (F : Factory α)
 
 /--
 Correctness of the measure computation relation 
-when rendering results in multiple lines (Theorem 5.3)
+when it results in multiple lines (second part of Theorem 5.3)
 -/
 theorem MeasRender_multi_correct (F : Factory α) 
     (h_render : Render d c i ⟨s, ss⟩) (h_non_empty : ss ≠ []) : 

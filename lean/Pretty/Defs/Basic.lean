@@ -3,6 +3,8 @@ import Pretty.Supports.FactoryMath
 
 /-!
 ## Basic definitions
+
+### Layout
 -/
 
 /--
@@ -16,6 +18,10 @@ structure Layout where
 def Layout.max_with_offset : ℕ → Layout → ℕ 
 | col_pos, { fst := fst, rst := rst } => 
     max (col_pos + fst.length) ((rst.map String.length).foldl max 0)
+
+/-!
+### Document
+-/
 
 /--
 Document definition (syntax of $\Sigma_e$, Figure 4)
@@ -47,6 +53,10 @@ inductive Choiceless : Doc → Prop where
       Choiceless (Doc.concat d₁ d₂)
   | nest (n : Nat) (d : Doc) (h : Choiceless d) : Choiceless (Doc.nest n d)
   | align (d : Doc) (h : Choiceless d) : Choiceless (Doc.align d)
+
+/-!
+### Rendering and widening
+-/
 
 /--
 Rendering relation definition ($⇓_\mathcal{R}$, Figure 6)
@@ -82,6 +92,10 @@ inductive Widen : Doc → List Doc → Prop where
 
 section Meas
 
+/-!
+### Measure
+-/
+
 variable {α : Type}
 variable (F : Factory α)
 
@@ -96,7 +110,7 @@ structure Meas where
   y : ℕ  
 
 /-!
-Various measure operations (Figure 10), which consist of:
+### Various measure operations (Figure 10)
 -/ 
 
 /--
@@ -125,8 +139,12 @@ def Meas.concat : @Meas α → @Meas α → @Meas α
 def dominates (m₁ m₂ : @Meas α) : Bool := 
   m₁.last ≤ m₂.last ∧ F.le m₁.cost m₂.cost
 
+/-!
+### Measure computation/rendering
+-/
+
 /--
-Measure computation definition (Figure 11)
+Measure computation/rendering definition (Figure 11)
 -/ 
 inductive MeasRender : Doc → ℕ → ℕ → Meas → Prop where
   | text (s : String) : 
@@ -147,6 +165,10 @@ end Meas
 section Pareto
 
 variable (F : Factory α)
+
+/-!
+### Pareto frontier
+-/
 
 /--
 A list of measures is strictly increasing in cost
@@ -171,10 +193,9 @@ def last_decreasing (ms : List (@Meas α)) : Prop :=
 
 /--
 A predicate that a list of measures form a Pareto frontier (Section 5.4)
-We use this definition of Pareto frontier because it is easier to work with
-(and more strict) than the definition based on non-domination given in the paper.
-However, we proved that this definition implies 
-the non-domination-based definition at `pareto_nondom_of_pareto` in `Pretty.Thm.ParetoThm`.
+This definition is not the same as the definition described in the paper, 
+which is based on non-domination. However, they are equivalent, 
+proven at `pareto_nondom_iff_pareto` in `Pretty.Claims.Pareto`.
 -/
 def pareto (ms : List (@Meas α)) : Prop := 
   last_decreasing ms ∧ cost_increasing F ms
@@ -186,7 +207,7 @@ section ListMeasure
 variable (F : Factory α)
 
 /-!
-Various list of measures operations (Figure 12), which consist of:
+### Various list of measures operations (Figure 12)
 -/
 
 /--
@@ -210,6 +231,10 @@ def merge : List (@Meas α) × List (@Meas α) → List (@Meas α)
     else if dominates F m₂ m₁ then merge ⟨ms₁, m₂ :: ms₂⟩ 
     else if m₁.last > m₂.last then m₁ :: merge ⟨ms₁, m₂ :: ms₂⟩ 
     else m₂ :: merge ⟨m₁ :: ms₁, ms₂⟩ 
+
+/-!
+### Measure set
+-/
 
 /--
 Measure set definition (Figure 12).

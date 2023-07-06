@@ -1,5 +1,9 @@
 import Pretty.Supports.Pareto
 
+/-!
+## Equivalence of Pareto frontier definitions
+-/
+
 /--
 The traditional definition of Pareto frontier based on non-domination
 -/

@@ -1,9 +1,8 @@
 open Printer
 
-
 module P = Printer (Cost (struct
                       let limit = 100
-                      let width_limit = 10
+                      let width_limit = 80
                     end))
 
 open P
@@ -23,7 +22,5 @@ let d =
     )
   ) <$> text "}"
 
-let s = render d
-
 let () =
-  Printf.printf "%s\n" s
+  Printf.printf "%s\n" (render d)

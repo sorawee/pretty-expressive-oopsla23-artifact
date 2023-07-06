@@ -1,6 +1,6 @@
 .PHONY: doc run-server
 doc:
-	rm -r build/doc
+	rm -rf build/doc
 	lake -Kenv=dev build Pretty:docs
 
 run-server:

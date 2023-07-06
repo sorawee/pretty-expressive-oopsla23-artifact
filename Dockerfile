@@ -27,6 +27,11 @@ RUN apt-get update && apt-get install -y \
 
 ENV BOOTSTRAP_HASKELL_NONINTERACTIVE=1
 
+# GHC installation could die due to memory limit of /tmp.
+# so change TMPDIR
+RUN mkdir /workspace/tmpdir
+ENV TMPDIR="/workspace/tmpdir"
+
 RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 
 ENV PATH=${PATH}:/root/.local/bin
@@ -39,7 +44,7 @@ RUN git clone https://github.com/jyp/prettiest
 WORKDIR /workspace/prettiest
 
 # 5e7a12cf37bb01467485bbe1e9d8f272fa4f8cd5 is the camera-ready version
-# of Bernardy's printer, which is used for JSON and XML printing
+# of Bernardy's printer
 
 ARG BERNARDY_PRINTER_COMMIT=5e7a12cf37bb01467485bbe1e9d8f272fa4f8cd5
 
@@ -57,19 +62,33 @@ RUN cabal install --lib \
     attoparsec-0.14.4 \
     wl-pprint-1.2.1
 
+###################################################
+# Install elan + lean
+
+RUN curl -O https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh
+RUN chmod +x elan-init.sh
+RUN ./elan-init.sh -y --default-toolchain "leanprover/lean4:nightly-2023-02-23"
+RUN rm elan-init.sh
+ENV PATH=${PATH}:/root/.elan/bin
+
+COPY lean/ lean
+WORKDIR /workspace/lean
+
+
+
 # <--- This is the last computationally intensive task.
 #      If not necessary, don't invalidate the cache.
 #      On the other hand, if we will edit stuff above,
 #      make sure to clean all things up!
 
-COPY artifacts/ artifacts
-WORKDIR /workspace/artifacts
+# COPY other-artifacts/ other-artifacts
+# WORKDIR /workspace/other-artifacts
 
-RUN cp -r ../prettiest/Text Text
-COPY bernardy-remove-width-limit.patch .
-RUN patch -p1 < bernardy-remove-width-limit.patch
-RUN mv Text TextPatched
+# RUN cp -r ../prettiest/Text Text
+# COPY bernardy-remove-width-limit.patch .
+# RUN patch -p1 < bernardy-remove-width-limit.patch
+# RUN mv Text TextPatched
 
-RUN cp -r ../prettiest/Text Text
+# RUN cp -r ../prettiest/Text Text
 
 # RUN cabal build

@@ -1,6 +1,10 @@
 import Pretty.Defs.Basic
 import Pretty.Tactic
 
+/-!
+## Theorems about the widening relation
+-/
+
 /--
 Determinism of the widening relation (Section 3.3)
 -/

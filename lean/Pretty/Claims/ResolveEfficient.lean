@@ -1,13 +1,39 @@
 import Pretty.Defs.Resolve
 import Pretty.Claims.MeasRender
 import Pretty.Supports.Pareto
+import Pretty.Supports.ResolveLast 
+import Pretty.Supports.ResolvePareto
+
+/-!
+## Lemmas for the informal proof of time complexity of $Π_e$
+-/
+
+/--
+A measure set from resolving will have size 
+at most $W_\mathcal{F} + 1$ (Lemma 5.9) 
+-/
+lemma Resolve_bound
+    {h_not_empty : ms ≠ []}
+    (h : Resolve F d c i (MeasureSet.set ms h_not_empty)) : 
+    ms.length ≤ F.W + 1 := by 
+  have h_last := (Resolve_pareto h).left
+  cases ms
+  case nil => simp
+  case cons hd tl =>
+    have h_bound : ((hd :: tl).get ⟨(hd :: tl).length - 1 - ((hd :: tl).length - 1), by simp⟩).last ≥ (hd :: tl).length - 1 := by {
+      dwi { apply last_decreasing_bound }
+    }
+    simp at h_bound
+    have h_last := @Resolve_last _ _ _ _ _ _ hd (by simp) h (by simp)
+    simp_arith 
+    dwi { apply le_trans }
 
 /--
 If resolving happens at a printing context that 
 exceeds $W_\mathcal{F}$, the result will always 
 be tainted (Lemma 5.10)
 -/
-lemma exceeds_tainted
+lemma Resolve_exceeding_tainted
   (h : Resolve F d c i ms) 
   (h_bad : c > F.W ∨ i > F.W) : ∃ m, ms = MeasureSet.tainted m := by 
   induction d generalizing c i ms

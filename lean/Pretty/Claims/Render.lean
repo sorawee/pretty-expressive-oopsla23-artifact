@@ -1,6 +1,10 @@
 import Pretty.Defs.Basic
 import Pretty.Tactic
 
+/-!
+## Theorems about the rendering relation ($⇓_\mathcal{R}$)
+-/
+
 /--
 Determinism of the rendering relation (Section 3.3)
 -/
