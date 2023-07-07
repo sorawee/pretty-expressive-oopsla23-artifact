@@ -24,7 +24,8 @@ def Layout.max_with_offset : ℕ → Layout → ℕ
 -/
 
 /--
-Document definition (syntax of $\Sigma_e$, Figure 4)
+Document definition (syntax of $\Sigma_e$, Figure 4).
+One deviation is that we don't include the `flatten` construct, as explained in Page 16, Section 5.3.
 -/ 
 inductive Doc where 
   | text (s : String) : Doc
@@ -43,8 +44,8 @@ def Doc.size : Doc → ℕ
   | Doc.choice d₁ d₂ => Doc.size d₁ + Doc.size d₂ + 1
 
 /--
-Choiceless document definition (Section 3.2)
-We make it a predicate of `Doc`, since it's a subset of `Doc`.
+Choiceless document definition (Section 3.2),
+defined as a predicate on `Doc`.
 -/ 
 inductive Choiceless : Doc → Prop where 
   | text (s : String) : Choiceless (Doc.text s)
@@ -59,7 +60,8 @@ inductive Choiceless : Doc → Prop where
 -/
 
 /--
-Rendering relation definition ($⇓_\mathcal{R}$, Figure 6)
+Rendering relation definition ($⇓_\mathcal{R}$, Figure 6).
+One deviation is that the flattening mode is not included, as explained in Page 16, Section 5.3.
 -/ 
 inductive Render : Doc → ℕ → ℕ → Layout → Prop where
   | text : Render (Doc.text s) c i (Layout.mk s [])

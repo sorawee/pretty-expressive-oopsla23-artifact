@@ -21,24 +21,26 @@ We will provide an updated artifact that is consistent with the camera ready ver
 
 ## Introduction 
 
-Our paper introduces a pretty printer that is expressive, optimal, and practically efficient. 
+Our paper introduced a pretty printer that is expressive, optimal, and practically efficient. 
 The pretty printer is formalized and proven correct in the Lean theorem prover. 
-We implement the pretty printer in OCaml and Racket which we call SnowWhite, 
-and create a Racket code formatter that is powered by the Racket SnowWhite. 
-Furthermore, we run experiments on our benchmarks to show that 
-(1) the OCaml SnowWhite is practically efficient; 
-(2) the layout quality from the OCaml SnowWhite is higher than that from other pretty printers; and
-(3) the Racket code formatter is effective.
-The artifact aims to support the paper by providing the implementations, Lean formalization, and benchmarks.
+We implemented the pretty printer in OCaml and Racket. 
+These implementations are called SnowWhite in the paper, 
+and called `pretty-expressive` in the artifact.
+We further created a code formatter for Racket (for formatting Racket source code), 
+powered by the Racket SnowWhite. 
+To evaluate our pretty printer, we run experiments on our benchmarks to show that 
+SnowWhite is practically efficient and produce layouts with high quality.
+The artifact supports the paper by providing the Lean formalization, implementations, 
+and benchmarks to reproduce the evaluation.
 
 More elaboratedly, following are all claims in the paper.
 
 ### Formalization and proofs
 
 All proofs in this paper are either formalized in Lean or sketched in the paper's Appendix B.
+
 In particular, the correctness proofs are formalized in Lean, and included in the artifact
-under the directory `/workspace/lean/Pretty`. 
-Below descriptions follow the format at https://proofartifacts.github.io/guidelines/
+under the directory `/workspace/lean/Pretty`.
 
 | Definition / Theorem                                                      | Paper                | File                           | Name in Lean                                                              | Notation in paper                                 |
 |---------------------------------------------------------------------------|----------------------|--------------------------------|---------------------------------------------------------------------------|---------------------------------------------------|
@@ -67,52 +69,104 @@ Below descriptions follow the format at https://proofartifacts.github.io/guideli
 | Taintedness when resolving exceeds the limit                              | Page 20, Lemma 5.10  | `Claims/ResolveEfficient.lean` | `Resolve_exceeding_tainted`                                               |                                                   |
 | Conformance of SnowWhite's cost factory to the cost factory interface | Page 20, Section 6   | `Claims/OurFactory.lean`       | `ourFactory`                                                              |                                                   |
 
+Other proofs (those in Section 4 and time complexity analysis) are informal, and presented in Appendix B.
+
 ### Implementations 
 
-As detailed in Page 20, Section 6, we implemented the OCaml and Racket SnowWhite, and then implemented 
-the Racket code formatter which uses the Racket SnowWhite as its foundation.
+As detailed in Page 20, Section 6, we implemented the OCaml and Racket SnowWhite,
+and then implemented the Racket code formatter which utilizes the Racket SnowWhite as its foundation.
 The artifact contains all three implementations.
 
-| Name                            | Path                           | Internal name       |
-|---------------------------------|--------------------------------|---------------------|
-| OCaml SnowWhite pretty printer  | `/workspace/snow-white`        | `snow-white`        |
-| Racket SnowWhite pretty printer | `/workspace/pretty-expressive` | `pretty-expressive` |
-| Racket code formatter           | `/workspace/fmt`               | `fmt`               |
+| Name                            | Path                                  |
+|---------------------------------|---------------------------------------|
+| OCaml SnowWhite pretty printer  | `/workspace/pretty-expressive-ocaml`  |
+| Racket SnowWhite pretty printer | `/workspace/pretty-expressive-racket` |
+| Racket code formatter           | `/workspace/fmt`                      |
 
 
 ### Benchmarks 
 
-In Section 7, we aim to answer the following questions:
+In Page 21, Section 7, we aim to answer the following questions:
 
 1. Does SnowWhite run fast in practice? 
 2. Does SnowWhite produce pretty layouts in practice? 
 
-To answer these questions, we run two experiments. The first experiment compares OCaml SnowWhite against popular pretty printers 
-(Bernardy's and Wadler/Leijen's pretty printer). The second experiment evaluates our Racket code formatter.
+To answer these questions, we run two experiments. The first experiment compares OCaml SnowWhite against 
+other popular pretty printers (Bernardy's and Wadler/Leijen's pretty printer). 
+The second experiment evaluates our Racket code formatter.
 
 #### Comparison of pretty printers 
 
-The benchmarks in Page 22, Table 2 is for testing OCaml SnowWhite against popular pretty printers.
+The benchmarks in Page 22, Table 2 are for testing OCaml SnowWhite against the popular pretty printers.
 The description on each benchmark can be found in Page 21, Section 7.1.
-The symbol ^^^ indicates that the content is the same as the previous row.
 
-| Benchmark   | ID                 | Size  | Allowed targets                                    | Note                                                          |
-|-------------|--------------------|-------|----------------------------------------------------|---------------------------------------------------------------|
-| Concat10k   | `test-concat`      | 10000 | `wadler`<br>`bernardy-patched`                     |                                                               |
-| Concat50k   | ^^^                | 50000 | ^^^                                                |                                                               |
-| FillSep5k   | `test-fill-sep`    | 5000  | `wadler`<br>`bernardy-paper`<br>`bernardy-patched` |                                                               |
-| FillSep50k  | ^^^                | 50000 | ^^^                                                |                                                               |
-| Flatten8k   | `test-flatten`     | 8000  | `wadler`                                           |                                                               |
-| Flatten16k  | ^^^                | 16000 | ^^^                                                |                                                               |
-| SExpFull15  | `test-sexp-full`   | 15    | `wadler`<br>`bernardy-paper`<br>`bernardy-patched` |                                                               |
-| SExpFull16  | ^^^                | 16    | ^^^                                                |                                                               |
-| RandFit1k   | `test-sexp-random` | 1     | `wadler`<br>`bernardy-paper`<br>`bernardy-patched` |                                                               |
-| RandFit10k  | ^^^                | 2     | ^^^                                                |                                                               |
-| RandOver1k  | ^^^                | 3     | ^^^                                                |                                                               |
-| RandOver10k | ^^^                | 4     | ^^^                                                |                                                               |
-| JSON1k      | `test-json`        | 1     | `wadler`<br>`bernardy-patched`                     |                                                               |
-| JSON10k     | ^^^                | 2     | ^^^                                                |                                                               |
-| JSONW       | ^^^                | 1     | ^^^                                                | With page width limit of 50 and computation width limit of 60 |
+
+| Benchmark   | Commands                                                                                                                   |
+|-------------|----------------------------------------------------------------------------------------------------------------------------|
+| Concat10k   | `racket table-2.rkt --benchmark concat --size 10000 --page-width 80 --target pretty-expressive --computation-width 100`    |
+|             | `racket table-2.rkt --benchmark concat --size 10000 --page-width 80 --target pretty-expressive --computation-width 1000`   |
+|             | `racket table-2.rkt --benchmark concat --size 10000 --page-width 80 --target wadler `                                      |
+|             | `racket table-2.rkt --benchmark concat --size 10000 --page-width 80 --target bernardy-patched `                            |
+| Concat50k   | `racket table-2.rkt --benchmark concat --size 50000 --page-width 80 --target pretty-expressive --computation-width 100`    |
+|             | `racket table-2.rkt --benchmark concat --size 50000 --page-width 80 --target pretty-expressive --computation-width 1000`   |
+|             | `racket table-2.rkt --benchmark concat --size 50000 --page-width 80 --target wadler `                                      |
+|             | `racket table-2.rkt --benchmark concat --size 50000 --page-width 80 --target bernardy-patched `                            |
+| FillSep5k   | `racket table-2.rkt --benchmark fill-sep --size 5000 --page-width 80 --target pretty-expressive --computation-width 100`   |
+|             | `racket table-2.rkt --benchmark fill-sep --size 5000 --page-width 80 --target pretty-expressive --computation-width 1000`  |
+|             | `racket table-2.rkt --benchmark fill-sep --size 5000 --page-width 80 --target wadler `                                     |
+|             | `racket table-2.rkt --benchmark fill-sep --size 5000 --page-width 80 --target bernardy-paper `                             |
+|             | `racket table-2.rkt --benchmark fill-sep --size 5000 --page-width 80 --target bernardy-patched `                           |
+| FillSep50k  | `racket table-2.rkt --benchmark fill-sep --size 50000 --page-width 80 --target pretty-expressive --computation-width 100`  |
+|             | `racket table-2.rkt --benchmark fill-sep --size 50000 --page-width 80 --target pretty-expressive --computation-width 1000` |
+|             | `racket table-2.rkt --benchmark fill-sep --size 50000 --page-width 80 --target wadler `                                    |
+|             | `racket table-2.rkt --benchmark fill-sep --size 50000 --page-width 80 --target bernardy-paper `                            |
+|             | `racket table-2.rkt --benchmark fill-sep --size 50000 --page-width 80 --target bernardy-patched `                          |
+| Flatten8k   | `racket table-2.rkt --benchmark flatten --size 8000 --page-width 80 --target pretty-expressive --computation-width 100`    |
+|             | `racket table-2.rkt --benchmark flatten --size 8000 --page-width 80 --target pretty-expressive --computation-width 1000`   |
+|             | `racket table-2.rkt --benchmark flatten --size 8000 --page-width 80 --target wadler `                                      |
+| Flatten16k  | `racket table-2.rkt --benchmark flatten --size 16000 --page-width 80 --target pretty-expressive --computation-width 100`   |
+|             | `racket table-2.rkt --benchmark flatten --size 16000 --page-width 80 --target pretty-expressive --computation-width 1000`  |
+|             | `racket table-2.rkt --benchmark flatten --size 16000 --page-width 80 --target wadler `                                     |
+| SExpFull15  | `racket table-2.rkt --benchmark sexp-full --size 15 --page-width 80 --target pretty-expressive --computation-width 100`    |
+|             | `racket table-2.rkt --benchmark sexp-full --size 15 --page-width 80 --target pretty-expressive --computation-width 1000`   |
+|             | `racket table-2.rkt --benchmark sexp-full --size 15 --page-width 80 --target wadler`                                       |
+|             | `racket table-2.rkt --benchmark sexp-full --size 15 --page-width 80 --target bernardy-paper`                               |
+|             | `racket table-2.rkt --benchmark sexp-full --size 15 --page-width 80 --target bernardy-patched`                             |
+| SExpFull16  | `racket table-2.rkt --benchmark sexp-full --size 16 --page-width 80 --target pretty-expressive --computation-width 100`    |
+|             | `racket table-2.rkt --benchmark sexp-full --size 16 --page-width 80 --target pretty-expressive --computation-width 1000`   |
+|             | `racket table-2.rkt --benchmark sexp-full --size 16 --page-width 80 --target wadler`                                       |
+|             | `racket table-2.rkt --benchmark sexp-full --size 16 --page-width 80 --target bernardy-paper`                               |
+|             | `racket table-2.rkt --benchmark sexp-full --size 16 --page-width 80 --target bernardy-patched`                             |
+| RandFit1k   | `racket table-2.rkt --benchmark sexp-random --size 1 --page-width 80 --target pretty-expressive --computation-width 100`   |
+|             | `racket table-2.rkt --benchmark sexp-random --size 1 --page-width 80 --target pretty-expressive --computation-width 1000`  |
+|             | `racket table-2.rkt --benchmark sexp-random --size 1 --page-width 80 --target wadler`                                      |
+|             | `racket table-2.rkt --benchmark sexp-random --size 1 --page-width 80 --target bernardy-paper`                              |
+|             | `racket table-2.rkt --benchmark sexp-random --size 1 --page-width 80 --target bernardy-patched`                            |
+| RandFit1k   | `racket table-2.rkt --benchmark sexp-random --size 2 --page-width 80 --target pretty-expressive --computation-width 100`   |
+|             | `racket table-2.rkt --benchmark sexp-random --size 2 --page-width 80 --target pretty-expressive --computation-width 1000`  |
+|             | `racket table-2.rkt --benchmark sexp-random --size 2 --page-width 80 --target wadler`                                      |
+|             | `racket table-2.rkt --benchmark sexp-random --size 2 --page-width 80 --target bernardy-paper`                              |
+|             | `racket table-2.rkt --benchmark sexp-random --size 2 --page-width 80 --target bernardy-patched`                            |
+| RandOver1k  | `racket table-2.rkt --benchmark sexp-random --size 3 --page-width 80 --target pretty-expressive --computation-width 100`   |
+|             | `racket table-2.rkt --benchmark sexp-random --size 3 --page-width 80 --target pretty-expressive --computation-width 1000`  |
+|             | `racket table-2.rkt --benchmark sexp-random --size 3 --page-width 80 --target wadler`                                      |
+|             | `racket table-2.rkt --benchmark sexp-random --size 3 --page-width 80 --target bernardy-patched`                            |
+| RandOver10k | `racket table-2.rkt --benchmark sexp-random --size 4 --page-width 80 --target pretty-expressive --computation-width 100`   |
+|             | `racket table-2.rkt --benchmark sexp-random --size 4 --page-width 80 --target pretty-expressive --computation-width 1000`  |
+|             | `racket table-2.rkt --benchmark sexp-random --size 4 --page-width 80 --target wadler`                                      |
+|             | `racket table-2.rkt --benchmark sexp-random --size 4 --page-width 80 --target bernardy-patched`                            |
+| JSON1k      | `racket table-2.rkt --benchmark json --size 1 --page-width 80 --target pretty-expressive --computation-width 100`          |
+|             | `racket table-2.rkt --benchmark json --size 1 --page-width 80 --target pretty-expressive --computation-width 1000`         |
+|             | `racket table-2.rkt --benchmark json --size 1 --page-width 80 --target wadler`                                             |
+|             | `racket table-2.rkt --benchmark json --size 1 --page-width 80 --target bernardy-patched`                                   |
+| JSON10k     | `racket table-2.rkt --benchmark json --size 2 --page-width 80 --target pretty-expressive --computation-width 100`          |
+|             | `racket table-2.rkt --benchmark json --size 2 --page-width 80 --target pretty-expressive --computation-width 1000`         |
+|             | `racket table-2.rkt --benchmark json --size 2 --page-width 80 --target wadler`                                             |
+|             | `racket table-2.rkt --benchmark json --size 2 --page-width 80 --target bernardy-patched`                                   |
+| JSONW       | `racket table-2.rkt --benchmark json --size 1 --page-width 50 --target pretty-expressive --computation-width 60`           |
+|             | `racket table-2.rkt --benchmark json --size 1 --page-width 50 --target pretty-expressive --computation-width 1000`         |
+|             | `racket table-2.rkt --benchmark json --size 1 --page-width 50 --target wadler`                                             |
+|             | `racket table-2.rkt --benchmark json --size 1 --page-width 50 --target bernardy-patched`                                   |
 
 
 ## Getting Started Guide 
@@ -140,7 +194,7 @@ $ docker pull unsat/pretty-expressive-oopsla23-artifact:latest
 $ docker run -it --name pretty-expressive-artifact unsat/pretty-expressive-oopsla23-artifact:latest
 ```
 
-This will drop you into a shell inside the container, in the `/workspace` directory, the main directory containing Lean proofs and benchmarks.
+This will drop you into a shell inside the container, in the `/workspace` directory, the main directory containing Lean proofs, implementations, and benchmarks.
 
 We have installed `vim` into the container for convenience to edit and view files; you can also use Docker to copy files into and out of the container, see <https://docs.docker.com/engine/reference/commandline/cp/>.
 
@@ -148,7 +202,6 @@ If you leave the container and wish to get back, you will need to restart it wit
 
 ### Basic testing
 
-#### Sanity test: implementations
 
 
 
@@ -170,6 +223,8 @@ This should produce exactly one error:
 ```
 
 All other files should be built without any error.
+
+#### Sanity test: implementations
 
 #### Sanity test: benchmarks
 
