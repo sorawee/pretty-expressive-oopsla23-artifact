@@ -100,7 +100,7 @@ The description on each benchmark can be found in Section 7.1.
 The second experiment runs the Racket code formatter to evaluate its performance and quality 
 on another set of benchmarks.
 
-Table 2 and Table 3 detail the results of these experiment, 
+Table 2 and Table 3 detail the results of these experiments, 
 and Section 7.3 explains how they support the claims.
 This artifact contains the benchmarks and scripts to reproduce both tables.
 
