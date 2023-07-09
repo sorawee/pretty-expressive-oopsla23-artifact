@@ -8,7 +8,6 @@ let print_layout oc (s: string): unit =
 let param_out = ref None
 let param_view_lines = ref false
 let param_iter = ref 0
-let param_series = ref false
 let param_size = ref 0
 
 type config = { size: int; page_limit: int; com_limit: int }
@@ -40,7 +39,7 @@ let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): config =
          flag
            "--size"
            (optional_with_default size int)
-           ~doc: (Printf.sprintf "int Document size (default: %d)" size)
+           ~doc: (Printf.sprintf "int Size (default: %d)" size)
        and out =
          flag
            "--out"
@@ -54,23 +53,11 @@ let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): config =
            no_arg
            ~doc: " Output the number of lines (default: no)"
 
-       and view_memo =
-         flag
-           "--view-memo"
-           no_arg
-           ~doc: " Output memoization stats (default: no)"
-
        and view_cost =
          flag
            "--view-cost"
            no_arg
            ~doc: " Output cost (default: no)"
-
-       and series =
-         flag
-           "--series"
-           no_arg
-           ~doc: " Runs from s = 1 .. size (default: no)"
 
        and memo_limit =
          flag
@@ -84,9 +71,7 @@ let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): config =
          param_view_lines := view_lines;
          param_out := out;
          param_iter := iter;
-         param_series := series;
          Printer.param_memo_limit := memo_limit;
-         Printer.param_view_memo := view_memo;
          Printer.param_view_cost := view_cost;
          param_width := width;
          param_limit := limit;
@@ -97,10 +82,7 @@ let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): config =
     com_limit = !param_limit;
     size = !param_size }
 
-let cnt_runs = ref 0
-
 let instrument f () =
-  cnt_runs := !cnt_runs + 1;
   let out = f () in
   begin
     match !param_out with
@@ -121,8 +103,8 @@ let instrument f () =
     Stdlib.flush_all ()
   end
 
-let measure_time_int f =
-  let f = instrument f in
+let measure_time f =
+  let f = instrument (fun () -> f !param_size) in
   Bench.bench
     ~run_config:
       (Bench.Run_config.create
@@ -131,14 +113,3 @@ let measure_time_int f =
             else Some (Bench.Quota.Num_calls !param_iter))
          ())
     [Bench.Test.create ~name:"Benchmark" f];
-  Printf.printf "(total-run %d)\n" !cnt_runs;
-  cnt_runs := 0
-
-let measure_time f =
-  if !param_series then
-    for i = 1 to !param_size do
-      Printf.printf "(size %d)\n" i;
-      measure_time_int (fun () -> f i)
-    done
-  else
-    measure_time_int (fun () -> f !param_size)

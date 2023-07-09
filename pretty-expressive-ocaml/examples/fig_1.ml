@@ -1,6 +1,6 @@
 open Printer
 
-module P = Printer (Cost (struct
+module P = Printer (DefaultCost (struct
                       let limit = 100
                       let width_limit = 80
                     end))

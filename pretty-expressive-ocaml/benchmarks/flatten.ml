@@ -1,9 +1,9 @@
 open Printer
-open Test_lib
+open Benchtool
 
 let {page_limit; com_limit; _} = setup ~size:1000 ()
 
-module P = Printer (Cost (struct
+module P = Printer (DefaultCost (struct
                       let limit = com_limit
                       let width_limit = page_limit
                     end))

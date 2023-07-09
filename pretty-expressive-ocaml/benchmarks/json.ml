@@ -1,5 +1,5 @@
 open Printer
-open Test_lib
+open Benchtool
 
 let {page_limit; com_limit; size; _} = setup ~size:2 ()
 
@@ -7,7 +7,7 @@ let () =
   if not (size = 1 || size = 2) then
     raise (Arg.Bad "bad size")
 
-module P = Printer (Cost (struct
+module P = Printer (DefaultCost (struct
                       let limit = com_limit
                       let width_limit = page_limit
                     end))

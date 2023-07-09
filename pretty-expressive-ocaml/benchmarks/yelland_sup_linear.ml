@@ -1,5 +1,5 @@
 open Printer
-open Test_lib
+open Benchtool
 
 (* NOTE: May require `ulimit -s <larger-limit>` *)
 (*       when the size is large. *)
@@ -11,10 +11,10 @@ let () =
   if not (size > 500) then
     raise (Arg.Bad "bad size")
 
-module P = Printer(Cost(struct
-                     let limit = com_limit
-                     let width_limit = page_limit
-                   end))
+module P = Printer( DefaultCost (struct
+                      let limit = com_limit
+                      let width_limit = page_limit
+                    end))
 
 open P
 

@@ -1,9 +1,9 @@
 open Printer
-open Test_lib
+open Benchtool
 
-let {page_limit; com_limit; _} = setup ~size:15 ()
+let {page_limit; com_limit; _} = setup ~size:1 ()
 
-module P = Printer (Cost (struct
+module P = Printer (DefaultCost (struct
                       let limit = com_limit
                       let width_limit = page_limit
                     end))
@@ -22,15 +22,15 @@ let rec pp v =
   | List xs -> lparen <+> sep (List.map pp xs) <+> rparen
   | Atom x -> text x
 
-let rec test_expr n c =
-  if n = 0 then
-    (Atom (string_of_int c), c + 1)
-  else
-    let (t1 , c1) = test_expr (n - 1) c in
-    let (t2 , c2) = test_expr (n - 1) c1 in
-    (List [t1; t2], c2)
+let rec convert v =
+  match v with
+  | `String s -> Atom s
+  | `List xs -> List (List.map convert xs)
+  | _ -> failwith "bad"
 
 let () =
   measure_time (fun size ->
-      let (t, _) = test_expr size 0 in
+      let json = Yojson.Basic.from_file
+          ("../benchdata/random-tree-" ^ (string_of_int size) ^ ".sexp") in
+      let t = convert json in
       render (pp t))
