@@ -1,4 +1,4 @@
-module LibTest where
+module Lib.Bench where
 
 import Options.Applicative
 import Constants.Values

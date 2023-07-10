@@ -1,11 +1,11 @@
 open Printer
 open Benchtool
 
-let {page_limit; com_limit; _} = setup ~size:15 ()
+let {page_width; computation_width; _} = setup ~size:15 "sexp-full"
 
 module P = Printer (DefaultCost (struct
-                      let limit = com_limit
-                      let width_limit = page_limit
+                      let page_width = page_width
+                      let computation_width = computation_width
                     end))
 
 open P
@@ -31,6 +31,6 @@ let rec test_expr n c =
     (List [t1; t2], c2)
 
 let () =
-  measure_time (fun size ->
+  do_bench (fun size ->
       let (t, _) = test_expr size 0 in
       print (pp t))

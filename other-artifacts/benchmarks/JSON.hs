@@ -11,8 +11,8 @@ import qualified Text.PrettyPrint.Leijen   as WL
 import qualified Text.PrettyPrint.Compact  as PC
 import qualified TextPatched.PrettyPrint.Compact  as PCP
 
-import LibTest
-import LibJSON
+import Lib.Bench
+import Lib.JSON
 
 -- PC.encloseSep adds an extra space, so we reimplement it to be faithful with
 -- Wadler/Leijen's encloseSep

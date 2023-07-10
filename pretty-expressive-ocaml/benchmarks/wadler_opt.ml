@@ -1,15 +1,15 @@
 open Printer
 open Benchtool
 
-let {page_limit; com_limit; size; _} = setup ~width:5 ~size:0 ()
+let {page_width; computation_width; size; _} = setup ~width:5 ~size:0 "wadler-opt"
 
 let () =
   if not (size = 0) then
     raise (Arg.Bad "Size must be zero")
 
 module P = Printer (DefaultCost (struct
-                      let limit = com_limit
-                      let width_limit = page_limit
+                      let page_width = page_width
+                      let computation_width = computation_width
                     end))
 
 open P

@@ -3,13 +3,13 @@ module Main where
 import Prelude hiding ((<>))
 import qualified Criterion.Main as C
 
-import BernardyPaper
-import BernardyCustomizableWidth
+import PrinterPaper.BernardyPaper
+import PrinterPaper.BernardyCustomizableWidth
 import qualified Text.PrettyPrint.Compact  as PC
 import qualified TextPatched.PrettyPrint.Compact  as PCP
 import qualified Text.PrettyPrint.Leijen   as WL
 
-import LibTest
+import Lib.Bench
 
 fillSep :: Doc d => [String] -> d
 fillSep [] = text ""

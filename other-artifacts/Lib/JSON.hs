@@ -1,4 +1,4 @@
-module LibJSON where
+module Lib.JSON where
 
 import qualified Data.ByteString as BS
 import Data.Aeson.Parser

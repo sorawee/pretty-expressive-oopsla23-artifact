@@ -1,40 +1,35 @@
-open Core_bench
-
 module Command = Core.Command
 
 let print_layout oc (s: string): unit =
   Printf.fprintf oc "%s\n" s
 
 let param_out = ref None
-let param_view_lines = ref false
 let param_iter = ref 0
 let param_size = ref 0
+let param_page_width = ref 0
+let param_computation_width = ref 0
+let param_name = ref ""
 
-type config = { size: int; page_limit: int; com_limit: int }
+type config = { size: int; page_width: int; computation_width: int }
 
-let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): config =
-  let param_width = ref width in
-  let param_limit = ref limit in
+let setup ?(size = 0) ?(page_width = 80) ?(computation_width = 100) (name: string): config =
   param_size := size;
+  param_page_width := page_width;
+  param_computation_width := computation_width;
+  param_name := name;
   let main_command =
     Command.basic
       ~summary: "Run a benchmark"
-      (let%map_open.Command width =
+      (let%map_open.Command page_width =
          flag
-           "--width"
-           (optional_with_default width int)
-           ~doc: (Printf.sprintf "int Page width limit (default: %d)" width)
-       and limit =
+           "--page-width"
+           (optional_with_default page_width int)
+           ~doc: (Printf.sprintf "int Page width limit (default: %d)" page_width)
+       and computation_width =
          flag
-           "--limit"
-           (optional_with_default limit int)
-           ~doc: (Printf.sprintf "int Computation width limit (default: %d)" limit)
-       and iter =
-         flag
-           "--iter"
-           (optional_with_default 0 int)
-           ~doc: ("int Number of iterations\n" ^
-                  "(default: 0; 0 uses core bench's default value)")
+           "--computation-width"
+           (optional_with_default computation_width int)
+           ~doc: (Printf.sprintf "int Computation width limit (default: %d)" computation_width)
        and size =
          flag
            "--size"
@@ -46,12 +41,6 @@ let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): config =
            (optional string)
            ~doc: ("path Output the actual layout to a specified path;\n" ^
                   "- means stdout (default: do not output)")
-
-       and view_lines =
-         flag
-           "--view-lines"
-           no_arg
-           ~doc: " Output the number of lines (default: no)"
 
        and view_cost =
          flag
@@ -68,22 +57,22 @@ let setup ?(size = 0) ?(width = 80) ?(limit = 100) (): config =
        in
        fun () ->
          Sys_unix.override_argv [| Sys.argv.(0) |];
-         param_view_lines := view_lines;
          param_out := out;
-         param_iter := iter;
          Printer.param_memo_limit := memo_limit;
          Printer.param_view_cost := view_cost;
-         param_width := width;
-         param_limit := limit;
+         param_page_width := page_width;
+         param_computation_width := computation_width;
          param_size := size)
   in
   Command_unix.run main_command;
-  { page_limit = !param_width;
-    com_limit = !param_limit;
+  { page_width = !param_page_width;
+    computation_width = !param_computation_width;
     size = !param_size }
 
-let instrument f () =
-  let out = f () in
+let do_bench f =
+  let at_init = Sys.time () in
+  let out = f !param_size in
+  let at_end = Sys.time () in
   begin
     match !param_out with
     | None -> ()
@@ -97,19 +86,54 @@ let instrument f () =
       end;
       Stdlib.flush_all ()
   end;
-  if !param_view_lines then begin
-    Printf.printf "(lines %d)\n"
-      (1 + (Core.String.count out ~f:(fun x -> x = '\n')));
-    Stdlib.flush_all ()
-  end
+  let module S = Core.Sexp in
+  Printf.printf "%s\n"
+    (S.to_string
+       (S.List
+          [S.List
+             [S.Atom "name";
+              S.Atom !param_name];
 
-let measure_time f =
-  let f = instrument (fun () -> f !param_size) in
-  Bench.bench
-    ~run_config:
-      (Bench.Run_config.create
-         ?quota:
-           (if !param_iter = 0 then None
-            else Some (Bench.Quota.Num_calls !param_iter))
-         ())
-    [Bench.Test.create ~name:"Benchmark" f];
+           S.List
+             [S.Atom "duration";
+              S.Atom (string_of_float (at_end -. at_init))];
+
+           S.List
+             [S.Atom "lines";
+              S.Atom (string_of_int
+                        (1 + (Core.String.count out ~f:(fun x -> x = '\n'))))];
+
+           S.List
+             [S.Atom "size";
+              S.Atom (string_of_int !param_size)];
+
+           S.List
+             [S.Atom "page-width";
+              S.Atom (string_of_int !param_page_width)];
+
+           S.List
+             [S.Atom "computation-width";
+              S.Atom (string_of_int !param_computation_width)];
+
+           S.List
+             [S.Atom "md5";
+              S.Atom (out |> Digest.string |> Digest.to_hex)];
+
+           S.List
+             [S.Atom "memo-limit";
+              S.Atom (string_of_int !Printer.param_memo_limit)]]))
+
+(* Core bench unfortunately doesn't meet the flexibility that I want. *)
+
+(* Bench.bench *)
+(*   ~display_config: *)
+(*     (Bench.Display_config.create *)
+(*        ~show_output_as_sexp: true *)
+(*        ()) *)
+  (*   ~run_config: *)
+  (*     (Bench.Run_config.create *)
+  (*        ?quota: *)
+  (*          (if !param_iter = 0 then None *)
+  (*           else Some (Bench.Quota.Num_calls !param_iter)) *)
+  (*        ()) *)
+  (*   [Bench.Test.create ~name:"Benchmark" f]; *)

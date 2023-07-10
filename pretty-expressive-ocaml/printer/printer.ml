@@ -307,25 +307,17 @@ module Printer (C : Signature.CostFactory): Signature.PrinterT = struct
   let hcat = fold_doc (<->)
   let vcat = fold_doc (<$>)
 
-  let enclose_sep left right sep ds =
-    match ds with
-    | [] -> left <+> right
-    | [d] -> left <+> d <+> right
-    | d :: ds ->
-      ((hcat (left :: Core.List.intersperse ~sep: sep (d :: ds)))
-       <|> (vcat ((left <+> d) :: List.map ((<+>) sep) ds)))
-      <+> right
 end
 
 module DefaultCost (C: Signature.Config): Signature.CostFactory = struct
   type t = int * int
-  let limit = C.limit
+  let limit = C.computation_width
 
   let text pos len =
     let stop = pos + len in
-    if stop > C.width_limit then
-      let maxwc = max C.width_limit pos in
-      let a = maxwc - C.width_limit in
+    if stop > C.page_width then
+      let maxwc = max C.page_width pos in
+      let a = maxwc - C.page_width in
       let b = stop - maxwc in
       (b * (2*a + b), 0)
     else

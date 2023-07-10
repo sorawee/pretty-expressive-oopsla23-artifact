@@ -83,21 +83,6 @@ sig
       This is especially useful when we want to do horizontal concatenation,
       but don't want the left part to have multiple lines. *)
 
-  val enclose_sep : doc -> doc -> doc -> doc list -> doc
-  (** [enclose_sep left right sep ds] is a document for a choice between
-
-      {[left d_1 sep d_2 sep ... sep dn right]}
-
-      and
-
-      {[left d_1
-        sep d_2
-        sep ...
-        sep d_n right]}
-
-      where [d_1 d_2 ... d_n] are drawn from [ds], and
-      the first style is constrained to not have any newline *)
-
   val fold_doc : (doc -> doc -> doc) -> doc list -> doc
   (** [fold_doc (++) ds] is a shorthand for [d_1 ++ d_2 ++ ... ++ d_n]
       where [d_1 d_2 ... d_n] are drawn from [ds]. *)
@@ -145,9 +130,9 @@ module type Config =
 sig
   (** A configuration for the pre-defined cost factory *)
 
-  val width_limit : int
+  val page_width : int
   (** the page width limit *)
 
-  val limit: int
+  val computation_width: int
   (** the computation width limit *)
 end

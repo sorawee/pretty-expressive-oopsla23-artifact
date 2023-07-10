@@ -6,9 +6,9 @@ import qualified Criterion.Main as C
 import qualified Text.PrettyPrint.Leijen   as WL
 import qualified Text.PrettyPrint.Compact  as PC
 import qualified TextPatched.PrettyPrint.Compact  as PCP
-import BernardyPaper
+import PrinterPaper.BernardyPaper
 
-import LibTest
+import Lib.Bench
 
 ppWL :: Int -> WL.Doc
 ppWL 0 = WL.text ""

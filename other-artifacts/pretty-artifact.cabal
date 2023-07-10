@@ -11,10 +11,22 @@ Library
     TextPatched.PrettyPrint.Compact
     TextPatched.PrettyPrint.Compact.Core
     Constants.Values
+    PrinterPaper.BernardyPaper
+    PrinterPaper.BernardyCustomizableWidth
+    Lib.Bench
+    Lib.JSON
+    Lib.SExp
   build-depends:
     base >= 3 && < 5,
     base-compat >= 0.9.3 && <0.13,
-    containers
+    containers,
+    wl-pprint,
+    criterion-measurement,
+    criterion,
+    optparse-applicative,
+    bytestring,
+    aeson,
+    attoparsec
 
 common warnings
     ghc-options: -Wall
@@ -22,39 +34,33 @@ common warnings
 common deps
     import:           warnings
     build-depends:    base,
-                      optparse-applicative,
-                      criterion,
-                      criterion-measurement,
                       aeson,
-                      bytestring,
-                      attoparsec,
+                      criterion,
                       wl-pprint,
                       text,
                       pretty-artifact
-    other-modules:    BernardyPaper, BernardyCustomizableWidth,
-                      LibTest, LibJSON, LibSExp
-    hs-source-dirs:   app
+    hs-source-dirs:   benchmarks
 
-executable test-fill-sep
+executable fill-sep
     import: deps
-    main-is:          TestFillSep.hs
+    main-is:          FillSep.hs
 
-executable test-sexp-full
+executable sexp-full
     import: deps
-    main-is:          TestSExpFull.hs
+    main-is:          SExpFull.hs
 
-executable test-sexp-random
+executable sexp-random
     import: deps
-    main-is:          TestSExpRandom.hs
+    main-is:          SExpRandom.hs
 
-executable test-json
+executable json
     import: deps
-    main-is:          TestJSON.hs
+    main-is:          JSON.hs
 
-executable test-flatten
+executable flatten
     import: deps
-    main-is:          TestFlatten.hs
+    main-is:          Flatten.hs
 
-executable test-concat
+executable concat
     import: deps
-    main-is:          TestConcat.hs
+    main-is:          Concat.hs

@@ -3,7 +3,7 @@ module Main where
 import qualified Criterion.Main as C
 import qualified Text.PrettyPrint.Leijen   as WL
 
-import LibTest
+import Lib.Bench
 
 pp :: Int -> WL.Doc
 pp 0 = WL.text "line"

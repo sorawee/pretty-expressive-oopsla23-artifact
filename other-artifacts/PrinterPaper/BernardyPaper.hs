@@ -1,6 +1,8 @@
 {-# LANGUAGE FlexibleInstances, InstanceSigs #-}
 
-module BernardyPaper where
+module PrinterPaper.BernardyPaper where
+
+-- The pretty printer as originally appeared in Bernardy's paper
 
 import Prelude hiding ((<>))
 import Data.List (intercalate, minimumBy)

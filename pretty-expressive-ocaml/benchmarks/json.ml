@@ -1,21 +1,33 @@
 open Printer
 open Benchtool
 
-let {page_limit; com_limit; size; _} = setup ~size:2 ()
+let {page_width; computation_width; size; _} = setup ~size:2 "json"
 
-let () =
-  if not (size = 1 || size = 2) then
-    raise (Arg.Bad "bad size")
+let json_file =
+  match size with
+  | 1 -> "/1k.json"
+  | 2 -> "/10k.json"
+  | _ -> raise (Arg.Bad "bad size")
 
 module P = Printer (DefaultCost (struct
-                      let limit = com_limit
-                      let width_limit = page_limit
+                      let page_width = page_width
+                      let computation_width = computation_width
                     end))
 
 open P
 
-(* NOTE: Bernardy formats JSON in the Haskell style, which is unconventional *)
-(* We follow the style, however, to obtain comparable data points. *)
+(* NOTE: Bernardy's paper formats JSON in the Haskell style, *)
+(* which is unconventional. We follow the style, however, *)
+(* to obtain comparable data points. *)
+
+let enclose_sep left right sep ds =
+  match ds with
+  | [] -> left <+> right
+  | [d] -> left <+> d <+> right
+  | d :: ds ->
+    ((hcat (left :: Core.List.intersperse ~sep: sep (d :: ds)))
+     <|> (vcat ((left <+> d) :: List.map ((<+>) sep) ds)))
+    <+> right
 
 let rec pp v =
   match v with
@@ -32,8 +44,6 @@ let rec pp v =
     enclose_sep lbrace rbrace comma xs
   | _ -> failwith "bad"
 
-let () =
-  let smallJson = Yojson.Basic.from_file "../benchdata/1k.json" in
-  let bigJson = Yojson.Basic.from_file "../benchdata/10k.json" in
-  measure_time (fun _ ->
-      print (pp (if size = 1 then smallJson else bigJson)))
+let json = Yojson.Basic.from_file (Sys.getenv "BENCHDATA" ^ json_file)
+
+let () = do_bench (fun _ -> print (pp json))

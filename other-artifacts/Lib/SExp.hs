@@ -1,4 +1,4 @@
-module LibSExp where
+module Lib.SExp where
 
 import qualified Text.PrettyPrint.Compact as PC
 import qualified TextPatched.PrettyPrint.Compact as PCP

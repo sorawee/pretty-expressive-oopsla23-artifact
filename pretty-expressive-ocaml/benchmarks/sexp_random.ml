@@ -1,11 +1,11 @@
 open Printer
 open Benchtool
 
-let {page_limit; com_limit; _} = setup ~size:1 ()
+let {page_width; computation_width; size; _} = setup ~size:1 "sexp-random"
 
 module P = Printer (DefaultCost (struct
-                      let limit = com_limit
-                      let width_limit = page_limit
+                      let page_width = page_width
+                      let computation_width = computation_width
                     end))
 
 open P
@@ -28,9 +28,9 @@ let rec convert v =
   | `List xs -> List (List.map convert xs)
   | _ -> failwith "bad"
 
-let () =
-  measure_time (fun size ->
-      let json = Yojson.Basic.from_file
-          (Sys.getenv "BENCHDATA"  ^ "/random-tree-" ^ string_of_int size ^ ".sexp") in
-      let t = convert json in
-      print (pp t))
+let json = Yojson.Basic.from_file
+    (Sys.getenv "BENCHDATA"  ^ "/random-tree-" ^ string_of_int size ^ ".sexp")
+
+let doc = convert json
+
+let () = do_bench (fun size -> print (pp doc))

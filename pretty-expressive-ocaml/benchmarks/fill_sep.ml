@@ -1,11 +1,11 @@
 open Printer
 open Benchtool
 
-let {page_limit; com_limit; _} = setup ~size:20000 ()
+let {page_width; computation_width; _} = setup ~size:20000 "fill-sep"
 
 module P = Printer (DefaultCost (struct
-                      let limit = com_limit
-                      let width_limit = page_limit
+                      let page_width = page_width
+                      let computation_width = computation_width
                     end))
 
 open P
@@ -23,4 +23,4 @@ let fill_sep xs =
 
 let () =
   let lines = Stdio.In_channel.read_lines "/usr/share/dict/words" in
-  measure_time (fun size -> print (fill_sep (Core.List.take lines size)))
+  do_bench (fun size -> print (fill_sep (Core.List.take lines size)))

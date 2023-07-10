@@ -1,10 +1,18 @@
-module BernardyCustomizableWidth where
+module PrinterPaper.BernardyCustomizableWidth where
+
+-- This file is an experiment to patch the pretty printer in Bernardy's paper,
+-- (BernardyPaper) which does not suffer from combinatorial explosion,
+-- to support customizable width limit.
+-- Unfortunately, the experiment shows that supporting customizable width limit
+-- is precisely what causes the combinatorial explosion,
+-- as computations are no longer shared.
+-- In our paper, this version is not included.
 
 import Prelude hiding ((<>))
 import Data.List (minimumBy)
 import Data.Function
 
-import BernardyPaper
+import PrinterPaper.BernardyPaper
 
 newtype ODoc = MkDoc {fromDoc :: Int -> [(M, L)]}
 

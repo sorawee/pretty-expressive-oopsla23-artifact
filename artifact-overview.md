@@ -78,11 +78,11 @@ As detailed in Section 6, we implemented the OCaml and Racket SnowWhite,
 and then implemented the Racket code formatter which utilizes the Racket SnowWhite as its foundation.
 The artifact contains all three implementations.
 
-| Name                            | Path                                  |
-|---------------------------------|---------------------------------------|
-| OCaml SnowWhite pretty printer  | `/workspace/pretty-expressive-ocaml`  |
-| Racket SnowWhite pretty printer | `/workspace/pretty-expressive-racket` |
-| Racket code formatter           | `/workspace/fmt`                      |
+| Name                            | Path                                         |
+|---------------------------------|----------------------------------------------|
+| OCaml SnowWhite pretty printer  | `/workspace/pretty-expressive-ocaml/printer` |
+| Racket SnowWhite pretty printer | `/workspace/pretty-expressive-racket`        |
+| Racket code formatter           | `/workspace/fmt`                             |
 
 ### Evaluation 
 
@@ -93,9 +93,9 @@ In Section 7, we claimed that:
 
 These claims are backed by two experiments. 
 
-The first experiment compares OCaml SnowWhite against other popular pretty printers 
+The first experiment compares the OCaml SnowWhite against other popular pretty printers 
 (Bernardy's and Wadler/Leijen's pretty printer) on a set of benchmarks. 
-The description on each benchmark can be found in Section 7.1.
+The description of the benchmarks can be found in Section 7.1.
 
 The second experiment runs the Racket code formatter to evaluate its performance and quality 
 on another set of benchmarks.
@@ -103,7 +103,6 @@ on another set of benchmarks.
 Table 2 and Table 3 detail the results of these experiments, 
 and Section 7.3 explains how they support the claims.
 This artifact contains the benchmarks and scripts to reproduce both tables.
-
 
 ## Getting Started Guide 
 
@@ -253,3 +252,22 @@ Likewise, .
 ## Additional information 
 
 ### Artifact contents
+
+### Documentation 
+
+All implementations and Lean formalization are documented via the recommended format for their ecosystems.
+For the Racket SnowWhite and Racket code formatter, the documentation is in the Scribble format. 
+For the OCaml SnowWhite, the documentation is in the interface files (`.mli`). 
+For the Lean formalization, the documentation is written in-source. 
+Reviewers can read the documentation from these formats directly. 
+
+Optionally, reviewers can generate HTMLs using tools in the ecosystem 
+(`doc-gena4` for Lean code, `scribble` for Racket code, and `odoc` for OCaml code).
+We are aware that these tools do not work in all circumstances (e.g. in Docker when running Appple M1), which is why HTML generation is optional for reviewing.
+
+Although not a part of the artifact, these HTML documentations are also online at 
+
+- Lean formalization: TODO(sorawee)
+- OCaml SnowWhite: TODO(sorawee)
+- Racket SnowWhite: TODO(sorawee)
+- Racket code formatter: TODO(sorawee)

@@ -3,19 +3,18 @@ module Main where
 import Prelude hiding ((<>))
 import qualified Criterion.Main as C
 
-import BernardyPaper
+import qualified Data.Text as TXT
+import Data.Aeson.Types
+import Data.Foldable (toList)
+
 import qualified Text.PrettyPrint.Compact as PC
 import qualified TextPatched.PrettyPrint.Compact as PCP
 import qualified Text.PrettyPrint.Leijen   as WL
+import PrinterPaper.BernardyPaper
 
-import LibTest
-import LibSExp
-
-testExpr :: Int -> Int -> (SExpr, Int)
-testExpr 0 c = (Atom $ show c, c + 1)
-testExpr n c = (SExpr [t1, t2], c2)
-  where (t1, c1) = testExpr (n-1) c
-        (t2, c2) = testExpr (n-1) c1
+import Lib.Bench
+import Lib.JSON
+import Lib.SExp
 
 prettyPC ::  SExpr -> PC.Doc ()
 prettyPC  (Atom s)    = PC.text s
@@ -49,16 +48,24 @@ bench t conf = do
         | otherwise = error "impossible"
   return s
 
+convert :: Value -> SExpr
+convert (Array a) = SExpr $ map convert $ toList a
+convert (String s) = Atom $ TXT.unpack s
+convert _ = error "impossible"
+
 core :: TestingFun
 core conf = do
-  let (t, _) = testExpr (size conf) 0
-  return $ C.nfAppIO (instrument $ bench t) conf
+  let fname | size conf == -1 = "../benchdata/tmp.sexp"
+            | otherwise = "../benchdata/random-tree-" ++ (show $ size conf) ++ ".sexp"
+
+  tree <- readJSONValue fname
+  return $ C.nfAppIO (instrument (bench $ convert tree)) conf
 
 main :: IO ()
 main = do
   runIt
-    "TestFullSExp"
-    (defaultConfig { size = 10 })
+    "TestRandomSExp"
+    (defaultConfig { size = 1 })
     (validateTargets
       [ bernardyMeasureTarget
       , bernardyPaperTarget

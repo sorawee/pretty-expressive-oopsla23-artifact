@@ -5,15 +5,15 @@ open Benchtool
 (*       when the size is large. *)
 (*       E.g., the size could be as large as `500` with *)
 (*       `ulimit -s 65520` *)
-let {page_limit; com_limit; size; _} = setup ~size:100 ~width:0 ()
+let {page_width; computation_width; size; _} = setup ~size:100 ~width:0 "yelland-sup-linear"
 
 let () =
   if not (size > 500) then
     raise (Arg.Bad "bad size")
 
-module P = Printer( DefaultCost (struct
-                      let limit = com_limit
-                      let width_limit = page_limit
+module P = Printer (DefaultCost (struct
+                      let page_width = page_width
+                      let computation_width = computation_width
                     end))
 
 open P
@@ -46,4 +46,4 @@ let example (k : int): doc =
   let giant = make_choices k in
   dummy <+> giant
 
-let () = measure_time (fun i -> print (example i))
+let () = do_bench (fun i -> print (example i))
