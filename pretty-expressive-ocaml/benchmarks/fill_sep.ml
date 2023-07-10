@@ -23,4 +23,4 @@ let fill_sep xs =
 
 let () =
   let lines = Stdio.In_channel.read_lines "/usr/share/dict/words" in
-  measure_time (fun size -> render (fill_sep (Core.List.take lines size)))
+  measure_time (fun size -> print (fill_sep (Core.List.take lines size)))

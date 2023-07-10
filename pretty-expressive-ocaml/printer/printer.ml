@@ -180,8 +180,8 @@ module CorePrinter (C : Signature.CostFactory) = struct
       else f g d c i
     in g
 
-  let render (d : doc): string =
-    let render self { dc; _ } (c : int) (i : int) : measure_set =
+  let print (d : doc): string =
+    let resolve self { dc; _ } (c : int) (i : int) : measure_set =
       let core () =
         match dc with
         | Fail -> failwith "fails to render"
@@ -210,7 +210,7 @@ module CorePrinter (C : Signature.CostFactory) = struct
             | MeasureSet (m :: _) -> m
             | _ -> failwith "impossible")
       else core () in
-    let m = match memoize render d 0 0 with
+    let m = match memoize resolve d 0 0 with
       | MeasureSet (m :: _) -> m
       | Tainted m ->
         if !param_view_cost then Printf.printf "tainted\n";

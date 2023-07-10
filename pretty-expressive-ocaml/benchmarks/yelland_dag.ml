@@ -21,4 +21,4 @@ let rec mk (n : int): doc =
   if n = 0 then text "X"
   else let subdoc = mk (n - 1) in (chr n <> subdoc <> chr n) <|> subdoc
 
-let () = measure_time (fun size -> render (mk size))
+let () = measure_time (fun size -> print (mk size))

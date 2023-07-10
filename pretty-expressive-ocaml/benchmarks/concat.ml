@@ -14,4 +14,4 @@ let rec pp (n : int): doc =
   if n = 0 then empty
   else (pp (n - 1)) <> text "line"
 
-let () = measure_time (fun size -> render (pp size))
+let () = measure_time (fun size -> print (pp size))

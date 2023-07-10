@@ -46,4 +46,4 @@ let example (k : int): doc =
   let giant = make_choices k in
   dummy <+> giant
 
-let () = measure_time (fun i -> render (example i))
+let () = measure_time (fun i -> print (example i))

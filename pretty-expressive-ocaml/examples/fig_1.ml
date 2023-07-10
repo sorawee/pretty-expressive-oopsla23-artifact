@@ -23,4 +23,4 @@ let d =
   ) <$> text "}"
 
 let () =
-  Printf.printf "%s\n" (render d)
+  Printf.printf "%s\n" (print d)

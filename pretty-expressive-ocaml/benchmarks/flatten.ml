@@ -14,4 +14,4 @@ let rec quadratic (n : int): doc =
   if n = 0 then text "line"
   else group (quadratic (n - 1)) <> nl <> text "line"
 
-let () = measure_time (fun size -> render (quadratic size))
+let () = measure_time (fun size -> print (quadratic size))

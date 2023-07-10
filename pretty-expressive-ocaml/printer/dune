@@ -1,4 +1,5 @@
 (library
  (name printer)
+ (public_name pretty_expressive)
  (libraries core)
  (modules_without_implementation signature))

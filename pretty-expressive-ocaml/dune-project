@@ -1,1 +1,5 @@
 (lang dune 3.0)
+(name pretty_expressive)
+(generate_opam_files true)
+(package
+ (name pretty_expressive))

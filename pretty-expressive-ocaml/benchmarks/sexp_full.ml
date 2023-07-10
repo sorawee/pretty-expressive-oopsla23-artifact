@@ -33,4 +33,4 @@ let rec test_expr n c =
 let () =
   measure_time (fun size ->
       let (t, _) = test_expr size 0 in
-      render (pp t))
+      print (pp t))

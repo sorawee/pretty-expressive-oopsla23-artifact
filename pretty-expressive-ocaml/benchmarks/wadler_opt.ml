@@ -5,7 +5,7 @@ let {page_limit; com_limit; size; _} = setup ~width:5 ~size:0 ()
 
 let () =
   if not (size = 0) then
-    raise (Arg.Bad "bad size")
+    raise (Arg.Bad "Size must be zero")
 
 module P = Printer (DefaultCost (struct
                       let limit = com_limit
@@ -21,4 +21,4 @@ let doc =
             text "B" <> nl <>
             text "B"))
 
-let () = print_string (render doc)
+let () = print_string (print doc)

@@ -36,4 +36,4 @@ let () =
   let smallJson = Yojson.Basic.from_file "../benchdata/1k.json" in
   let bigJson = Yojson.Basic.from_file "../benchdata/10k.json" in
   measure_time (fun _ ->
-      render (pp (if size = 1 then smallJson else bigJson)))
+      print (pp (if size = 1 then smallJson else bigJson)))

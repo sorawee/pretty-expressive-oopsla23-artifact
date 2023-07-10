@@ -31,6 +31,6 @@ let rec convert v =
 let () =
   measure_time (fun size ->
       let json = Yojson.Basic.from_file
-          ("../benchdata/random-tree-" ^ (string_of_int size) ^ ".sexp") in
+          (Sys.getenv "BENCHDATA"  ^ "/random-tree-" ^ string_of_int size ^ ".sexp") in
       let t = convert json in
-      render (pp t))
+      print (pp t))
