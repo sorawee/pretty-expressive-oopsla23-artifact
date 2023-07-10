@@ -7,7 +7,7 @@ sig
   (** A type for cost *)
 
   val text : int -> int -> t
-  (** [text c i] calculate a cost for a text placement at column position [c]
+  (** [text c i] calculates a cost for a text placement at column position [c]
       and indentation level [i] *)
 
   val newline : int -> t
@@ -20,7 +20,7 @@ sig
   (** [le x y] tests if the cost [x] is less than or equal to the cost [y]. *)
 
   val limit: int
-  (** [limit] is a computation width limit. *)
+  (** [limit] is the computation width limit. *)
 
   val debug : t -> string
   (** [debug c] produces a string representation of a cost [c] *)
@@ -36,7 +36,7 @@ sig
 
   val text : string -> doc
   (** [text s] is a document for textual content [s];
-      [s] must not have a newline. *)
+      [s] must not contain a newline. *)
 
   val (<>) : doc -> doc -> doc
   (** [a <> b] is a document for concatenation of documents [a] and [b]

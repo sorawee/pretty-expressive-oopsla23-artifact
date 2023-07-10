@@ -1,10 +1,10 @@
 (**  This module provides a pretty expressive printer. *)
 
 val param_memo_limit: int ref
-(** A parameter to set memoization weight; positive integer; default is [7] *)
+(** A parameter to set the memoization weight. It must be positive. Defaults to [7] *)
 
 val param_view_cost: bool ref
-(** A parameter whether to print cost for debugging; default is [false] *)
+(** A parameter saying whether to print the cost, for debugging purposes. Defaults to [false] *)
 
 module DefaultCost :
   functor (Config : Signature.Config) -> Signature.CostFactory

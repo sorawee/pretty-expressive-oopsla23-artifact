@@ -8,7 +8,8 @@ For non-reviewers: this artifact is for the initially submitted paper
 The camera ready version may have different organization 
 (e.g., different section or figure numbering),
 causing mismatches between the paper and the artifact.
-We will provide an updated artifact that is consistent with the camera ready version, however.
+In the future, and updated artifact that is consistent with the camera ready
+paper will be available at <https://github.com/sorawee/pretty-artifact>.
 
 ## Table of contents
 
@@ -35,7 +36,7 @@ SnowWhite is practically efficient and produces layouts with high quality.
 The artifact supports the paper by providing the Lean formalization, implementations, 
 and benchmarks to reproduce the evaluation.
 
-More elaboratedly, following are all claims in the paper.
+The following elaborates all claims made in the paper.
 
 ### Formalization and proofs
 
@@ -70,13 +71,13 @@ under the directory `/workspace/lean/Pretty`.
 | Taintedness when resolving exceeds the limit                              | Page 20, Lemma 5.10  | `Claims/ResolveEfficient.lean` | `Resolve_exceeding_tainted`                                               |                                                   |
 | Conformance of SnowWhite's cost factory to the cost factory interface | Page 20, Section 6   | `Claims/OurFactory.lean`       | `ourFactory`                                                              |                                                   |
 
-Other proofs (those in Section 4 and the main time complexity analysis) are sketched in Appendix B.
+Other proofs (those in Section 4 and the main time complexity analysis) are sketched in Appendix B of the paper.
 
 ### Implementations 
 
-As detailed in Section 6, we implemented the OCaml and Racket SnowWhite,
-and then implemented the Racket code formatter which utilizes the Racket SnowWhite as its foundation.
-The artifact contains all three implementations.
+As described in Section 6, we implemented SnowWhite in both OCaml and Racket,
+and implemented a code formatter for Racket code using the Racket version of
+SnowWhite. The artifact contains all three implementations:
 
 | Name                            | Path                                         |
 |---------------------------------|----------------------------------------------|
@@ -99,9 +100,9 @@ The description of the benchmarks can be found in Section 7.1.
 
 The second experiment runs the Racket code formatter to evaluate its performance and quality 
 on another set of benchmarks.
-
 Table 2 and Table 3 detail the results of these experiments, 
 and Section 7.3 explains how they support the claims.
+
 This artifact contains the benchmarks and scripts to reproduce both tables.
 
 ## Getting Started Guide 
@@ -113,7 +114,7 @@ To use this artifact, you will need a machine capable of running Docker with at 
 For reference, we tested this artifact on an Apple M1 Macbook Pro with 16GB of RAM. 
 The performance results you obtain may vary from ours because of the lack of Dockerization in our run, 
 and they may depend on your particular machine setup, including CPU, available RAM, concurrently running processes, etc. 
-However, we do expect relative performance on the benchmarks to be approximately the same.
+However, we do expect the _relative_ performance on the benchmarks to be approximately the same.
 
 ### Installation
 
@@ -148,14 +149,7 @@ $ lake clean
 $ lake build
 ```
 
-This should produce exactly one error:
-
-```
-./././Pretty/Bad.lean:5:31: error: unsolved goals
-⊢ False
-```
-
-All other files should be built without any error.
+This should produce no errors.
 
 #### Sanity test: implementations
 
@@ -167,20 +161,43 @@ All other files should be built without any error.
 
 ### Evaluation: comparison of pretty printers 
 
-| Benchmark ID | Benchmarks                                     | Available targets                                                                                     |
-|-------------------|------------------------------------------------|-------------------------------------------------------------------------------------------------------|
-| `concat`          | Concat10k, Concat50k                           | `pretty-expressive`, `leijen`, `bernardy-patched`                                                     |
-| `fill-sep`        | FillSep5k, FillSep50k                          | `pretty-expressive`, `leijen`, `bernardy-paper`, `bernardy-patched`                                   |
-| `flatten`         | Flatten8k, Flatten16k                          | `pretty-expressive`, `leijen`                                                                         |
-| `sexp-full`       | SExpFull15, SExpFull16                         | `pretty-expressive`, `leijen`, `bernardy-paper`, `bernardy-patched`                                   |
-| `sexp-random`     | RandFit1k, RandFit10k, RandOver1k, RandOver10k | `pretty-expressive`, `leijen`, `bernardy-paper` (failing for RandOver benchmarks), `bernardy-patched` |
-| `json`            | JSON1k, JSON10k, JSONW                         | `pretty-expressive`, `leijen`, `bernardy-patched`                                                     |
 
 
 ### Evaluation: Racket code formatter 
 
 Table 3 details the results of this experiment. 
-Likewise, .
+Likewise, TODO.
+
+
+## Additional information 
+
+### Artifact contents
+
+### Documentation 
+
+All implementations and Lean formalization are documented via the recommended format for their ecosystems.
+For the Racket SnowWhite and Racket code formatter, the documentation is in the Scribble format. 
+For the OCaml SnowWhite, the documentation is in the interface files (`.mli`). 
+For the Lean formalization, the documentation is written in-source. 
+Reviewers can read the documentation from these formats directly. 
+
+Optionally, reviewers can generate HTMLs using tools in the ecosystem 
+(`doc-gena4` for Lean code, `scribble` for Racket code, and `odoc` for OCaml code).
+We are aware that these tools do not work in all circumstances (e.g. in Docker when running Appple M1), which is why HTML generation is optional for reviewing.
+
+Although not a part of the artifact, these HTML documentations are also online at 
+
+- Lean formalization: TODO(sorawee)
+- OCaml SnowWhite: TODO(sorawee)
+- Racket SnowWhite: TODO(sorawee)
+- Racket code formatter: TODO(sorawee)
+
+### Benchmark Details
+
+The benchmark commands above ran _all_ of the benchmarks, but they can also be
+run individually. `racket table-2.rkt --help` describes the options.
+This table details the commands you would use to reproduce each cell in the
+table individually:
 
 | Benchmark   | Commands                                                                                                                   |
 |-------------|----------------------------------------------------------------------------------------------------------------------------|
@@ -249,25 +266,14 @@ Likewise, .
 |             | `racket table-2.rkt --benchmark json --size 1 --page-width 50 --target wadler`                                             |
 |             | `racket table-2.rkt --benchmark json --size 1 --page-width 50 --target bernardy-patched`                                   |
 
-## Additional information 
+TODO: Delete the following table? It's redundant with the above.
 
-### Artifact contents
+| Benchmark ID | Benchmarks                                     | Available targets                                                                                     |
+|-------------------|------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| `concat`          | Concat10k, Concat50k                           | `pretty-expressive`, `leijen`, `bernardy-patched`                                                     |
+| `fill-sep`        | FillSep5k, FillSep50k                          | `pretty-expressive`, `leijen`, `bernardy-paper`, `bernardy-patched`                                   |
+| `flatten`         | Flatten8k, Flatten16k                          | `pretty-expressive`, `leijen`                                                                         |
+| `sexp-full`       | SExpFull15, SExpFull16                         | `pretty-expressive`, `leijen`, `bernardy-paper`, `bernardy-patched`                                   |
+| `sexp-random`     | RandFit1k, RandFit10k, RandOver1k, RandOver10k | `pretty-expressive`, `leijen`, `bernardy-paper` (failing for RandOver benchmarks), `bernardy-patched` |
+| `json`            | JSON1k, JSON10k, JSONW                         | `pretty-expressive`, `leijen`, `bernardy-patched`                                                     |
 
-### Documentation 
-
-All implementations and Lean formalization are documented via the recommended format for their ecosystems.
-For the Racket SnowWhite and Racket code formatter, the documentation is in the Scribble format. 
-For the OCaml SnowWhite, the documentation is in the interface files (`.mli`). 
-For the Lean formalization, the documentation is written in-source. 
-Reviewers can read the documentation from these formats directly. 
-
-Optionally, reviewers can generate HTMLs using tools in the ecosystem 
-(`doc-gena4` for Lean code, `scribble` for Racket code, and `odoc` for OCaml code).
-We are aware that these tools do not work in all circumstances (e.g. in Docker when running Appple M1), which is why HTML generation is optional for reviewing.
-
-Although not a part of the artifact, these HTML documentations are also online at 
-
-- Lean formalization: TODO(sorawee)
-- OCaml SnowWhite: TODO(sorawee)
-- Racket SnowWhite: TODO(sorawee)
-- Racket code formatter: TODO(sorawee)
