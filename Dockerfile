@@ -136,9 +136,9 @@ COPY benchmark-results /workspace/benchmark-results
 COPY pdf /workspace/pdf
 COPY output-dir /workspace/output-dir
 
+WORKDIR /workspace
+
 COPY artifact-overview.md artifact-overview.md
 
 ###################################################
 # Done
-
-WORKDIR /workspace
