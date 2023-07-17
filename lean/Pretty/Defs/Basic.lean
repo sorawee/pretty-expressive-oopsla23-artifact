@@ -8,16 +8,16 @@ import Pretty.Supports.FactoryMath
 -/
 
 /--
-Layout definition. We encode it as a pair of `String` and `List String` 
-so that the layout always has at least one line (Section 3.1)
+Layout definition, which has at least one line (Section 3.1)
 -/ 
-structure Layout where
-  fst : String
-  rst : List String
+inductive Layout where 
+  | single (s : String) : Layout 
+  | multi (first : String) (middle : List String) (last : String) : Layout
 
-def Layout.max_with_offset : ℕ → Layout → ℕ 
-| col_pos, { fst := fst, rst := rst } => 
-    max (col_pos + fst.length) ((rst.map String.length).foldl max 0)
+def Layout.max_with_offset (col_pos : ℕ) : Layout → ℕ 
+| Layout.single s => col_pos + s.length
+| Layout.multi first middle last =>
+    max (col_pos + first.length) (max last.length ((middle.map String.length).foldl max 0))
 
 /-!
 ### Document
@@ -64,18 +64,24 @@ Rendering relation definition ($⇓_\mathcal{R}$, Figure 6).
 One deviation is that the flattening mode is not included, as explained in Page 16, Section 5.3.
 -/ 
 inductive Render : Doc → ℕ → ℕ → Layout → Prop where
-  | text : Render (Doc.text s) c i (Layout.mk s [])
-  | nl : Render Doc.nl c i (Layout.mk "" [List.asString (List.replicate i ' ')])
-  | concat_one
-      (h₁ : Render d₁ c i (Layout.mk s [])) 
-      (h₂ : Render d₂ (c + s.length) i (Layout.mk t ts)) : 
-      Render (Doc.concat d₁ d₂) c i (Layout.mk (s ++ t) ts)
-  | concat_multi 
-      (h_non_empty : ss ≠ []) 
-      (h_last : slast = List.getLast ss (by assumption))
-      (h₁ : Render d₁ c i (Layout.mk s ss))
-      (h₂ : Render d₂ slast.length i (Layout.mk t ts)) : 
-      Render (Doc.concat d₁ d₂) c i (Layout.mk s ((List.dropLast ss) ++ [slast ++ t] ++ ts))
+  | text : Render (Doc.text s) c i (Layout.single s)
+  | nl : Render Doc.nl c i (Layout.multi "" [] (List.asString (List.replicate i ' ')))
+  | concat_single_single
+      (h₁ : Render d₁ c i (Layout.single s₁)) 
+      (h₂ : Render d₂ (c + s₁.length) i (Layout.single s₂)) : 
+      Render (Doc.concat d₁ d₂) c i (Layout.single (s₁ ++ s₂))
+  | concat_single_multi
+      (h₁ : Render d₁ c i (Layout.single s₁)) 
+      (h₂ : Render d₂ (c + s₁.length) i (Layout.multi first₂ middle₂ last₂)) : 
+      Render (Doc.concat d₁ d₂) c i (Layout.multi (s₁ ++ first₂) middle₂ last₂)
+  | concat_multi_single
+      (h₁ : Render d₁ c i (Layout.multi first₁ middle₁ last₁)) 
+      (h₂ : Render d₂ last₁.length i (Layout.single s₂)) : 
+      Render (Doc.concat d₁ d₂) c i (Layout.multi first₁ middle₁ (last₁ ++ s₂))
+  | concat_multi_multi
+      (h₁ : Render d₁ c i (Layout.multi first₁ middle₁ last₁))
+      (h₂ : Render d₂ last₁.length i (Layout.multi first₂ middle₂ last₂)) : 
+      Render (Doc.concat d₁ d₂) c i (Layout.multi first₁ (middle₁ ++ [last₁ ++ first₂] ++ middle₂) last₂)
   | nest (h : Render d c (i + n) L) : Render (Doc.nest n d) c i L
   | align (h : Render d c c L) : Render (Doc.align d) c i L
 

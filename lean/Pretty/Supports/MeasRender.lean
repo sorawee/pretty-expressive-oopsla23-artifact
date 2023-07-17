@@ -62,14 +62,14 @@ Measure computation on a choiceless document preserves
 the doc component
 -/
 lemma MeasRender_doc (h_render : MeasRender F d c i m) (h : Choiceless d) : m.doc = d := by {
-  let ⟨⟨s, ss⟩, h⟩ := @Render_total d c i h
-  cases ss 
-  case nil => 
+  let ⟨L, h⟩ := @Render_total d c i h
+  cases L
+  case single => 
     let ⟨cost, ⟨y, h_render'⟩⟩ := MeasRender_single_correct F h
     cases MeasRender_deterministic h_render h_render'
     simp
-  case cons hd tl => 
-    let ⟨cost, ⟨y, h_render'⟩⟩ := MeasRender_multi_correct F h (by simp)
+  case multi => 
+    let ⟨cost, ⟨y, h_render'⟩⟩ := MeasRender_multi_correct F h
     cases MeasRender_deterministic h_render h_render'
     simp
 }
