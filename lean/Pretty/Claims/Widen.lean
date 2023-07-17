@@ -80,7 +80,7 @@ lemma Widen_choiceless (h : Widen d D) (h_in : d_choiceless ∈ D) : Choiceless 
   case choice ih₁ ih₂ => 
     cases h 
     rw [List.mem_append] at h_in
-    cases h_in <;> [apply ih₁, apply ih₂] <;> assumption 
+    cases h_in <;> [apply ih₁; apply ih₂] <;> assumption 
   case concat ih₁ ih₂ => 
     cases h 
     case concat => 
@@ -92,4 +92,4 @@ lemma Widen_choiceless (h : Widen d D) (h_in : d_choiceless ∈ D) : Choiceless 
       rw [List.mem_map] at h_right 
       let ⟨_, _, h_right_right⟩ := h_right 
       subst h_right_right 
-      constructor <;> [apply ih₁, apply ih₂] <;> assumption
+      constructor <;> [apply ih₁; apply ih₂] <;> assumption
