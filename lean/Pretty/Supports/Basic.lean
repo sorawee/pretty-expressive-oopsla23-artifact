@@ -10,7 +10,7 @@ import Mathlib.Data.String.Lemmas
 
 lemma List.fold_max_max_eq_max_fold_max : 
     ∀ {a b : ℕ}, List.foldl max (max a b) xs = max a (List.foldl max b xs) := by {
-  induction xs 
+  induction xs
   case nil => simp
   case cons ih => simp [ih, max_assoc]
 }
