@@ -9,8 +9,9 @@ package «pretty» {
 
 @[default_target]
 lean_lib «Pretty» {
-  -- Compile everything under Pretty
-  globs := #[`Pretty, .submodules `Pretty]
+  -- Compile Pretty.lean, which should import every submodules under Pretty/
+  -- Run `racket scripts/gen-main.rkt` to generate Pretty.lean
+  globs := #[`Pretty]
   -- Treat warnings (e.g. presence of sorry) as errors
   moreLeanArgs := #[
     "-DwarningAsError=true"
