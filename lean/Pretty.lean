@@ -26,7 +26,7 @@ import Pretty.Supports.Merge
 import Pretty.Supports.MergeBasic
 import Pretty.Supports.Pareto
 import Pretty.Supports.ResolveLast
-import Pretty.Supports.ResolveOptimality
+import Pretty.Supports.ResolveOptimal
 import Pretty.Supports.ResolvePareto
 import Pretty.Supports
 import Pretty.Tactic

@@ -69,6 +69,27 @@ lemma invalid_inequality (h₁ : F.le c₁ c₂) (h₂ : F.lt c₂ c₃) (h₃ :
   subst h 
   simp at h₂
 
+lemma bigtext_monotonic (h : c₁ ≤ c₂) : F.le (F.bigtext l c₁) (F.bigtext l c₂) := by
+  cases l
+  case single => 
+    simp [Factory.bigtext]
+    apply F.text_monotonic
+    assumption
+  case multi first middle last => 
+    cases middle
+    case nil => 
+      simp [Factory.bigtext]
+      apply F.concat_monotonic 
+      . apply F.text_monotonic 
+        assumption 
+      . apply F.le_refl 
+    case cons hd tl => 
+      simp [Factory.bigtext]
+      apply F.concat_monotonic
+      . apply F.text_monotonic 
+        assumption 
+      . apply F.concat_monotonic <;> apply F.le_refl 
+
 end FactoryImplicit
 
 end Factory

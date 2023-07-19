@@ -33,6 +33,28 @@ mutual
         constructor 
         case h_bad => simp [h_i]
         case h => assumption
+    | Doc.bigtext l => 
+      by_cases h_i : i ≤ F.W
+      case pos => 
+        by_cases h_c : l.max_with_offset c ≤ F.W 
+        case pos => 
+          let ⟨m, h⟩ := MeasRender_total F (Doc.bigtext l) c i (by constructor)
+          exists MeasureSet.set [m] (by simp) 
+          constructor <;> assumption
+        case neg => 
+          replace h_c := Nat.gt_of_not_le h_c
+          let ⟨m, h⟩ := MeasRender_total F (Doc.bigtext l) c i (by constructor)
+          exists MeasureSet.tainted m
+          constructor 
+          case h_bad => simp [h_c]
+          case h => assumption
+      case neg => 
+        replace h_i := Nat.gt_of_not_le h_i
+        let ⟨m, h⟩ := MeasRender_total F (Doc.bigtext l) c i (by constructor)
+        exists MeasureSet.tainted m
+        constructor 
+        case h_bad => simp [h_i]
+        case h => assumption
     | Doc.nl =>
       by_cases h_i : i ≤ F.W
       case pos => 

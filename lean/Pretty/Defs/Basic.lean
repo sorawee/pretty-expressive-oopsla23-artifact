@@ -1,25 +1,10 @@
+import Pretty.Defs.Layout
 import Pretty.Defs.Factory
 import Pretty.Supports.FactoryMath
 
 /-!
 ## Basic definitions
 
-### Layout
--/
-
-/--
-Layout definition, which has at least one line (Section 3.1)
--/ 
-inductive Layout where 
-  | single (s : String) : Layout 
-  | multi (first : String) (middle : List String) (last : String) : Layout
-
-def Layout.max_with_offset (col_pos : ℕ) : Layout → ℕ 
-| Layout.single s => col_pos + s.length
-| Layout.multi first middle last =>
-    max (col_pos + first.length) (max last.length ((middle.map String.length).foldl max 0))
-
-/-!
 ### Document
 -/
 
@@ -29,6 +14,7 @@ One deviation is that we don't include the `flatten` construct, as explained in 
 -/ 
 inductive Doc where 
   | text (s : String) : Doc
+  | bigtext (l : Layout) : Doc
   | nl : Doc
   | concat (d₁ d₂ : Doc) : Doc
   | nest (n : Nat) (d : Doc) : Doc
@@ -37,6 +23,7 @@ inductive Doc where
 
 def Doc.size : Doc → ℕ
   | Doc.text _ => 1 
+  | Doc.bigtext _ => 1
   | Doc.nl => 1
   | Doc.concat d₁ d₂ => Doc.size d₁ + Doc.size d₂ + 1 
   | Doc.nest _ d => Doc.size d + 1
@@ -49,6 +36,7 @@ defined as a predicate on `Doc`.
 -/ 
 inductive Choiceless : Doc → Prop where 
   | text (s : String) : Choiceless (Doc.text s)
+  | bigtext (l : Layout) : Choiceless (Doc.bigtext l)
   | nl : Choiceless Doc.nl
   | concat (d₁ d₂ : Doc) (h₁ : Choiceless d₁) (h₂ : Choiceless d₂) : 
       Choiceless (Doc.concat d₁ d₂)
@@ -65,6 +53,7 @@ One deviation is that the flattening mode is not included, as explained in Page 
 -/ 
 inductive Render : Doc → ℕ → ℕ → Layout → Prop where
   | text : Render (Doc.text s) c i (Layout.single s)
+  | bigtext : Render (Doc.bigtext l) c i l
   | nl : Render Doc.nl c i (Layout.multi "" [] (List.asString (List.replicate i ' ')))
   | concat_single_single
       (h₁ : Render d₁ c i (Layout.single s₁)) 
@@ -90,6 +79,7 @@ Widening relation definition ($⇓_\mathcal{W}$, Figure 6)
 -/ 
 inductive Widen : Doc → List Doc → Prop where
   | text (s : String) : Widen (Doc.text s) [Doc.text s]
+  | bigtext (l : Layout) : Widen (Doc.bigtext l) [Doc.bigtext l]
   | nl : Widen Doc.nl [Doc.nl]
   | concat (h₁ : Widen d₁ L₁) (h₂ : Widen d₂ L₂) : 
       Widen (Doc.concat d₁ d₂) (L₁.map (fun d₁ => L₂.map (fun d₂ => Doc.concat d₁ d₂))).join 
@@ -158,6 +148,9 @@ inductive MeasRender : Doc → ℕ → ℕ → Meas → Prop where
   | text (s : String) : 
       MeasRender (Doc.text s) c i 
         (Meas.mk (c + s.length) (F.text c s.length) (Doc.text s) (c + s.length) i)
+  | bigtext (l : Layout) : 
+      MeasRender (Doc.bigtext l) c i 
+        (Meas.mk (l.last c) (F.bigtext l c) (Doc.bigtext l) (l.max_with_offset c) i)
   | nl : MeasRender Doc.nl c i (Meas.mk i (F.nl i) Doc.nl (max c i) i)
   | concat
       (h₁ : MeasRender d₁ c i m₁) 

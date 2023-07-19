@@ -1,4 +1,5 @@
 import Pretty.Claims.MeasRender
+import Pretty.Supports.Layout
 
 /--
 Measure computation at higher column position or indentation level 
@@ -16,8 +17,18 @@ lemma MeasRender_dom_monotonic {F : Factory α}
       Bool.and_eq_true, decide_eq_true_eq
     ]
     constructor
-    case left => linarith 
+    case left => assumption
     case right => dwi { apply F.text_monotonic }
+  case bigtext => 
+    cases h
+    cases h'
+    simp only [
+      dominates, add_le_add_iff_right, Bool.decide_and, Bool.decide_coe,
+      Bool.and_eq_true, decide_eq_true_eq
+    ]
+    constructor
+    case left => dwi { apply Layout.last_monotonic }
+    case right => dwi { apply F.bigtext_monotonic }
   case nl =>
     cases h
     cases h'
@@ -96,7 +107,22 @@ lemma MeasRender_dom_is_good {F : Factory α}
     case right => 
       simp at h_y 
       dwi { apply le_trans } 
-
+  case bigtext l => 
+    cases h 
+    cases h'
+    simp only [
+      dominates, add_le_add_iff_right, Bool.decide_and, Bool.decide_coe,
+      Bool.and_eq_true, decide_eq_true_eq
+    ]
+    constructor
+    case left => 
+      simp at h_x
+      apply Nat.le_trans
+      . apply Layout.max_with_offset_monotonic l h_c
+      . assumption
+    case right => 
+      simp at h_y 
+      dwi { apply le_trans } 
   case nl =>
     cases h
     cases h'

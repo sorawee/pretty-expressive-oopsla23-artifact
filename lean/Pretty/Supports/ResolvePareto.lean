@@ -48,6 +48,10 @@ mutual
       subst h_gen
       cases h_print 
       case text_set => apply pareto_one
+    | Doc.bigtext l => 
+      subst h_gen
+      cases h_print
+      case bigtext_set => apply pareto_one
     | Doc.nl => 
       subst h_gen
       cases h_print

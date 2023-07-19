@@ -12,6 +12,8 @@ theorem Render_deterministic (h₁ : Render d c i L₁) (h₂ : Render d c i L�
   induction h₁ generalizing L₂
   case text => 
     dwi { cases h₂ }
+  case bigtext => 
+    dwi { cases h₂ }
   case nl => 
     dwi { cases h₂ }
   case nest ih => 
@@ -72,6 +74,9 @@ theorem Render_total (c i : ℕ) (h : Choiceless d) : ∃ L, Render d c i L := b
   dwi { induction d generalizing c i }
   case text s => 
     exists (Layout.single s)
+    constructor
+  case bigtext l => 
+    exists l 
     constructor
   case nl => 
     exists (Layout.multi "" [] (List.asString (List.replicate i ' ')))
