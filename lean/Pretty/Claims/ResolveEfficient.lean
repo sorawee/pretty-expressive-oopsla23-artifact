@@ -49,6 +49,20 @@ lemma Resolve_exceeding_tainted
       case inr h_bad => 
         replace h_bad := Nat.not_le_of_lt h_bad
         contradiction
+  case bigtext l => 
+    cases h 
+    case bigtext_taint m _ _ => exists m 
+    case bigtext_set h_c h_i _ => 
+      cases h_bad 
+      case inl h_bad => 
+        have : c ≤ F.W := by {
+          cases l <;> (simp [Layout.max_with_offset] at h_c; linarith)         
+        }
+        replace h_bad := Nat.not_le_of_lt h_bad
+        contradiction
+      case inr h_bad => 
+        replace h_bad := Nat.not_le_of_lt h_bad
+        contradiction
   case nl => 
     cases h 
     case line_taint m _ _ => exists m

@@ -10,7 +10,7 @@ Determinism of the widening relation (Section 3.3)
 -/
 theorem Widen_deterministic (h₁ : Widen d L₁) (h₂ : Widen d L₂) : L₁ = L₂ := by 
   induction d generalizing L₁ L₂
-  case text | nl => 
+  case text | bigtext | nl => 
     cases h₁ 
     cases h₂
     simp
@@ -34,6 +34,9 @@ theorem Widen_total : ∃ L, Widen d L := by
   induction d
   case text s => 
     exists [Doc.text s]
+    constructor
+  case bigtext l => 
+    exists [Doc.bigtext l]
     constructor
   case nl => 
     exists [Doc.nl]
@@ -66,7 +69,7 @@ Choicelessness of widened documents (not stated in the paper)
 -- but this current form suffices for our purposes.
 lemma Widen_choiceless (h : Widen d D) (h_in : d_choiceless ∈ D) : Choiceless d_choiceless := by 
   induction d generalizing D d_choiceless
-  case text | nl => 
+  case text | bigtext | nl => 
     cases h 
     cases List.eq_of_mem_singleton h_in
     constructor 

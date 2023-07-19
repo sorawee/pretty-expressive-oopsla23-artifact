@@ -1,7 +1,7 @@
 import Pretty.Defs.Resolve
 import Pretty.Supports.MeasRender
 import Pretty.Supports.ResolvePareto
-import Pretty.Supports.ResolveOptimality
+import Pretty.Supports.ResolveOptimal
 import Pretty.Claims.Widen
 
 /-!
@@ -21,6 +21,8 @@ mutual
     match d with
     | Doc.text s => 
       apply Resolve_optimal_text <;> assumption
+    | Doc.bigtext s => 
+      apply Resolve_optimal_bigtext <;> assumption
     | Doc.nl => 
       apply Resolve_optimal_nl <;> assumption
     | Doc.nest n d => 

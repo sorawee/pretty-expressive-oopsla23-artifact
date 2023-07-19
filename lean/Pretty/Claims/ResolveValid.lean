@@ -24,6 +24,15 @@ mutual
         cases h_widen 
         simp
       case right => assumption
+    | Doc.bigtext l => 
+      cases h_print 
+      cases List.eq_of_mem_singleton h_m
+      exists Doc.bigtext l
+      constructor 
+      case left => 
+        cases h_widen 
+        simp
+      case right => assumption
     | Doc.nl => 
       cases h_print 
       cases List.eq_of_mem_singleton h_m
@@ -239,6 +248,14 @@ mutual
     | Doc.text s => 
       cases h_print 
       exists Doc.text s
+      constructor 
+      case left => 
+        cases h_widen 
+        simp
+      case right => assumption
+    | Doc.bigtext s => 
+      cases h_print 
+      exists Doc.bigtext s
       constructor 
       case left => 
         cases h_widen 

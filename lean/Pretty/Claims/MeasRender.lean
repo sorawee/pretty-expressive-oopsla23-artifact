@@ -12,7 +12,7 @@ Determinism of the measure computation relation (Section 5.3)
 theorem MeasRender_deterministic {F : Factory α} {m₁ m₂ : Meas}
   (h₁ : @MeasRender α F d c i m₁) (h₂ : @MeasRender α F d c i m₂) : m₁ = m₂ := by 
   induction h₁ generalizing m₂
-  case text | nl => dwi { cases h₂ }
+  case text | nl | bigtext => dwi { cases h₂ }
   case nest ih | align ih => 
     rename Doc => d
     cases h₂
@@ -37,6 +37,10 @@ theorem MeasRender_single_correct (F : Factory α)
     exists F.text c s.length, i
     cases h_render 
     constructor
+  case bigtext l => 
+    exists F.bigtext l c, i
+    cases h_render 
+    constructor  
   case nl => exists F.text c s.length, i 
   case nest ih  => 
     cases h_render
@@ -92,6 +96,10 @@ theorem MeasRender_multi_correct (F : Factory α)
                                   (Layout.multi first middle last).max_with_offset c, y⟩ := by
   induction d generalizing c i first middle last
   case text => cases h_render 
+  case bigtext => 
+    exists F.bigtext (Layout.multi first middle last) c, i
+    cases h_render
+    constructor
   case nl =>
     exists F.nl i, i
     cases h_render 
