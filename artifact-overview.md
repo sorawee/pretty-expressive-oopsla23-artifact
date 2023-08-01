@@ -400,7 +400,7 @@ Reviewers can read the documentation from these formats directly.
 Optionally, reviewers can extract HTML documentation via tools in the ecosystem 
 (`doc-gen4` for Lean code, `scribble` for Racket code, and `odoc` for OCaml code).
 We are aware that these tools do not work in all circumstances 
-(e.g. we are unable to run `doc-gen4` in Docker when running on Appple M1),
+(e.g. we are unable to run `doc-gen4` in Docker when running on Apple M1),
 which is why HTML generation is optional for reviewing.
 Regardless, following are the commands to generate the HTML documentation.
 
@@ -409,7 +409,7 @@ Regardless, following are the commands to generate the HTML documentation.
 $ cd /workspace/pretty-expressive-ocaml/
 $ make doc 
 # The rendered documentation is at 
-#/workspace/pretty-expressive-ocaml/_build/default/_doc/_html/
+# /workspace/pretty-expressive-ocaml/_build/default/_doc/_html/
 
 # Racket SnowWhite documentation is already rendered, which is at
 # /workspace/pretty-expressive-racket/doc/
