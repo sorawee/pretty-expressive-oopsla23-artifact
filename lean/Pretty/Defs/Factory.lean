@@ -21,6 +21,9 @@ structure Factory (α : Type) where
   le_antisymm : le c₁ c₂ → le c₂ c₁ → c₁ = c₂
   le_total (c₁ c₂ : α) : le c₁ c₂ ∨ le c₂ c₁
 
+  -- Not necessary for the correctness of the printer
+  text_concat : concat (text c l₁) (text (c + l₁) l₂) = text c (l₁ + l₂)
+
 /-!
 ### Cost for a bigtext
 -/

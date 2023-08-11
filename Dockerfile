@@ -60,7 +60,7 @@ RUN echo 'eval $(opam config env)' >> ~/.bashrc
 # See https://github.com/racket/racket/issues/2691
 RUN raco setup --doc-index --force-user-docs
 
-RUN raco pkg install --auto text-table
+RUN raco pkg install --auto text-table rosette
 
 ###################################################
 # Install elan + lean
