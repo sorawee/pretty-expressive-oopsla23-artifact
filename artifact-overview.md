@@ -70,7 +70,9 @@ under the directory `/workspace/lean/Pretty`.
 | Validity of resolving theorems                                            | Page 20, Theorem 5.8 | `Claims/ResolveValid.lean`     | `Resolve_valid`<br>`Resolve_tainted_valid`                                |                                                   |
 | Measure set size bound lemma                                              | Page 20, Lemma 5.9   | `Claims/ResolveEfficient.lean` | `Resolve_bound`                                                           |                                                   |
 | Taintedness when resolving exceeds the limit                              | Page 20, Lemma 5.10  | `Claims/ResolveEfficient.lean` | `Resolve_exceeding_tainted`                                               |                                                   |
-| Conformance of SnowWhite's cost factory to the cost factory interface | Page 20, Section 6   | `Claims/OurFactory.lean`       | `ourFactory`                                                              |                                                   |
+
+Conformance of SnowWhite's cost factory ("pretty-expressive factory") to the cost factory interface is proven using automated theorem proving, via Rosette and Z3.
+See details at `/workspace/rosette/cost-factory.rkt`.
 
 Other proofs (those in Section 4 and the main time complexity analysis) are sketched in Appendix B of the paper.
 
@@ -162,6 +164,40 @@ $ lake build
 ```
 
 This should compile all of our Lean files under the directory `Pretty` with no errors.
+
+#### Sanity test: Rosette proof 
+
+(Expected execution time: ~10 seconds)
+
+To test that Rosette proof about the conformance of `pretty-expressive` 
+to the cost factory interface, run:
+
+```
+$ cd /workspace/rosette 
+$ racket cost-factory.rkt
+```
+
+which should contain:
+
+```
+== pretty-expressive factory ==
+
+<= - transitivity: verified
+
+<= - antisymmetry: verified
+
+<= - total: verified
+
++ - translational invariance: verified
+
++ - associativity: verified
+
+text - ordered: verified
+
+text - additive: verified
+
+nl - ordered: verified
+```
 
 #### Sanity test: implementations
 
@@ -302,6 +338,21 @@ The correspondence is given in the table at [Formalization and proofs](#formaliz
 The **only deviation** from the paper is the definition of document (`Doc`), 
 which does not contain the `flatten` construct. This is becaused our core algorithm 
 does not deal with this construct, as mentioned in Page 16, Section 5.3 of the paper.
+
+### Evaluation: Lean formalization 
+
+(Expected execution time: 10 seconds)
+
+Our sanity test has already verified that our Rosette proofs are valid. 
+You may run it again if you wish:
+
+```
+$ cd /workspace/rosette
+$ racket cost-factory.rkt
+```
+
+You should additionally view the file content to see that it verifies the desired properties.
+
 
 ### Evaluation: benchmarks 
 

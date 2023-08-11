@@ -1,0 +1,12 @@
+July 14, 2023:
+  initial release
+
+July 31, 2023:
+  - add big-text to Lean formalization
+  - support import graph in Lean
+  - refactoring Lean proofs
+  - upgrade Lean 4 to 2023-07-12
+
+August 11, 2023:
+  - convert cost factory conformance's Lean proof
+    to a Rosette proof
