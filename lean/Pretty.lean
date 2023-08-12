@@ -11,6 +11,7 @@ import Pretty.Claims.Widen
 import Pretty.Claims
 import Pretty.Defs.Basic
 import Pretty.Defs.Factory
+import Pretty.Defs.Layout
 import Pretty.Defs.MeasureSetOp
 import Pretty.Defs.Resolve
 import Pretty.Defs
@@ -20,6 +21,8 @@ import Pretty.Supports.DocSize
 import Pretty.Supports.Domination
 import Pretty.Supports.FactoryMath
 import Pretty.Supports.LastAndCost
+import Pretty.Supports.Layout
+import Pretty.Supports.LayoutCost
 import Pretty.Supports.MeasRender
 import Pretty.Supports.Merge
 import Pretty.Supports.MergeBasic
