@@ -2,7 +2,8 @@
 
 (provide all-ids)
 
-(require "gen-table-3-cell.rkt")
+(require "gen-table-3-cell.rkt"
+         "common.rkt")
 
 (define all-ids
   '("class-internal.rkt"

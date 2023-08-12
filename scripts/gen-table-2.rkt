@@ -1,7 +1,8 @@
 #lang racket
 
 (provide all-ids)
-(require "gen-table-2-cell.rkt")
+(require "gen-table-2-cell.rkt"
+         "common.rkt")
 
 (define all-ids
   '([concat10k concat 10000]
@@ -26,8 +27,30 @@
   (define iter 5)
   (define timeout 60)
 
+  (define printers '())
+
+  (define pretty-expressive-default "pretty-expressive-default")
+  (define pretty-expressive-1000 "pretty-expressive-1000")
+  (define leijen "leijen")
+  (define bernardy-paper "bernardy-paper")
+  (define bernardy-patched "bernardy-patched")
+
+  (define valid-printers (list pretty-expressive-default
+                               pretty-expressive-1000
+                               leijen
+                               bernardy-paper
+                               bernardy-patched))
+
   (define ids
     (command-line
+     #:multi
+     [("--printer")
+      p
+      [(apply format "Printer to run (one of: [~a, ~a, ~a, ~a, ~a]," valid-printers)
+       "default: run everything)"]
+      (unless (member p valid-printers)
+        (raise-user-error "invalid printer" p))
+      (set! printers (cons p printers))]
      #:once-each
      [("--timeout")
       the-timeout
@@ -62,18 +85,32 @@
                             (append (list "--size" (~a size) "--page-width" (~a page-width))
                                     (com-proc (~a computation-width)))])))
 
+    (define (run-it name program variant computation-width-proc)
+      (when (or (empty? printers) (member name printers))
+        (for ([i iter])
+          (do-run program variant computation-width-proc))))
 
-    (for ([i iter])
-      (do-run "pretty-expressive-ocaml" "default" (λ (computation-width) (list "--computation-width" computation-width))))
+    (run-it pretty-expressive-default
+            "pretty-expressive-ocaml"
+            "default"
+            (λ (computation-width) (list "--computation-width" computation-width)))
 
-    (for ([i iter])
-      (do-run "pretty-expressive-ocaml" "1000" (λ (_) (list "--computation-width" "1000"))))
+    (run-it pretty-expressive-1000
+            "pretty-expressive-ocaml"
+            "1000"
+            (λ (_) (list "--computation-width" "1000")))
 
-    (for ([i iter])
-      (do-run "leijen" "none" (λ (_) '())))
+    (run-it leijen
+            "leijen"
+            "none"
+            (λ (_) '()))
 
-    (for ([i iter])
-      (do-run "bernardy-paper" "none" (λ (_) '())))
+    (run-it bernardy-paper
+            "bernardy-paper"
+            "none"
+            (λ (_) '()))
 
-    (for ([i iter])
-      (do-run "bernardy-patched" "none" (λ (_) '())))))
+    (run-it bernardy-patched
+            "bernardy-patched"
+            "none"
+            (λ (_) '()))))

@@ -3,9 +3,7 @@
 (require text-table
          "common.rkt"
          (prefix-in table2: "gen-table-2.rkt")
-         (prefix-in table2: "gen-table-2-cell.rkt")
-         (prefix-in table3: "gen-table-3.rkt")
-         (prefix-in table3: "gen-table-3-cell.rkt"))
+         (prefix-in table3: "gen-table-3.rkt"))
 
 (define all-targets '(["SnowWhite (default W)"
                        "pretty-expressive-ocaml"

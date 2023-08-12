@@ -1,6 +1,6 @@
 #lang racket
 
-(provide run-task string->nat benchmark-result-dir)
+(provide run-task)
 
 (require "common.rkt")
 
@@ -43,11 +43,6 @@
          #:exists 'append
          run-it)]
       [else (run-it #f)])))
-
-(define (string->nat #:who who n)
-  (match (string->number n)
-    [(? natural? nn) nn]
-    [_ (raise-user-error (format "~a must be a natural number, got ~a" who n))]))
 
 (module+ main
   (require racket/cmdline)
