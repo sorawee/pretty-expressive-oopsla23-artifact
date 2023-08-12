@@ -10,11 +10,7 @@ Determinism of the rendering relation (Section 3.3)
 -/
 theorem Render_deterministic (h₁ : Render d c i L₁) (h₂ : Render d c i L₂) : L₁ = L₂ := by 
   induction h₁ generalizing L₂
-  case text => 
-    dwi { cases h₂ }
-  case bigtext => 
-    dwi { cases h₂ }
-  case nl => 
+  case text | nl => 
     dwi { cases h₂ }
   case nest ih => 
     cases h₂
@@ -75,11 +71,8 @@ theorem Render_total (c i : ℕ) (h : Choiceless d) : ∃ L, Render d c i L := b
   case text s => 
     exists (Layout.single s)
     constructor
-  case bigtext l => 
-    exists l 
-    constructor
   case nl => 
-    exists (Layout.multi "" [] (List.asString (List.replicate i ' ')))
+    exists Layout.multi "" [] ⟨i, ""⟩
     constructor
   case concat ih₁ ih₂ => 
     cases h
@@ -95,14 +88,15 @@ theorem Render_total (c i : ℕ) (h : Choiceless d) : ∃ L, Render d c i L := b
         case multi first₂ middle₂ last₂ => 
           exists (Layout.multi (s₁ ++ first₂) middle₂ last₂)
           dwi { constructor }
-      case multi first₁ middle₁ last₁ => 
-        let ⟨L₂, h₂⟩ := @ih₂ last₁.length i h₂
+      case multi first₁ middle₁ last₁_c => 
+        let ⟨i_last₁, last₁⟩ := last₁_c
+        let ⟨L₂, h₂⟩ := @ih₂ (i_last₁ + last₁.length) i h₂
         cases L₂
         case single s₂ => 
-          exists (Layout.multi first₁ middle₁ (last₁ ++ s₂))
+          exists Layout.multi first₁ middle₁ ⟨i_last₁, last₁ ++ s₂⟩
           dwi { constructor }
         case multi first₂ middle₂ last₂ =>
-          exists (Layout.multi first₁ (middle₁ ++ [last₁ ++ first₂] ++ middle₂) last₂)
+          exists (Layout.multi first₁ (middle₁ ++ [⟨i_last₁, last₁ ++ first₂⟩] ++ middle₂) last₂)
           dwi { constructor }
   case nest n _ ih => 
     cases h

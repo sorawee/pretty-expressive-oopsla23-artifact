@@ -69,20 +69,6 @@ mutual
         cases h_meas 
         simp
         assumption
-    case bigtext l => 
-      cases h 
-      case bigtext_set h_c h_i h_meas => 
-        simp at h_in 
-        subst h_in
-        cases h_meas 
-        simp
-        cases l
-        case single => 
-          simp [Layout.max_with_offset] at h_c
-          simp [Layout.last, h_c]
-        case multi => 
-          simp [Layout.max_with_offset] at h_c
-          simp [Layout.last, h_c]
     case nl => 
       cases h 
       case line_set h_c h_i h_meas => 

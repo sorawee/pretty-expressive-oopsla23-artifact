@@ -42,36 +42,6 @@ mutual
           have := MeasRender_deterministic h₁ h₂
           subst this
           simp
-    | Doc.bigtext l => 
-      cases h₁ 
-      case bigtext_taint h_bad h₁ => 
-        cases h₂ 
-        case bigtext_taint h₂ => 
-          have := MeasRender_deterministic h₁ h₂
-          subst this
-          simp
-        case bigtext_set h_c h_i _=> 
-          cases h_bad 
-          case inl h_bad => 
-            replace h_bad := Nat.not_le_of_lt h_bad 
-            contradiction
-          case inr h_bad =>
-            replace h_bad := Nat.not_le_of_lt h_bad 
-            contradiction
-      case bigtext_set h_c h_i h₁ => 
-        cases h₂ 
-        case bigtext_taint h_bad _ => 
-          cases h_bad 
-          case inl h_bad => 
-            replace h_bad := Nat.not_le_of_lt h_bad 
-            contradiction
-          case inr h_bad =>
-            replace h_bad := Nat.not_le_of_lt h_bad 
-            contradiction
-        case bigtext_set h₂ => 
-          have := MeasRender_deterministic h₁ h₂
-          subst this
-          simp
     | Doc.nl => 
       cases h₁ 
       case line_taint h_bad h₁ => 

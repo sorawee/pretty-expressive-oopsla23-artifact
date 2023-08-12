@@ -19,16 +19,6 @@ lemma MeasRender_dom_monotonic {F : Factory α}
     constructor
     case left => assumption
     case right => dwi { apply F.text_monotonic }
-  case bigtext => 
-    cases h
-    cases h'
-    simp only [
-      dominates, add_le_add_iff_right, Bool.decide_and, Bool.decide_coe,
-      Bool.and_eq_true, decide_eq_true_eq
-    ]
-    constructor
-    case left => dwi { apply Layout.last_monotonic }
-    case right => dwi { apply F.bigtext_monotonic }
   case nl =>
     cases h
     cases h'
@@ -76,11 +66,11 @@ lemma MeasRender_doc (h_render : MeasRender F d c i m) (h : Choiceless d) : m.do
   let ⟨L, h⟩ := @Render_total d c i h
   cases L
   case single => 
-    let ⟨cost, ⟨y, h_render'⟩⟩ := MeasRender_single_correct F h
+    let ⟨y, h_render'⟩ := MeasRender_single_correct F h
     cases MeasRender_deterministic h_render h_render'
     simp
   case multi => 
-    let ⟨cost, ⟨y, h_render'⟩⟩ := MeasRender_multi_correct F h
+    let ⟨y, h_render'⟩ := MeasRender_multi_correct F h
     cases MeasRender_deterministic h_render h_render'
     simp
 }
@@ -104,22 +94,6 @@ lemma MeasRender_dom_is_good {F : Factory α}
     ]
     constructor
     case left => linarith 
-    case right => 
-      simp at h_y 
-      dwi { apply le_trans } 
-  case bigtext l => 
-    cases h 
-    cases h'
-    simp only [
-      dominates, add_le_add_iff_right, Bool.decide_and, Bool.decide_coe,
-      Bool.and_eq_true, decide_eq_true_eq
-    ]
-    constructor
-    case left => 
-      simp at h_x
-      apply Nat.le_trans
-      . apply Layout.max_with_offset_monotonic l h_c
-      . assumption
     case right => 
       simp at h_y 
       dwi { apply le_trans } 
