@@ -21,8 +21,6 @@ mutual
     match d with
     | Doc.text s => 
       apply Resolve_optimal_text <;> assumption
-    | Doc.bigtext s => 
-      apply Resolve_optimal_bigtext <;> assumption
     | Doc.nl => 
       apply Resolve_optimal_nl <;> assumption
     | Doc.nest n d => 

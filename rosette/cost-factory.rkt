@@ -1,7 +1,5 @@
 #lang rosette
 
-(require syntax/parse/define)
-
 ;; get-nat :: get a fresh symbolic natural number
 (define (get-nat)
   (define-symbolic* x integer?)
@@ -11,7 +9,7 @@
 (define width (get-nat))
 
 ;; report is a macro to make counterexample reporting concise
-(define-syntax-parse-rule (report name:string e binding ...)
+(define-syntax-rule (report name e binding ...)
   (let ()
     (newline)
     (define result e)

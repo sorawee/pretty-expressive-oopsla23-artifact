@@ -23,14 +23,6 @@ structure Factory (α : Type) where
 
   -- Not necessary for the correctness of the printer
   text_concat : concat (text c l₁) (text (c + l₁) l₂) = text c (l₁ + l₂)
-
-/-!
-### Cost for a bigtext
--/
-
-def Factory.bigtext (F : Factory α) : Layout → ℕ → α
-| Layout.single s, c => F.text c s.length
-| Layout.multi first [] last, c => 
-  F.concat (F.text c first.length) (F.concat (F.nl 0) (F.text 0 last.length))
-| Layout.multi first (line :: lines) last, c => 
-  F.concat (F.text c first.length) (F.concat (F.nl 0) (F.bigtext (Layout.multi line lines last) 0))
+  text_id_left : concat (text c 0) cost = cost 
+  text_id_right : concat cost (text c 0) = cost 
+  concat_assoc : concat (concat cost₁ cost₂) cost₃ = concat cost₁ (concat cost₂ cost₃)

@@ -16,10 +16,6 @@ mutual
         Resolve (Doc.text s) c i (MeasureSet.tainted m)
     | text_set (h_c : c + s.length ≤ F.W) (h_i : i ≤ F.W) (h : MeasRender F (Doc.text s) c i m) : 
         Resolve (Doc.text s) c i (MeasureSet.set [m] (by simp))
-    | bigtext_taint {l : Layout} (h_bad : l.max_with_offset c > F.W ∨ i > F.W) (h : MeasRender F (Doc.bigtext l) c i m) : 
-        Resolve (Doc.bigtext l) c i (MeasureSet.tainted m)
-    | bigtext_set {l : Layout} (h_c : l.max_with_offset c ≤ F.W) (h_i : i ≤ F.W) (h : MeasRender F (Doc.bigtext l) c i m) : 
-        Resolve (Doc.bigtext l) c i (MeasureSet.set [m] (by simp))
     | align_taint (h_bad : i > F.W) (h : Resolve d c c ms) : 
         Resolve (Doc.align d) c i (ms.taint.lift (Meas.adjust_align i))
     | align (h_ok : i ≤ F.W) (h : Resolve d c c ms) : 
