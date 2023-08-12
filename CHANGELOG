@@ -10,3 +10,7 @@ July 31, 2023:
 August 11, 2023:
   - convert cost factory conformance's Lean proof
     to a Rosette proof
+
+August 12, 2023:
+  - remove big-text from Lean formalization
+  - strengthen the correctness of measure rendering
