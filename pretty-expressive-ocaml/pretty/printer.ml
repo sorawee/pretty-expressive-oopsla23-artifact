@@ -85,7 +85,7 @@ module CorePrinter (C : Signature.CostFactory) = struct
 
   let nest (n : int) (d : doc) =
     match d.dc with
-    | Fail | Align _ | Text _ | Reset _ -> d
+    | Fail | Align _ | Reset _ | Text _ -> d
     | _ ->
       let memo_w = calc_weight d in
       { dc = Nest (n, d);
@@ -96,7 +96,7 @@ module CorePrinter (C : Signature.CostFactory) = struct
 
   let reset (d : doc) =
     match d.dc with
-    | Fail | Text _ | Reset _ -> d
+    | Fail | Align _ | Reset _ | Text _   -> d
     | _ ->
       let memo_w = calc_weight d in
       { dc = Reset d;
@@ -107,7 +107,7 @@ module CorePrinter (C : Signature.CostFactory) = struct
 
   let align d =
     match d.dc with
-    | Fail | Align _ | Text _ | Reset _ -> d
+    | Fail | Align _ | Reset _ | Text _  -> d
     | _ ->
       let memo_w = calc_weight d in
       { dc = Align d;
