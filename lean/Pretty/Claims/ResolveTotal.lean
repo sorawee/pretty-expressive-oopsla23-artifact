@@ -65,6 +65,16 @@ mutual
         replace h_i := Nat.gt_of_not_le h_i
         exists ms.taint.lift (Meas.adjust_align i) 
         constructor <;> assumption
+    | Doc.reset d => 
+      let ⟨ms, h⟩ := Resolve_total F d c 0
+      by_cases h_i : i ≤ F.W 
+      case pos => 
+        exists ms.lift (Meas.adjust_reset i)
+        constructor <;> assumption
+      case neg => 
+        replace h_i := Nat.gt_of_not_le h_i
+        exists ms.taint.lift (Meas.adjust_reset i) 
+        constructor <;> assumption
     | Doc.choice d₁ d₂ => 
       let ⟨ms₁, h₁⟩ := Resolve_total F d₁ c i
       let ⟨ms₂, h₂⟩ := Resolve_total F d₂ c i 

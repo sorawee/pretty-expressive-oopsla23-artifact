@@ -1,6 +1,9 @@
 import Pretty.Claims.MeasRender
 import Pretty.Supports.Layout
 
+-- We use case <a> | <b>, and while case <a> doesn't need simpa, case <b> does.
+set_option linter.unnecessarySimpa false
+
 /--
 Measure computation at higher column position or indentation level 
 is worse
@@ -29,7 +32,7 @@ lemma MeasRender_dom_monotonic {F : Factory α}
     dwi { constructor }
     case right => dwi { apply Factory.nl_monotonic }
       
-  case nest ih | align ih =>
+  case nest ih | align ih | reset ih =>
     cases h
     rename_i h
     cases h' 
@@ -128,7 +131,7 @@ lemma MeasRender_dom_is_good {F : Factory α}
     rename_i h'
     simp at ih h_x h_y ⊢
     exact ih h h' h_c (by simpa) h_x h_y
-  case align ih =>
+  case align ih | reset ih =>
     cases h
     rename_i h
     cases h' 

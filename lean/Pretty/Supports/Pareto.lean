@@ -113,6 +113,23 @@ lemma pareto_map_lift_align (n : ℕ) (h : pareto F ms) :
         replace h := pareto_head h 
         simp [Meas.adjust_align, h]
 
+lemma pareto_map_lift_reset (n : ℕ) (h : pareto F ms) : 
+    pareto F (ms.map (Meas.adjust_reset n)) := by 
+  induction ms
+  case nil => simpa
+  case cons tl ih => 
+    cases tl
+    case nil => apply pareto_one
+    case cons => 
+      dwi { apply pareto_cons } 
+      case h => 
+        apply ih
+        apply pareto_rest 
+        assumption
+      case h_last | h_cost => 
+        replace h := pareto_head h 
+        simp [Meas.adjust_reset, h]
+
 lemma pareto_map_lift_nest (n : ℕ) (h : pareto F ms) : 
     pareto F (ms.map (Meas.adjust_nest n)) := by 
   induction ms

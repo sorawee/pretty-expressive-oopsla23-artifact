@@ -4,7 +4,6 @@ July 14, 2023:
 July 31, 2023:
   - add big-text to Lean formalization
   - support import graph in Lean
-  - refactoring Lean proofs
   - upgrade Lean 4 to 2023-07-12
 
 August 11, 2023:
@@ -14,3 +13,4 @@ August 11, 2023:
 August 12, 2023:
   - remove big-text from Lean formalization
   - strengthen the correctness of measure rendering
+  - add reset to Lean formalization

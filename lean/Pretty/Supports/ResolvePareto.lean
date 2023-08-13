@@ -71,6 +71,16 @@ mutual
           apply pareto_map_lift_align
           exact Resolve_pareto h'
       case align_taint ms' _ _ => dwi { cases ms' }
+    | Doc.reset d' =>
+      cases h_print 
+      case reset ms' h' _ => 
+        dwi { cases ms' } 
+        case set => 
+          simp [MeasureSet.lift] at h_gen
+          subst h_gen
+          apply pareto_map_lift_reset
+          exact Resolve_pareto h'
+      case reset_taint ms' _ _ => dwi { cases ms' }
     | Doc.choice d₁ d₂ => 
       dwi { cases h_print } 
       case choice ms ms' h_left h_right => 

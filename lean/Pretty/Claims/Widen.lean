@@ -14,7 +14,7 @@ theorem Widen_deterministic (h₁ : Widen d L₁) (h₂ : Widen d L₂) : L₁ =
     cases h₁ 
     cases h₂
     simp
-  case nest ih | align ih => 
+  case nest ih | align ih | reset ih => 
     cases h₁ 
     rename_i h₁ 
     cases h₂
@@ -48,6 +48,11 @@ theorem Widen_total : ∃ L, Widen d L := by
     exists L.map (fun d => Doc.align d)
     constructor
     assumption
+  case reset ih => 
+    let ⟨L, h⟩ := ih
+    exists L.map (fun d => Doc.reset d)
+    constructor
+    assumption
   case choice ih₁ ih₂ => 
     let ⟨L₁, h₁⟩ := ih₁
     let ⟨L₂, h₂⟩ := ih₂
@@ -70,7 +75,7 @@ lemma Widen_choiceless (h : Widen d D) (h_in : d_choiceless ∈ D) : Choiceless 
     cases h 
     cases List.eq_of_mem_singleton h_in
     constructor 
-  case nest ih | align ih => 
+  case nest ih | align ih | reset ih => 
     cases h 
     rw [List.mem_map] at h_in
     let ⟨_, _, h_right⟩ := h_in

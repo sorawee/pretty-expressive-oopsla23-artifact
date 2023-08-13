@@ -114,6 +114,26 @@ mutual
       case align_taint ms h _ => 
         cases ms 
         case set | tainted => simp [MeasureSet.lift, MeasureSet.taint] at h_meas
+    case reset ih => 
+      generalize h_meas : MeasureSet.set ms h_not_empty = ml at h
+      cases h
+      case reset ms' h _ => 
+        cases ms' 
+        case tainted => simp [MeasureSet.lift] at h_meas
+        case set => 
+          simp [MeasureSet.lift] at h_meas
+          subst h_meas
+          simp at h_in
+          let ⟨m', h_left, h_right⟩ := h_in
+          have ih := Resolve_last h h_left
+          simp [Meas.adjust_reset] at h_right
+          cases m 
+          simp at h_right ⊢ 
+          simp [← h_right.left]
+          assumption
+      case reset_taint ms h _ => 
+        cases ms 
+        case set | tainted => simp [MeasureSet.lift, MeasureSet.taint] at h_meas
     case choice ih₁ ih₂ => 
       generalize h_meas : MeasureSet.set ms h_not_empty = ml at h
       cases h
