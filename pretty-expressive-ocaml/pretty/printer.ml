@@ -36,10 +36,11 @@ module CorePrinter (C : Signature.CostFactory) = struct
   and doc_case =
     | Fail
     | Text of (string treeof) * int
-    | Newline
+    | Newline of (string option)
     | Concat of doc * doc
     | Nest of int * doc
     | Align of doc
+    | Reset of doc
     | Choice of doc * doc
 
   let init_memo_w = !param_memo_limit - 1
@@ -51,11 +52,14 @@ module CorePrinter (C : Signature.CostFactory) = struct
                memo_w = init_memo_w;
                nl_cnt = 0;
                table = None }
-  let nl = { dc = Newline;
-             id = next_id ();
-             memo_w = init_memo_w;
-             nl_cnt = 1;
-             table = None }
+
+  let newline v =
+    { dc = Newline v;
+      id = next_id ();
+      memo_w = init_memo_w;
+      nl_cnt = 1;
+      table = None }
+
 
   let make_text s l = { dc = Text (s, l);
                         id = next_id ();
@@ -81,7 +85,7 @@ module CorePrinter (C : Signature.CostFactory) = struct
 
   let nest (n : int) (d : doc) =
     match d.dc with
-    | Fail | Align _ | Text _ -> d
+    | Fail | Align _ | Text _ | Reset _ -> d
     | _ ->
       let memo_w = calc_weight d in
       { dc = Nest (n, d);
@@ -90,9 +94,20 @@ module CorePrinter (C : Signature.CostFactory) = struct
         nl_cnt = d.nl_cnt;
         table = init_table memo_w }
 
+  let reset (d : doc) =
+    match d.dc with
+    | Fail | Text _ | Reset _ -> d
+    | _ ->
+      let memo_w = calc_weight d in
+      { dc = Reset d;
+        id = next_id ();
+        memo_w = memo_w;
+        nl_cnt = d.nl_cnt;
+        table = init_table memo_w }
+
   let align d =
     match d.dc with
-    | Fail | Align _ | Text _ -> d
+    | Fail | Align _ | Text _ | Reset _ -> d
     | _ ->
       let memo_w = calc_weight d in
       { dc = Align d;
@@ -188,7 +203,7 @@ module CorePrinter (C : Signature.CostFactory) = struct
           MeasureSet [{ last = c + len_s;
                         cost = C.text c len_s;
                         layout = fun ss -> (tree_flatten s) @ ss }]
-        | Newline ->
+        | Newline _ ->
           MeasureSet [{ last = i;
                         cost = C.newline i;
                         layout = fun ss -> "\n" :: String.make i ' ' :: ss }]
@@ -196,6 +211,7 @@ module CorePrinter (C : Signature.CostFactory) = struct
           process_concat (fun (m1 : measure) -> self d2 m1.last i) (self d1 c i)
         | Nest (n, d) -> self d c (i + n)
         | Align d -> self d c c
+        | Reset d -> self d c 0
         | Choice (d1, d2) ->
           if d1.nl_cnt < d2.nl_cnt then merge (self d2 c i) (self d1 c i)
           else merge (self d1 c i) (self d2 c i) in
@@ -246,6 +262,13 @@ module Printer (C : Signature.CostFactory): Signature.PrinterT = struct
   let empty = text ""
   let space = text " "
 
+  let string_space = " "
+  let string_empty = ""
+
+  let nl = newline (Some string_space)
+  let break = newline (Some string_empty)
+  let hard_nl = newline None
+
   let flatten : doc -> doc =
     let cache = Hashtbl.create 1000 in
     let rec flatten ({ dc = dc; id = id; _ } as d) =
@@ -254,7 +277,8 @@ module Printer (C : Signature.CostFactory): Signature.PrinterT = struct
       else
         let out = match dc with
           | Fail | Text _ -> d
-          | Newline -> space
+          | Newline None -> fail
+          | Newline (Some s) -> text s
           | Concat (({ id = a_id; _ } as a), ({ id = b_id; _ } as b)) ->
             let { id = a_idp; _ } as ap = flatten a in
             let { id = b_idp; _ } as bp = flatten b in
@@ -263,40 +287,17 @@ module Printer (C : Signature.CostFactory): Signature.PrinterT = struct
             let { id = a_idp; _ } as ap = flatten a in
             let { id = b_idp; _ } as bp = flatten b in
             if a_idp = a_id && b_idp = b_id then d else ap <|> bp
-          | Nest (_, d) | Align d -> flatten d
+          | Nest (_, d) | Align d | Reset d -> flatten d
         in
         Hashtbl.add cache id out;
         out
     in flatten
 
-  let flat : doc -> doc =
-    let cache = Hashtbl.create 1000 in
-    let rec flat ({ dc; id; _ } as d) =
-      if Hashtbl.mem cache id then
-        Hashtbl.find cache id
-      else
-        let out = match dc with
-          | Fail | Text _ -> d
-          | Newline -> fail
-          | Concat (({ id = a_id; _ } as a), ({ id = b_id; _ } as b)) ->
-            let { id = a_idp; _ } as ap = flat a in
-            let { id = b_idp; _ } as bp = flat b in
-            if a_idp = a_id && b_idp = b_id then d else ap <> bp
-          | Choice (({ id = a_id; _ } as a), ({ id = b_id; _ } as b)) ->
-            let { id = a_idp; _ } as ap = flat a in
-            let { id = b_idp; _ } as bp = flat b in
-            if a_idp = a_id && b_idp = b_id then d else ap <|> bp
-          | Nest (_, d) | Align d -> flat d
-        in
-        Hashtbl.add cache id out;
-        out
-    in flat
-
   let (<+>) d1 d2 = d1 <> align d2
-  let (<$>) d1 d2 = d1 <> nl <> d2
+  let (<$>) d1 d2 = d1 <> hard_nl <> d2
   let group d = d <|> (flatten d)
 
-  let (<->) x y = (flat x) <+> y
+  let (<->) x y = (flatten x) <+> y
 
   let fold_doc f ds =
     match ds with

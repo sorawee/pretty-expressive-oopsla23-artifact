@@ -14,3 +14,4 @@ August 12, 2023:
   - remove big-text from Lean formalization
   - strengthen the correctness of measure rendering
   - add reset to Lean formalization
+  - add generalized newline and reset (to replace big-text)
