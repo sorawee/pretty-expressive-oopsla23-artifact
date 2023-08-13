@@ -83,6 +83,23 @@ inductive Widen : Doc → List Doc → Prop where
   | choice (h₁ : Widen d₁ L₁) (h₂ : Widen d₂ L₂) : 
       Widen (Doc.choice d₁ d₂) (L₁ ++ L₂) 
 
+section Cost 
+ 
+variable {α : Type}
+variable (F : Factory α)
+
+def compute_cost : List (ℕ × String) → α → α
+  | [], acc => acc
+  | ⟨i, s⟩ :: l, acc => 
+    compute_cost l (F.concat acc (F.concat (F.nl i) (F.text i s.length)))
+
+def Layout.find_cost (c : ℕ) : Layout → α
+  | Layout.single s => F.text c s.length
+  | Layout.multi first middle last => 
+    compute_cost F (middle ++ [last]) (F.text c first.length)
+
+end Cost
+
 section Meas
 
 /-!
@@ -91,16 +108,6 @@ section Meas
 
 variable {α : Type}
 variable (F : Factory α)
-
-def find_cost' : List (ℕ × String) → α → α
-  | [], acc => acc
-  | ⟨i, s⟩ :: l, acc => 
-    find_cost' l (F.concat acc (F.concat (F.nl i) (F.text i s.length)))
-
-def find_cost (c : ℕ) : Layout → α
-  | Layout.single s => F.text c s.length
-  | Layout.multi first middle last => 
-    find_cost' F (middle ++ [last]) (F.text c first.length)
 
 /--
 Measure definition (Figure 10)

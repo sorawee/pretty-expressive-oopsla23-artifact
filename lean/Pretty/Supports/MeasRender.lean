@@ -66,11 +66,13 @@ lemma MeasRender_doc (h_render : MeasRender F d c i m) (h : Choiceless d) : m.do
   let ⟨L, h⟩ := @Render_total d c i h
   cases L
   case single => 
-    let ⟨y, h_render'⟩ := MeasRender_single_correct F h
+    generalize h_layout : Layout.single _ = L at h
+    let ⟨y, h_render'⟩ := MeasRender_single_correct F h_layout h
     cases MeasRender_deterministic h_render h_render'
     simp
   case multi => 
-    let ⟨y, h_render'⟩ := MeasRender_multi_correct F h
+    generalize h_layout : Layout.multi _ _ _ = L at h
+    let ⟨y, h_render'⟩ := MeasRender_multi_correct F h_layout h
     cases MeasRender_deterministic h_render h_render'
     simp
 }

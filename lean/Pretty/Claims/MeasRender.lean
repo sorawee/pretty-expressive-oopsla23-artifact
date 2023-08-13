@@ -31,8 +31,10 @@ Correctness of the measure computation relation
 when it results in one line (first part of Theorem 5.3)
 -/
 theorem MeasRender_single_correct (F : Factory α) 
-    (h_render : Render d c i (Layout.single s)) : 
-    ∃ y, MeasRender F d c i ⟨c + s.length, find_cost F c (Layout.single s), d, c + s.length, y⟩ := by
+    (h_layout : Layout.single s = L)
+    (h_render : Render d c i L) : 
+    ∃ y, MeasRender F d c i ⟨c + s.length, L.find_cost F c, d, c + s.length, y⟩ := by
+  subst h_layout
   induction d generalizing c i s
   case text => 
     exists i
@@ -62,20 +64,20 @@ theorem MeasRender_single_correct (F : Factory α)
       let ⟨y₂, _⟩ := ih₂ h₂
       exists max y₁ y₂
       have h_ans : { last := c + String.length (s₁ ++ s₂), 
-                     cost := find_cost F c (Layout.single (s₁ ++ s₂)), 
+                     cost := (Layout.single (s₁ ++ s₂)).find_cost F c, 
                      doc := Doc.concat d₁ d₂,
                      x := c + String.length (s₁ ++ s₂), y := max y₁ y₂ } = 
        Meas.concat F 
          { last := c + String.length s₁, 
-           cost := find_cost F c (Layout.single s₁), 
+           cost := (Layout.single s₁).find_cost F c, 
            doc := d₁, x := c + String.length s₁,
            y := y₁ } 
          { last := c + String.length s₁ + String.length s₂, 
-           cost := find_cost F (c + String.length s₁) (Layout.single s₂),
+           cost := (Layout.single s₂).find_cost F (c + String.length s₁),
            doc := d₂, 
            x := c + String.length s₁ + String.length s₂, 
            y := y₂ } := by 
-        simp_arith [Meas.concat, find_cost, Factory.text_concat]
+        simp_arith [Meas.concat, Layout.find_cost, Factory.text_concat]
       dwi { constructor }
     case concat_single_multi | concat_multi_single | concat_multi_multi => 
       injection h_layout 
@@ -86,16 +88,18 @@ Correctness of the measure computation relation
 when it results in multiple lines (second part of Theorem 5.3)
 -/
 theorem MeasRender_multi_correct (F : Factory α) 
-    (h_render : Render d c i (Layout.multi first middle ⟨i_last, last⟩))  : 
+    (h_layout : Layout.multi first middle ⟨i_last, last⟩ = L)
+    (h_render : Render d c i L)  : 
     ∃ y, MeasRender F d c i ⟨i_last + last.length,
-                             find_cost F c (Layout.multi first middle ⟨i_last, last⟩), d, 
-                             (Layout.multi first middle ⟨i_last, last⟩).max_with_offset c, y⟩ := by
+                             L.find_cost F c, d, 
+                             L.max_with_offset c, y⟩ := by
+  subst h_layout
   induction d generalizing c i first middle last i_last
   case text => cases h_render 
   case nl =>
     exists i
     cases h_render 
-    simp [String.length, List.asString, Layout.max_with_offset, find_cost, find_cost', Factory.text_id_left, Factory.text_id_right]
+    simp [String.length, List.asString, Layout.max_with_offset, Layout.find_cost, compute_cost, Factory.text_id_left, Factory.text_id_right]
     constructor
   case nest ih  => 
     cases h_render
@@ -115,27 +119,31 @@ theorem MeasRender_multi_correct (F : Factory α)
   case concat ih₁ ih₂ => 
     cases h_render 
     case concat_single_multi s first h₁ h₂ => 
-      let ⟨y₁, _⟩ := MeasRender_single_correct F h₁
+      generalize h_layout : Layout.single s = L at h₁
+      let ⟨y₁, _⟩ := MeasRender_single_correct F h_layout h₁
+      subst h_layout
       let ⟨y₂, _⟩ := ih₂ h₂
       exists max y₁ y₂
       dwi { apply MeasRender.concat }
       case h => 
-        simp [Meas.concat, Layout.max_with_offset, add_assoc, find_cost]
-        rw [find_cost_extract]
+        simp [Meas.concat, Layout.max_with_offset, add_assoc, Layout.find_cost]
+        rw [compute_cost_extract]
         conv => 
           right 
-          rw [find_cost_extract]
+          rw [compute_cost_extract]
         simp [← Factory.concat_assoc, Factory.text_concat]
     case concat_multi_single last s h₂ h₁ =>
       let ⟨y₁, _⟩ := ih₁ h₁
-      let ⟨y₂, _⟩ := MeasRender_single_correct F h₂
+      generalize h_layout : Layout.single s = L at h₂
+      let ⟨y₂, _⟩ := MeasRender_single_correct F h_layout h₂
+      subst h_layout
       exists max y₁ y₂
       dwi { apply MeasRender.concat }
       case h => 
         simp [Meas.concat, Layout.max_with_offset, add_assoc]
         rw [max_assoc]
         simp [max_comm, ← max_assoc, ← add_assoc]
-        simp [find_cost, find_cost_split, find_cost', Factory.concat_assoc, Factory.text_concat]
+        simp [Layout.find_cost, compute_cost_split, compute_cost, Factory.concat_assoc, Factory.text_concat]
     case concat_multi_multi middle₁ i_last₁ last₁ first₂ middle₂ h₁ h₂ =>
       let ⟨y₁, _⟩ := ih₁ h₁
       let ⟨y₂, _⟩ := ih₂ h₂
@@ -160,7 +168,7 @@ theorem MeasRender_multi_correct (F : Factory α)
             rw [max_comm, max_assoc, max_assoc]
           simp [max_comm]
         case left => 
-          simp [find_cost, find_cost_split, find_cost', Factory.text_id_left, ← Factory.text_concat, Factory.concat_assoc]
+          simp [Layout.find_cost, compute_cost_split, compute_cost, Factory.text_id_left, ← Factory.text_concat, Factory.concat_assoc]
 
 /--
 Totality of the measure computation relation (Section 5.3)
@@ -170,9 +178,11 @@ theorem MeasRender_total (F : Factory α) (d : Doc) (c i : ℕ) (h : Choiceless 
   let ⟨L, h⟩ := Render_total c i h
   cases L
   case single s => 
-    let ⟨y, _⟩ := MeasRender_single_correct F h 
-    exists ⟨c + s.length, find_cost F c (Layout.single s), d, c + s.length, y⟩
+    generalize h_layout : Layout.single s = L at h
+    let ⟨y, _⟩ := MeasRender_single_correct F h_layout h 
+    exists ⟨c + s.length, L.find_cost F c, d, c + s.length, y⟩
   case multi first middle last_c => 
     let ⟨i_last, last⟩ := last_c
-    let ⟨y, _⟩ := MeasRender_multi_correct F h
-    exists ⟨i_last + last.length, find_cost F c (Layout.multi first middle ⟨i_last, last⟩), d, (Layout.multi first middle ⟨i_last, last⟩).max_with_offset c, y⟩
+    generalize h_layout : Layout.multi first middle ⟨i_last, last⟩ = L at h
+    let ⟨y, _⟩ := MeasRender_multi_correct F h_layout h
+    exists ⟨i_last + last.length, L.find_cost F c, d, L.max_with_offset c, y⟩
