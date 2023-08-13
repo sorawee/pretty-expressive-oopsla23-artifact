@@ -94,20 +94,30 @@
    (verify (begin
              (assume (<= col1 col2))
              (assert (cost<= (cost-text col1 len1) (cost-text col2 len1)))))
-   col1 col2 len1)
+   col1 col2 len1 width)
 
   (report
    "text - additive"
    (verify (assert (equal? (cost+ (cost-text col1 len1) (cost-text (+ col1 len1) len2))
                            (cost-text col1 (+ len1 len2)))))
-   col1 len1 len2)
+   col1 len1 len2 width)
+
+  (report
+   "text - id left"
+   (verify (assert (equal? (cost+ (cost-text col1 0) c1) c1)))
+   col1 c1 width)
+
+  (report
+   "text - id right"
+   (verify (assert (equal? (cost+ c1 (cost-text col1 0)) c1)))
+   col1 c1 width)
 
   (report
    "nl - ordered"
    (verify (begin
              (assume (<= i1 i2))
              (assert (cost<= (cost-nl i1) (cost-nl i2)))))
-   i1 i2))
+   i1 i2 width))
 
 
 (check "Ex 5.1"
@@ -130,7 +140,10 @@
              [(m1 m2) (<= m1 m2)])
        #:+ (match-lambda**
             [(m1 m2) (max m1 m2)])
-       #:text (λ (c l) (max width (+ c l)))
+       #:text (λ (c l)
+                (cond
+                  [(zero? l) 0]
+                  [else (max width (+ c l))]))
        #:nl (λ (i) (max width i))
        #:get-cost* (λ () (get-nat)))
 
@@ -147,7 +160,9 @@
             [((list m1 o1 h1) (list m2 o2 h2))
              (list (max m1 m2) (+ o1 o2) (+ h1 h2))])
        #:text (λ (c l)
-                (list (max width (+ c l))
+                (list (cond
+                        [(zero? l) 0]
+                        [else (max width (+ c l))])
                       (max (+ c l (- (max width c))) 0)
                       0))
        #:nl (λ (i) (list (max width i) (max (- i width) 0) 1))
