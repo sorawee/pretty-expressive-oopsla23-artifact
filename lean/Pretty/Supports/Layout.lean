@@ -23,8 +23,3 @@ lemma Layout.max_with_offset_monotonic (l : Layout) (h : c ≤ c') : l.max_with_
         right
         apply Nat.le_of_lt
         assumption
-
-
-
-      
-      
