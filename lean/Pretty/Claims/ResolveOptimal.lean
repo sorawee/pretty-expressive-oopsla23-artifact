@@ -70,7 +70,7 @@ mutual
           let ⟨_, h_y⟩ := h_y
           cases this h_y h_x
         case set printed_ms h_render' => 
-          simp [MeasureSet.lift, Meas.adjust_nest]
+          simp [MeasureSet.lift]
           cases h_render
           rename_i h_render
           have h_now := Resolve_optimal h' h_widen h_left h_render
@@ -81,6 +81,42 @@ mutual
           simp [Meas.adjust_align, dominates]
           assumption
       case align_taint ms' h h_bad => 
+        cases h_render
+        rename_i h_render
+        simp at h_y 
+        clear * - h_y h_bad 
+        linarith
+    | Doc.reset d => 
+      cases h_widen 
+      rename_i h_widen
+      simp at h_mem
+      let ⟨_, ⟨h_left, h_right⟩⟩ := h_mem
+      subst h_right
+      simp
+      cases h_print 
+      case reset ms' h' _ => 
+        simp at *
+        cases ms' 
+        case tainted => 
+          cases h_render
+          rename_i h_render
+          simp 
+          have := Resolve_optimal h' h_widen h_left (by assumption)
+          simp at this h_x h_y
+          let ⟨_, h_y⟩ := h_y
+          cases this h_y h_x
+        case set printed_ms h_render' => 
+          simp [MeasureSet.lift]
+          cases h_render
+          rename_i h_render
+          have h_now := Resolve_optimal h' h_widen h_left h_render
+          simp [dominates] at h_now h_x h_y
+          let ⟨_, h_y⟩ := h_y
+          specialize h_now h_y h_x
+          exists printed_ms.map (Meas.adjust_reset i)
+          simp [Meas.adjust_reset, dominates]
+          assumption
+      case reset_taint ms' h h_bad => 
         cases h_render
         rename_i h_render
         simp at h_y 

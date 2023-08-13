@@ -17,6 +17,9 @@ lemma Doc.size_choice₂ : Doc.size d₂ < Doc.size (Doc.choice d₁ d₂) := by
 lemma Doc.size_align : Doc.size d' < Doc.size (Doc.align d') := by simp_arith [Doc.size]
 
 @[simp]
+lemma Doc.size_reset : Doc.size d' < Doc.size (Doc.reset d') := by simp_arith [Doc.size]
+
+@[simp]
 lemma Doc.size_nest : Doc.size d' < Doc.size (Doc.nest n d') := by simp_arith [Doc.size]
 
 @[simp]

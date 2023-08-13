@@ -18,6 +18,9 @@ theorem Render_deterministic (h₁ : Render d c i L₁) (h₂ : Render d c i L�
   case align ih => 
     cases h₂
     case align h => exact ih h
+  case reset ih => 
+    cases h₂
+    case reset h => exact ih h
   case concat_single_single ih₁ ih₂ => 
     cases h₂
     case concat_single_single h₁ h₂ => 
@@ -108,5 +111,11 @@ theorem Render_total (c i : ℕ) (h : Choiceless d) : ∃ L, Render d c i L := b
     cases h
     case align h => 
       let ⟨L, _⟩ := @ih c c h
+      exists L
+      dwi { constructor }
+  case reset ih => 
+    cases h
+    case reset h => 
+      let ⟨L, _⟩ := @ih c 0 h
       exists L
       dwi { constructor }

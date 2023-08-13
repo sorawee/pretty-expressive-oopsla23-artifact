@@ -94,6 +94,22 @@ lemma Resolve_exceeding_tainted
       cases ms 
       case tainted m => exists m.adjust_align i
       case set ms _ => exists (ms.head (by assumption)).adjust_align i
+  case reset ih => 
+    cases h
+    case reset h _ => 
+      cases h_bad 
+      case inl h_bad => 
+        let ⟨m, _⟩ := ih h (by {
+          left
+          linarith
+        })
+        exists m.adjust_reset i
+        simp [*, MeasureSet.lift, Meas.adjust_align]
+      case inr => linarith
+    case reset_taint ms h _ => 
+      cases ms 
+      case tainted m => exists m.adjust_reset i
+      case set ms _ => exists (ms.head (by assumption)).adjust_reset i
   case choice ih₁ ih₂ => 
     cases h 
     case choice h_left h_right => 

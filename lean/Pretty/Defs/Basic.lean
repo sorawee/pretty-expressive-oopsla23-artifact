@@ -18,6 +18,7 @@ inductive Doc where
   | concat (d₁ d₂ : Doc) : Doc
   | nest (n : Nat) (d : Doc) : Doc
   | align (d : Doc) : Doc
+  | reset (d : Doc) : Doc
   | choice (d₁ d₂ : Doc) : Doc
 
 def Doc.size : Doc → ℕ
@@ -26,6 +27,7 @@ def Doc.size : Doc → ℕ
   | Doc.concat d₁ d₂ => Doc.size d₁ + Doc.size d₂ + 1 
   | Doc.nest _ d => Doc.size d + 1
   | Doc.align d => Doc.size d + 1
+  | Doc.reset d => Doc.size d + 1
   | Doc.choice d₁ d₂ => Doc.size d₁ + Doc.size d₂ + 1
 
 /--
@@ -39,6 +41,7 @@ inductive Choiceless : Doc → Prop where
       Choiceless (Doc.concat d₁ d₂)
   | nest (n : Nat) (d : Doc) (h : Choiceless d) : Choiceless (Doc.nest n d)
   | align (d : Doc) (h : Choiceless d) : Choiceless (Doc.align d)
+  | reset (d : Doc) (h : Choiceless d) : Choiceless (Doc.reset d)
 
 /-!
 ### Rendering and widening
@@ -69,6 +72,7 @@ inductive Render : Doc → ℕ → ℕ → Layout → Prop where
       Render (Doc.concat d₁ d₂) c i (Layout.multi first₁ (middle₁ ++ [⟨i_last₁, last₁ ++ first₂⟩] ++ middle₂) last₂)
   | nest (h : Render d c (i + n) L) : Render (Doc.nest n d) c i L
   | align (h : Render d c c L) : Render (Doc.align d) c i L
+  | reset (h : Render d c 0 L) : Render (Doc.reset d) c i L
 
 /--
 Widening relation definition ($⇓_\mathcal{W}$, Figure 6)
@@ -80,6 +84,7 @@ inductive Widen : Doc → List Doc → Prop where
       Widen (Doc.concat d₁ d₂) (L₁.map (fun d₁ => L₂.map (fun d₂ => Doc.concat d₁ d₂))).join 
   | nest (h : Widen d L) : Widen (Doc.nest n d) (L.map (fun d => Doc.nest n d))
   | align (h : Widen d L) : Widen (Doc.align d) (L.map (fun d => Doc.align d))
+  | reset (h : Widen d L) : Widen (Doc.reset d) (L.map (fun d => Doc.reset d))
   | choice (h₁ : Widen d₁ L₁) (h₂ : Widen d₂ L₂) : 
       Widen (Doc.choice d₁ d₂) (L₁ ++ L₂) 
 
@@ -130,6 +135,12 @@ def Meas.adjust_align (i : ℕ): @Meas α → @Meas α
 | ⟨last, cost, doc, x, y⟩ => ⟨last, cost, Doc.align doc, x, max i y⟩
 
 /--
+- adjustReset;
+-/ 
+def Meas.adjust_reset (i : ℕ): @Meas α → @Meas α
+| ⟨last, cost, doc, x, y⟩ => ⟨last, cost, Doc.reset doc, x, max i y⟩
+
+/--
 - adjustNest;
 -/ 
 def Meas.adjust_nest (n : ℕ): @Meas α → @Meas α
@@ -170,6 +181,8 @@ inductive MeasRender : Doc → ℕ → ℕ → Meas → Prop where
       MeasRender (Doc.nest n d) c i (Meas.mk last cost (Doc.nest n d) x y)
   | align (h : MeasRender d c c (Meas.mk last cost d x y)) :
       MeasRender (Doc.align d) c i (Meas.mk last cost (Doc.align d) x (max i y))
+  | reset (h : MeasRender d c 0 (Meas.mk last cost d x y)) :
+      MeasRender (Doc.reset d) c i (Meas.mk last cost (Doc.reset d) x (max i y))
 end Meas 
 
 section Pareto

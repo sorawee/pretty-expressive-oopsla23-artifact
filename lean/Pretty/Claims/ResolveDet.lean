@@ -94,6 +94,20 @@ mutual
         case align => 
           replace h_bad := Nat.not_le_of_lt h_bad
           contradiction
+    | Doc.reset d' => 
+      cases h₁ 
+      case reset h₁ h_ok =>
+        cases h₂ 
+        case reset_taint h_bad => 
+          replace h_bad := Nat.not_le_of_lt h_bad
+          contradiction
+        case reset h₂ _ => simp [Resolve_deterministic h₁ h₂]
+      case reset_taint h h_bad => 
+        cases h₂ 
+        case reset_taint h' _ => simp [Resolve_deterministic h h'] 
+        case reset => 
+          replace h_bad := Nat.not_le_of_lt h_bad
+          contradiction
     | Doc.choice d₁ d₂ => 
       cases h₁
       case choice h_right h_left => 

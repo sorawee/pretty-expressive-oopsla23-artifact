@@ -20,6 +20,10 @@ mutual
         Resolve (Doc.align d) c i (ms.taint.lift (Meas.adjust_align i))
     | align (h_ok : i ≤ F.W) (h : Resolve d c c ms) : 
         Resolve (Doc.align d) c i (ms.lift (Meas.adjust_align i))
+    | reset_taint (h_bad : i > F.W) (h : Resolve d c 0 ms) : 
+        Resolve (Doc.reset d) c i (ms.taint.lift (Meas.adjust_reset i))
+    | reset (h_ok : i ≤ F.W) (h : Resolve d c 0 ms) : 
+        Resolve (Doc.reset d) c i (ms.lift (Meas.adjust_reset i))
     | nest (h : Resolve d c (i + n) ms) : Resolve (Doc.nest n d) c i (ms.lift (Meas.adjust_nest n))
     | choice (h_left : Resolve d c i ms) (h_right : Resolve d' c i ms') : 
         Resolve (Doc.choice d d') c i (MeasureSet.union F ms ms')

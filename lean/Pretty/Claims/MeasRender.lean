@@ -14,7 +14,7 @@ theorem MeasRender_deterministic {F : Factory α} {m₁ m₂ : Meas}
   (h₁ : @MeasRender α F d c i m₁) (h₂ : @MeasRender α F d c i m₂) : m₁ = m₂ := by 
   induction h₁ generalizing m₂
   case text | nl => dwi { cases h₂ }
-  case nest ih | align ih => 
+  case nest ih | align ih | reset ih => 
     rename Doc => d
     cases h₂
     rename_i last₂ cost₂ x₂ y₂ h₂ 
@@ -48,7 +48,7 @@ theorem MeasRender_single_correct (F : Factory α)
     exists y 
     constructor
     assumption
-  case align ih => 
+  case align ih | reset ih => 
     cases h_render
     rename_i h  
     let ⟨y, hh⟩ := ih h
@@ -108,7 +108,7 @@ theorem MeasRender_multi_correct (F : Factory α)
     exists y
     constructor
     assumption
-  case align ih => 
+  case align ih | reset ih => 
     cases h_render
     rename_i h
     let ⟨y, _⟩ := ih h

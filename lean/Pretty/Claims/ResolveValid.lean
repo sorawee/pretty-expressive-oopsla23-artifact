@@ -77,6 +77,29 @@ mutual
           simpa [Meas.adjust_align]
       case align_taint ms' _ _ => 
         cases ms' <;> simp [MeasureSet.lift, MeasureSet.taint] at h_gen
+    | Doc.reset d' => 
+      generalize h_gen : MeasureSet.set _ _ = ms at h_print 
+      cases h_print 
+      case reset ms' h' _ => 
+        cases ms' 
+        case tainted => simp [MeasureSet.lift] at h_gen
+        case set => 
+          simp [MeasureSet.lift] at h_gen
+          subst h_gen 
+          cases h_widen
+          case reset h_widen => 
+          simp at h_m
+          let ⟨m', ⟨h_left, h_right⟩⟩ := h_m 
+          let ⟨d', h_in, h_render⟩ := Resolve_valid h' h_widen h_left
+          exists Doc.reset d' 
+          simp [*]
+          subst h_right 
+          have := MeasRender_doc h_render (Widen_choiceless h_widen h_in)
+          subst this 
+          constructor
+          simpa [Meas.adjust_reset]
+      case reset_taint ms' _ _ => 
+        cases ms' <;> simp [MeasureSet.lift, MeasureSet.taint] at h_gen
     | Doc.choice d₁ d₂ => 
       generalize h_gen : MeasureSet.set _ _ = ms at h_print 
       cases h_widen
@@ -312,7 +335,48 @@ mutual
             subst this 
             constructor
             simpa [Meas.adjust_align]
-          
+    | Doc.reset d' => 
+      generalize h_gen : MeasureSet.tainted _ = ml at h_print 
+      cases h_print 
+      case reset ms' h' _ => 
+        cases ms' 
+        case set => simp [MeasureSet.lift] at h_gen
+        case tainted => 
+          simp [MeasureSet.lift] at h_gen
+          subst h_gen 
+          cases h_widen
+          rename_i h_widen
+          let ⟨d', h_in, h_render⟩ := Resolve_tainted_valid h' h_widen
+          exists Doc.reset d' 
+          simp [*]
+          have := MeasRender_doc h_render (Widen_choiceless h_widen h_in)
+          subst this 
+          constructor
+          simpa [Meas.adjust_reset]
+      case reset_taint ms' _ _ => 
+        cases h_widen
+        rename_i h_widen
+        cases ms' <;> simp [MeasureSet.lift, MeasureSet.taint] at h_gen <;> subst h_gen
+        case tainted h' => 
+          let ⟨d', h_in, h_render⟩ := Resolve_tainted_valid h' h_widen
+          exists Doc.reset d' 
+          simp [*]
+          have := MeasRender_doc h_render (Widen_choiceless h_widen h_in)
+          subst this 
+          constructor
+          simpa [Meas.adjust_reset]
+        case set ms_res h_non_empty h' => 
+          cases ms_res 
+          case nil => contradiction 
+          case cons hd tl => 
+            have h_mem : hd ∈ hd :: tl := by simp
+            let ⟨d', h_in, h_render⟩ := Resolve_valid h' h_widen h_mem
+            exists Doc.reset d' 
+            simp [*]
+            have := MeasRender_doc h_render (Widen_choiceless h_widen h_in)
+            subst this 
+            constructor
+            simpa [Meas.adjust_reset]
     | Doc.choice d₁ d₂ => 
       generalize h_gen : MeasureSet.tainted _ = ml at h_print 
       cases h_widen
