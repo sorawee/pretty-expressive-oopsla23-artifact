@@ -48,7 +48,18 @@ sig
   (** [a <|> b] is a document for a choice between document [a] and [b]. *)
 
   val nl : doc
-  (** [nl] is a document for a newline. *)
+  (** [nl] is a document for a newline that [flatten]s to a single space. *)
+
+  val break : doc
+  (** [break] is a document for a newline that [flatten]s to an empty string. *)
+
+  val hard_nl : doc
+  (** [hard_nl] is a document for a newline that [fail]s to [flatten]. *)
+
+  val newline : (string option) -> doc
+  (** [newline s] is a document for a newline.
+      When [s] is [None], it [flatten]s to [fail].
+      When [s] is not [None], it [flatten]s to the specified [text]. *)
 
   val align : doc -> doc
   (** [align d] is a document that aligns [d] at the column position. *)
@@ -56,6 +67,9 @@ sig
   val nest : int -> doc -> doc
   (** [nest n d] is a document that increments the indentation level by [n]
       when rendering [d] *)
+
+  val reset : doc -> doc
+  (** [reset d] is a document that resets indentation level to 0 in [d] *)
 
   val print : doc -> Info.info
   (** [print d] prints the document [d] to an [info] record. *)
@@ -66,10 +80,6 @@ sig
   val flatten : doc -> doc
   (** [flatten d] is a document that removes newlines and indentation spaces
       when rendering [d] *)
-
-  val flat : doc -> doc
-  (** [flat d] is a document that imposes a constraint that [d] must not have
-      a newline -- an extension of Pi_e *)
 
   val fail : doc
   (** A document that always fails -- an extension of Pi_e *)
