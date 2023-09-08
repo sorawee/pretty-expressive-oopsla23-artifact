@@ -3,7 +3,7 @@
 (require "gen-table-2-cell.rkt")
 
 (module+ main
-  (displayln "Generating an output for RandFit1k on SnowWhite with 629 lines")
+  (displayln "Generating an output for RandFit1k on PrettyExpressive with 629 lines")
   (run-task #:program "sexp-random" #:target "pretty-expressive-ocaml" #:timeout 60
             #:extras (list "--out" (simple-form-path "output-dir/randfit1k@629")
                            "--size" "1"))
@@ -15,7 +15,7 @@
 
   ;;;;;;;;;;
 
-  (displayln "Generating an output for RandFit10k on SnowWhite with 7861 lines")
+  (displayln "Generating an output for RandFit10k on PrettyExpressive with 7861 lines")
   (run-task #:program "sexp-random" #:target "pretty-expressive-ocaml" #:timeout 60
             #:extras (list "--out" (simple-form-path "output-dir/randfit10k@7861")
                            "--size" "2"))
@@ -27,7 +27,7 @@
 
   ;;;;;;;;;;
 
-  (displayln "Generating an output for RandOver1k on SnowWhite with 1531 lines")
+  (displayln "Generating an output for RandOver1k on PrettyExpressive with 1531 lines")
   (run-task #:program "sexp-random" #:target "pretty-expressive-ocaml" #:timeout 60
             #:extras (list "--out" (simple-form-path "output-dir/randover1k@1531")
                            "--size" "3"))
@@ -44,7 +44,7 @@
 
   ;;;;;;;;;;
 
-  (displayln "Generating an output for RandOver10k on SnowWhite with 15027 lines")
+  (displayln "Generating an output for RandOver10k on PrettyExpressive with 15027 lines")
   (run-task #:program "sexp-random" #:target "pretty-expressive-ocaml" #:timeout 60
             #:extras (list "--out" (simple-form-path "output-dir/randover10k@15027")
                            "--size" "4"))
@@ -61,7 +61,7 @@
 
   ;;;;;;;;;;
 
-  (displayln "Generating an output for JSONW on SnowWhite with 721 lines")
+  (displayln "Generating an output for JSONW on PrettyExpressive with 721 lines")
   (run-task #:program "json" #:target "pretty-expressive-ocaml" #:timeout 60
             #:extras (list "--out" (simple-form-path "output-dir/jsonw@721")
                            "--size" "1"
