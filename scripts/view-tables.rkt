@@ -38,25 +38,41 @@
                      (define val (file->list path))
                      (match val
                        ['() "Unavailable"]
-                       [(list fst _ ...)
-                        (match (assc 'status fst)
-                          ['timeout "Timeout"]
-                          ['failure "N/A"]
-                          [_ (format (if (equal? target "pretty-expressive-ocaml")
-                                         (string-append "~a s | ~a | "
-                                                        (match (assc 'tainted? fst)
-                                                          ['true "✗"]
-                                                          ['false "✓"])
-                                                        " ")
-                                         "~a s | ~a ")
-                                     (~r (/ (for/sum ([entry val])
-                                              (assc 'duration entry))
-                                            (length val))
-                                         #:min-width 10
-                                         #:precision '(= 6))
-                                     (~a (assc 'lines fst)
-                                         #:min-width 6
-                                         #:align 'right))])])]
+                       [_
+                        (define-values (timeout failure ok ok-duration ok-lines ok-tainted?)
+                          (for/fold ([timeout 0] [failure 0] [ok 0] [ok-duration 0] [ok-lines #f] [ok-tainted? #f]) ([entry val])
+                            (match (assc 'status entry)
+                              ['timeout (values (add1 timeout) failure ok ok-duration ok-lines ok-tainted?)]
+                              ['failure (values timeout (add1 failure) ok ok-duration ok-lines ok-tainted?)]
+                              ['ok
+                               (values timeout failure (add1 ok)
+                                       (+ ok-duration (assc 'duration entry))
+                                       (assc 'lines entry)
+                                       (if (equal? target "pretty-expressive-ocaml")
+                                           (assc 'tainted? entry)
+                                           #f))])))
+                        (string-join
+                         (append*
+                          (list (if (positive? timeout) (list (format "~a timeout" timeout)) '())
+                                (if (positive? failure) (list (format "~a N/A" failure)) '())
+                                (if (positive? ok)
+                                    (list
+                                     (string-append
+                                      (if (and (zero? timeout) (zero? failure))
+                                          ""
+                                          (format "~a OK: " ok))
+                                      (format
+                                       (if (equal? target "pretty-expressive-ocaml")
+                                           (string-append "~a s | ~a | "
+                                                          (match ok-tainted?
+                                                            ['true "✗"]
+                                                            ['false "✓"])
+                                                          " ")
+                                           "~a s | ~a ")
+                                       (~r (/ ok-duration ok) #:min-width 10 #:precision '(= 6))
+                                       (~a ok-lines #:min-width 6 #:align 'right))))
+                                    '())))
+                         ", ")])]
                     [else "Unavailable"])))))))
 
 (newline)
