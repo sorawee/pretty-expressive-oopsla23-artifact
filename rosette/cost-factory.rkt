@@ -120,7 +120,7 @@
    i1 i2 width))
 
 
-(check "Ex 5.1"
+(check "Ex 3.4: linear overflow"
        #:<= (match-lambda**
              [((list o1 h1) (list o2 h2))
               (cond
@@ -135,7 +135,30 @@
        #:nl (λ (i) (list (max (- i width) 0) 1))
        #:get-cost* (λ () (list (get-nat) (get-nat))))
 
-(check "max"
+(let ([text-cost (λ (c l)
+                   (define stop (+ c l))
+                   (cond
+                     [(> stop width)
+                      (define start (max width c))
+                      (define a (- start width))
+                      (define b (- stop start))
+                      (list (* b (+ (* 2 a) b)) 0)]
+                     [else (list 0 0)]))]
+      [cost+ (match-lambda**
+              [((list o1 h1) (list o2 h2))
+               (list (+ o1 o2) (+ h1 h2))])])
+  (check "Ex 3.5: quadratic overflow"
+         #:<= (match-lambda**
+               [((list o1 h1) (list o2 h2))
+                (cond
+                  [(= o1 o2) (<= h1 h2)]
+                  [else (< o1 o2)])])
+         #:+ cost+
+         #:text text-cost
+         #:nl (λ (i) (cost+ (list 0 1) (text-cost 0 i)))
+         #:get-cost* (λ () (list (get-nat) (get-nat)))))
+
+(check "Ex 3.6: max overflow"
        #:<= (match-lambda**
              [(m1 m2) (<= m1 m2)])
        #:+ (match-lambda**
@@ -143,30 +166,26 @@
        #:text (λ (c l)
                 (cond
                   [(zero? l) 0]
-                  [else (max width (+ c l))]))
-       #:nl (λ (i) (max width i))
+                  [else (max 0 (+ c l (- width)))]))
+       #:nl (λ (i) (max 0 (- i width)))
        #:get-cost* (λ () (get-nat)))
 
-(check "max in lex ordering is bad"
+(check "Ex 3.7: max overflow in lex ordering is invalid"
        #:<= (match-lambda**
-             [((list m1 o1 h1) (list m2 o2 h2))
+             [((list m1 h1) (list m2 h2))
               (cond
-                [(= m1 m2)
-                 (cond
-                   [(= o1 o2) (<= h1 h2)]
-                   [else (< o1 o2)])]
+                [(= m1 m2) (<= h1 h2)]
                 [else (< m1 m2)])])
        #:+ (match-lambda**
-            [((list m1 o1 h1) (list m2 o2 h2))
-             (list (max m1 m2) (+ o1 o2) (+ h1 h2))])
+            [((list m1 h1) (list m2 h2))
+             (list (max m1 m2) (+ h1 h2))])
        #:text (λ (c l)
                 (list (cond
                         [(zero? l) 0]
-                        [else (max width (+ c l))])
-                      (max (+ c l (- (max width c))) 0)
+                        [else (max 0 (+ c l (- width)))])
                       0))
-       #:nl (λ (i) (list (max width i) (max (- i width) 0) 1))
-       #:get-cost* (λ () (list (get-nat) (get-nat) (get-nat))))
+       #:nl (λ (i) (list (max 0 (- i width)) 1))
+       #:get-cost* (λ () (list (get-nat) (get-nat))))
 
 (check "pretty-expressive factory"
        #:<= (match-lambda**

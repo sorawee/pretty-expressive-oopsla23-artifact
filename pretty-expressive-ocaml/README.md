@@ -1,4 +1,4 @@
-## OCaml SnowWhite
+## OCaml PrettyExpressive
 
 Please consults the artifact overview for details.
 

@@ -5,10 +5,10 @@
          (prefix-in table2: "gen-table-2.rkt")
          (prefix-in table3: "gen-table-3.rkt"))
 
-(define all-targets '(["SnowWhite (default W)"
+(define all-targets '(["PrettyExpressive (default W)"
                        "pretty-expressive-ocaml"
                        "default"]
-                      ["SnowWhite (W = 1000)"
+                      ["PrettyExpressive (W = 1000)"
                        "pretty-expressive-ocaml"
                        "1000"]
                       ["Wadler/Leijen"
