@@ -78,6 +78,8 @@ under the directory `/workspace/lean/Pretty`.
 | Measure set size bound lemma                             | Lemma 6.8   | `Claims/ResolveEfficient.lean` | `Resolve_bound`                                                           |                                                   |
 | Taintedness when resolving exceeds the limit             | Lemma 6.9   | `Claims/ResolveEfficient.lean` | `Resolve_exceeding_tainted`                                               |                                                   |
 
+The dependency graph of Lean files can be accessed at `/workspace/lean/import_graph.png`
+
 (Non-)conformance of various cost factories (Definition 3.4, 3.5, 3.6, 3.8) to the cost factory interface (Theorem 3.7) 
 is proven using automated theorem proving, via Rosette and Z3 (`/workspace/rosette/cost-factory.rkt`).
 

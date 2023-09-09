@@ -14,3 +14,4 @@ Please consults the artifact overview for details.
 - `make doc-setup`: download packages for HTML doc generation (not necessarily runnable in Docker)
 - `make doc`: generate HTML doc (not necessarily runnable in Docker)
 - `make run-server`: spawn a server for viewing HTML doc (not necessarily runnable in Docker)
+- `make graph`: generate a dependency graph (`graphviz` required)
