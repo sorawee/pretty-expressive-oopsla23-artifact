@@ -27,7 +27,6 @@ mutual
     generalize h_meas : MeasureSet.set ms h_not_empty = ml at h
     cases h 
     case one h_current => 
-      simp at h_in 
       apply ResolveConcatOne_last 
       case h => 
         subst h_meas

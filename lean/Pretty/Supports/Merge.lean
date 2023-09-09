@@ -187,7 +187,6 @@ lemma merge_preserves_pareto
               have h_pareto₁' := pareto_rest h_pareto₁
               cases merge_head_either h_pareto₁' h_pareto₂
               case inl h => 
-                simp [← h]
                 replace h_pareto₁ := pareto_head h_pareto₁
                 simp [h_merge] at h
                 rw [h] at h_pareto₁

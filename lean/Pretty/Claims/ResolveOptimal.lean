@@ -37,7 +37,6 @@ mutual
         case tainted => 
           cases h_render
           rename_i h_render
-          simp 
           have := Resolve_optimal h' h_widen h_left (by assumption)
           simp at this h_x h_y
           cases this h_y h_x
@@ -64,7 +63,6 @@ mutual
         case tainted => 
           cases h_render
           rename_i h_render
-          simp 
           have := Resolve_optimal h' h_widen h_left (by assumption)
           simp at this h_x h_y
           let ⟨_, h_y⟩ := h_y
@@ -100,7 +98,6 @@ mutual
         case tainted => 
           cases h_render
           rename_i h_render
-          simp 
           have := Resolve_optimal h' h_widen h_left (by assumption)
           simp at this h_x h_y
           let ⟨_, h_y⟩ := h_y

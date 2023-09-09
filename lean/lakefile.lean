@@ -1,7 +1,7 @@
 import Lake
 open Lake DSL
 
-require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "f3dd5c320d6039ddbc829e869d918f8c1fd24920"
+require mathlib from git "https://github.com/leanprover-community/mathlib4" @ "a14fcecbe1b1a1d6c9d11878606b3a7a54e9cb97"
 
 package «pretty» {
   -- add package configuration options here
@@ -20,4 +20,4 @@ lean_lib «Pretty» {
 
 -- Enable doc-gen4
 meta if get_config? env = some "dev" then -- dev is so not everyone has to build it
-require «doc-gen4» from git "https://github.com/leanprover/doc-gen4" @ "9af4c720f08e9c694e574fc35cf59b385be47175"
+require «doc-gen4» from git "https://github.com/leanprover/doc-gen4" @ "8ea6a55a82ecb27f1c5290c5249d8490af855d3a"

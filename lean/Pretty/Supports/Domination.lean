@@ -41,7 +41,6 @@ This lemma creates an exhaustive case analysis for these four cases.
 lemma four_cases (F : Factory α) (m₁ m₂ : Meas) : FourCases F m₁ m₂ := by {
   cases lt_trichotomy m₁.last m₂.last
   case inl h => 
-    simp [h, le_of_lt h]
     by_cases F.le m₁.cost m₂.cost = true
     case pos h' => 
       apply FourCases.first_dom
@@ -75,7 +74,6 @@ lemma four_cases (F : Factory α) (m₁ m₂ : Meas) : FourCases F m₁ m₂ := 
   case inr h =>
     cases h 
     case inl h' => 
-      simp [h']
       by_cases F.le m₁.cost m₂.cost = true
       case pos => 
         apply FourCases.first_dom 
