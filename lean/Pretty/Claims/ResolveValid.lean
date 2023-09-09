@@ -111,7 +111,6 @@ mutual
           dwi { cases ms₂ } 
           case set => 
             simp [MeasureSet.union] at h_gen
-            simp at h_gen 
             subst h_gen 
             let ⟨d_choiceless, h⟩ := Resolve_valid h₂ h_widen₂ h_m
             exists d_choiceless
@@ -120,7 +119,6 @@ mutual
           cases ms₂ 
           case tainted => 
             simp [MeasureSet.union] at h_gen
-            simp at h_gen 
             subst h_gen 
             let ⟨d_choiceless, h⟩ := Resolve_valid h₁ h_widen₁ h_m
             exists d_choiceless

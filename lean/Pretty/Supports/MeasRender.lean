@@ -160,15 +160,10 @@ lemma MeasRender_dom_is_good {F : Factory α}
     simp at h_x h_y ⊢
     have := MeasRender_dom_monotonic h₁ h₁' h_c h_i
     specialize ih₁ h₁ h₁' h_c (by assumption) (by simp [h_x]) (by simp [h_y])
-    simp only [
-      dominates, Bool.decide_and, Bool.decide_coe,
-      Bool.and_eq_true, decide_eq_true_eq
-    ] at ih₁
     specialize ih₂ h₂ h₂' (by {
       simp [dominates] at this
       simp [this]
     }) (by assumption)
-    simp [dominates] at ih₂ ⊢ 
     constructor
     case left => simp [*]
     case right => 
