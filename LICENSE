@@ -1,0 +1,4 @@
+This artifact is distributed under the MIT license and the Apache License, version 2.0, at your option.
+However, the file `bernardy-remove-width-limit.patch` is distributed under the GPL 3.0 license,
+as it is a derivative work of https://github.com/jyp/prettiest/ that is distributed under the GPL 3.0 license.
+The full license files of MIT, Apache, and GPL 3.0 are located under the `licenses` directory.
