@@ -69,7 +69,7 @@
                                                             ['false "✓"])
                                                           " ")
                                            "~a s | ~a ")
-                                       (~r (/ ok-duration ok) #:min-width 10 #:precision '(= 6))
+                                       (~r (/ ok-duration ok) #:min-width 7 #:precision '(= 3))
                                        (~a ok-lines #:min-width 6 #:align 'right))))
                                     '())))
                          ", ")])]
@@ -95,8 +95,8 @@
                                 (~r (/ (for/sum ([entry val])
                                          (assc 'duration entry))
                                        (length val))
-                                    #:min-width 10
-                                    #:precision '(= 6))
+                                    #:min-width 7
+                                    #:precision '(= 3))
                                 (~a (assc 'lines fst)
                                     #:min-width 6
                                     #:align 'right)
