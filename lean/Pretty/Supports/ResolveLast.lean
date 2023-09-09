@@ -2,7 +2,7 @@ import Pretty.Supports.ResolvePareto
 
 /-!
 This set of lemmas states that a measure set from resolving will consist of 
-measures whose last line length is bound by $W_F$
+measures whose last line length is bound by $W$
 -/
 
 mutual

@@ -10,7 +10,7 @@ import Pretty.Supports.FactoryMath
 
 /--
 Document definition (syntax of $\Sigma_e$, Figure 4).
-One deviation is that we don't include the `flatten` construct, as explained in Page 16, Section 5.3.
+One deviation is that we don't include the `flatten` construct, as explained in Section 6.2 / 6.7.
 -/ 
 inductive Doc where 
   | text (s : String) : Doc
@@ -31,7 +31,7 @@ def Doc.size : Doc → ℕ
   | Doc.choice d₁ d₂ => Doc.size d₁ + Doc.size d₂ + 1
 
 /--
-Choiceless document definition (Section 3.2),
+Choiceless document definition (Section 3.1),
 defined as a predicate on `Doc`.
 -/ 
 inductive Choiceless : Doc → Prop where 
@@ -48,8 +48,8 @@ inductive Choiceless : Doc → Prop where
 -/
 
 /--
-Rendering relation definition ($⇓_\mathcal{R}$, Figure 6).
-One deviation is that the flattening mode is not included, as explained in Page 16, Section 5.3.
+Rendering relation definition ($⇓_\mathcal{R}$, Figure 8).
+One deviation is that the flattening mode is not included, as explained in Section 6.2 / 6.7.
 -/ 
 inductive Render : Doc → ℕ → ℕ → Layout → Prop where
   | text : Render (Doc.text s) c i (Layout.single s)
@@ -75,7 +75,7 @@ inductive Render : Doc → ℕ → ℕ → Layout → Prop where
   | reset (h : Render d c 0 L) : Render (Doc.reset d) c i L
 
 /--
-Widening relation definition ($⇓_\mathcal{W}$, Figure 6)
+Widening relation definition ($⇓_\mathcal{W}$, Figure 8)
 -/ 
 inductive Widen : Doc → List Doc → Prop where
   | text (s : String) : Widen (Doc.text s) [Doc.text s]
@@ -115,7 +115,7 @@ variable {α : Type}
 variable (F : Factory α)
 
 /--
-Measure definition (Figure 10)
+Measure definition (Figure 12)
 -/ 
 structure Meas where
   last : ℕ
@@ -125,7 +125,7 @@ structure Meas where
   y : ℕ  
 
 /-!
-### Various measure operations (Figure 10)
+### Various measure operations (Figure 12)
 -/ 
 
 /--
@@ -165,7 +165,7 @@ def dominates (m₁ m₂ : @Meas α) : Bool :=
 -/
 
 /--
-Measure computation/rendering definition (Figure 11)
+Measure computation/rendering definition (Figure 13)
 -/ 
 inductive MeasRender : Doc → ℕ → ℕ → Meas → Prop where
   | text (s : String) : 
@@ -230,7 +230,7 @@ section ListMeasure
 variable (F : Factory α)
 
 /-!
-### Various list of measures operations (Figure 12)
+### Various list of measures operations (Figure 14)
 -/
 
 /--
@@ -260,7 +260,7 @@ def merge : List (@Meas α) × List (@Meas α) → List (@Meas α)
 -/
 
 /--
-Measure set definition (Figure 12).
+Measure set definition (Figure 14).
 Unlike the definition in the paper, we carry the proof that `ms` is non-empty 
 instead of relying on the implicit non-empty assumption everywhere.
 -/

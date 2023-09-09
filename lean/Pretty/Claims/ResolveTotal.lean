@@ -7,7 +7,7 @@ import Pretty.Supports.DocSize
 
 mutual 
   /--
-  The totality of resolving (Page 19, Section 5.6)
+  The totality of resolving (Section 6.5)
   -/
   theorem Resolve_total (F : Factory α) (d : Doc) (c i : ℕ) : ∃ ms, Resolve F d c i ms := by 
     match d with

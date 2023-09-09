@@ -6,7 +6,7 @@ import Pretty.Tactic
 -/
 
 /--
-Determinism of the rendering relation (Section 3.3)
+Determinism of the rendering relation (Section 4.2)
 -/
 theorem Render_deterministic (h₁ : Render d c i L₁) (h₂ : Render d c i L₂) : L₁ = L₂ := by 
   induction h₁ generalizing L₂
@@ -67,7 +67,7 @@ theorem Render_deterministic (h₁ : Render d c i L₁) (h₂ : Render d c i L�
       rfl
 
 /--
-Totality of the rendering relation (Section 3.3)
+Totality of the rendering relation (Section 4.2)
 -/
 theorem Render_total (c i : ℕ) (h : Choiceless d) : ∃ L, Render d c i L := by 
   dwi { induction d generalizing c i }

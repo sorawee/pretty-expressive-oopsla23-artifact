@@ -8,7 +8,7 @@ import Pretty.Supports.LayoutCost
 -/
 
 /--
-Determinism of the measure computation relation (Section 5.3)
+Determinism of the measure computation relation (Section 6.2)
 -/
 theorem MeasRender_deterministic {F : Factory α} {m₁ m₂ : Meas}
   (h₁ : @MeasRender α F d c i m₁) (h₂ : @MeasRender α F d c i m₂) : m₁ = m₂ := by 
@@ -28,7 +28,7 @@ theorem MeasRender_deterministic {F : Factory α} {m₁ m₂ : Meas}
 
 /--
 Correctness of the measure computation relation 
-when it results in one line (first part of Theorem 5.3)
+when it results in one line (first part of Theorem 6.2)
 -/
 theorem MeasRender_single_correct (F : Factory α) 
     (h_layout : Layout.single s = L)
@@ -85,7 +85,7 @@ theorem MeasRender_single_correct (F : Factory α)
 
 /--
 Correctness of the measure computation relation 
-when it results in multiple lines (second part of Theorem 5.3)
+when it results in multiple lines (second part of Theorem 6.2)
 -/
 theorem MeasRender_multi_correct (F : Factory α) 
     (h_layout : Layout.multi first middle ⟨i_last, last⟩ = L)
@@ -171,7 +171,7 @@ theorem MeasRender_multi_correct (F : Factory α)
           simp [Layout.find_cost, compute_cost_split, compute_cost, Factory.text_id_left, ← Factory.text_concat, Factory.concat_assoc]
 
 /--
-Totality of the measure computation relation (Section 5.3)
+Totality of the measure computation relation (Section 6.2)
 -/
 theorem MeasRender_total (F : Factory α) (d : Doc) (c i : ℕ) (h : Choiceless d) : 
     ∃ m, MeasRender F d c i m := by 

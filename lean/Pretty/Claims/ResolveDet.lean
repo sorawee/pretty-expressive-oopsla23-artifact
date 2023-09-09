@@ -8,7 +8,7 @@ import Pretty.Claims.MeasRender
 
 mutual 
   /--
-  The determinism of resolving (Page 19, Section 5.6)
+  The determinism of resolving (Section 6.5)
   -/
   theorem Resolve_deterministic (h₁ : Resolve F d c i ms₁) (h₂ : Resolve F d c i ms₂) : ms₁ = ms₂ := by {
     match d with 

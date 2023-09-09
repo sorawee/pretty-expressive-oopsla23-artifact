@@ -10,7 +10,7 @@ import Pretty.Claims.Widen
 
 mutual
   /--
-  The optimality theorem (Theorem 5.7)
+  The optimality theorem (Theorem 6.6)
   -/
   theorem Resolve_optimal 
       (h_print : Resolve F d c i ml)

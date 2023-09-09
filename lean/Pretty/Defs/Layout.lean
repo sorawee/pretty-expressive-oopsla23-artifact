@@ -5,7 +5,7 @@ import Pretty.Supports.Basic
 -/
 
 /--
-Layout definition, which has at least one line (Section 3.1).
+Layout definition, which has at least one line (Section 4.1).
 One deviation from the paper: here, we store indentation level
 information for each line (see Section 7 for details).
 -/ 
