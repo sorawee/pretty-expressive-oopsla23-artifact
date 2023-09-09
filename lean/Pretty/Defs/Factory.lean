@@ -2,7 +2,7 @@ import Pretty.Supports.Basic
 import Pretty.Defs.Layout
 
 /--
-Cost factory interface definition (Figure 8)
+Cost factory interface definition (Figure 6)
 -/
 structure Factory (α : Type) where
   le : α → α → Bool

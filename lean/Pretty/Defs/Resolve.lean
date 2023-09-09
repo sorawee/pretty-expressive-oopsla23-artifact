@@ -6,6 +6,10 @@ section Resolve
 
 variable (F : Factory α)
 
+/-!
+### Resolver (Figure 15)
+-/
+
 mutual 
   inductive Resolve : Doc → ℕ → ℕ → @MeasureSet α → Prop where 
     | line_taint (h_bad : c > F.W ∨ i > F.W) (h : MeasRender F Doc.nl c i m) : 

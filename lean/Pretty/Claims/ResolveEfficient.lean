@@ -10,7 +10,7 @@ import Pretty.Supports.ResolvePareto
 
 /--
 A measure set from resolving will have size 
-at most $W_\mathcal{F} + 1$ (Lemma 5.9) 
+at most $W_\mathcal{F} + 1$ (Lemma 6.8) 
 -/
 lemma Resolve_bound
     {h_not_empty : ms ≠ []}
@@ -31,7 +31,7 @@ lemma Resolve_bound
 /--
 If resolving happens at a printing context that 
 exceeds $W_\mathcal{F}$, the result will always 
-be tainted (Lemma 5.10)
+be tainted (Lemma 6.9)
 -/
 lemma Resolve_exceeding_tainted
   (h : Resolve F d c i ms) 

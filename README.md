@@ -353,6 +353,8 @@ The correspondence is given in the table at [Formalization and proofs](#formaliz
    which is explained in Appendix C.
 2. The cost factory interface, which generalizes `nl_F` to be a function.
    This is explained in Section 7 of the paper.
+   Also, computation width limit is a part of cost factory, 
+   since these two arguments are usually set together.
 3. The definition of layout, which keeps track of indentation space.
    This is similarly explained in Section 7 of the paper.
 
@@ -446,6 +448,11 @@ to validate that the implementations work on other inputs.
 Similarly, feel free to format Racket files under `/workspace/fmt/tests`, 
 or any other Racket files with `raco fmt <filename.rkt>`.
 Code formatting should work on all Racket files that can be successfully parsed.
+
+The implementation should match well to the formalism in the paper.
+Deviations are documented in Section 7 and Appendix C.
+Also, computation width limit is a part of cost factory, 
+since these two arguments are usually set together.
 
 ## Additional information 
 

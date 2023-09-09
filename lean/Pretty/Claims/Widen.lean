@@ -6,7 +6,7 @@ import Pretty.Tactic
 -/
 
 /--
-Determinism of the widening relation (Section 3.3)
+Determinism of the widening relation (Section 4.2)
 -/
 theorem Widen_deterministic (h₁ : Widen d L₁) (h₂ : Widen d L₂) : L₁ = L₂ := by 
   induction d generalizing L₁ L₂
@@ -28,7 +28,7 @@ theorem Widen_deterministic (h₁ : Widen d L₁) (h₂ : Widen d L₂) : L₁ =
     simp [ih_left h_left₁ h_left₂, ih_right h_right₁ h_right₂]
 
 /--
-Totality of the widening relation (Section 3.3)
+Totality of the widening relation (Section 4.2)
 -/
 theorem Widen_total : ∃ L, Widen d L := by 
   induction d
@@ -65,7 +65,7 @@ theorem Widen_total : ∃ L, Widen d L := by
     dwi { constructor }
 
 /--
-Choicelessness of widened documents (not stated in the paper)
+Choicelessness of widened documents (Section 4.2, though not explicitly stated)
 -/
 -- This lemma can be made more general by not requiring `d` to be supplied,
 -- but this current form suffices for our purposes.

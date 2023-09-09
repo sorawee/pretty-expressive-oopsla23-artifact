@@ -9,7 +9,7 @@ import Pretty.Claims.Widen
 
 mutual 
   /--
-  The validity theorem for non-tainted result (the first part of Theorem 5.8)
+  The validity theorem for non-tainted result (the first part of Theorem 6.7)
   -/
   theorem Resolve_valid (h_print : Resolve F d c i (MeasureSet.set ms h))
       (h_widen : Widen d D) (h_m : m ∈ ms) : ∃ d_choiceless, d_choiceless ∈ D ∧ 
@@ -251,7 +251,7 @@ termination_by
 
 mutual 
   /--
-  The validity theorem for tainted result (the second part of Theorem 5.8)
+  The validity theorem for tainted result (the second part of Theorem 6.7)
   -/
   theorem Resolve_tainted_valid (h_print : Resolve F d c i (MeasureSet.tainted m))
       (h_widen : Widen d D) : ∃ d_choiceless, d_choiceless ∈ D ∧ 
