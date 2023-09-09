@@ -1,4 +1,4 @@
-.PHONY: build doc-setup doc run-server
+.PHONY: build doc-setup doc run-server graph
 
 # Build and check the proofs
 build:
