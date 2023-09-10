@@ -106,6 +106,8 @@ RUN cabal build
 ###################################################
 # Clone implementations (fmt and pretty-expressive-racket)
 
+RUN echo "force-update"
+
 WORKDIR /workspace
 RUN git clone https://github.com/sorawee/pretty-expressive pretty-expressive-racket
 RUN git clone https://github.com/sorawee/fmt.git
