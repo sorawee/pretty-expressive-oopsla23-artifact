@@ -164,8 +164,8 @@ To test that Lean can check our proofs, run the following commands:
 
 ```
 $ cd /workspace/lean 
-$ lake clean 
-$ lake build
+$ racket scripts/gen-main.rkt  # generate main file
+$ lake build                   # build our project
 ```
 
 This should compile all of our Lean files under the directory `Pretty` with no errors.
@@ -330,15 +330,15 @@ In general, the output related to time duration will not exactly match the paper
 
 ### Evaluation: Lean formalization 
 
-(Expected execution time: 30 seconds)
+(Expected execution time: instant -- proofs are already checked)
 
 Our sanity test has already verified that our Lean proofs are valid. 
 You may run it again if you wish:
 
 ```
 $ cd /workspace/lean 
-$ lake clean 
-$ lake build
+$ racket scripts/gen-main.rkt  # generate main file
+$ lake build                   # build our project
 ```
 
 You should additionally view the files under the `Pretty` subdirectory
