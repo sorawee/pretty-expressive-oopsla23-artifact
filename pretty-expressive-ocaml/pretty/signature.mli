@@ -78,8 +78,8 @@ sig
   (** [pretty_print d] prints the document [d] to a string. *)
 
   val flatten : doc -> doc
-  (** [flatten d] is a document that removes newlines and indentation spaces
-      when rendering [d] *)
+  (** [flatten d] is a document that replaces newlines and indentation spaces
+      with what's specified in [newline] when rendering [d] *)
 
   val fail : doc
   (** A document that always fails -- an extension of Pi_e *)
@@ -91,11 +91,12 @@ sig
   (** [a <+> b] is a shorthand for [a <> align b] *)
 
   val (<$>) : doc -> doc -> doc
-  (** [a <$> b] is a shorthand for [a <> nl <> b] *)
+  (** [a <$> b] is a shorthand for [a <> hard_nl <> b] *)
 
   val (<->) : doc -> doc -> doc
-  (** [a <-> b] is a shorthand for [flat a <+> b].
-      This is especially useful when we want to do horizontal concatenation,
+  (** [a <-> b] is a shorthand for [flatten a <+> b].
+      This is especially useful when combined with [hard_nl].
+      It is used when we want to do horizontal concatenation,
       but don't want the left part to have multiple lines. *)
 
   val fold_doc : (doc -> doc -> doc) -> doc list -> doc
