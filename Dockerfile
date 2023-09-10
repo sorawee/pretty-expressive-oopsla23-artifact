@@ -67,7 +67,7 @@ RUN raco pkg install --auto text-table rosette
 
 RUN curl -O https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh
 RUN chmod +x elan-init.sh
-RUN ./elan-init.sh -y --default-toolchain "leanprover/lean4:nightly-2023-02-23"
+RUN ./elan-init.sh -y --default-toolchain "leanprover/lean4:v4.0.0"
 RUN rm elan-init.sh
 ENV PATH=${PATH}:/root/.elan/bin
 
@@ -75,8 +75,7 @@ WORKDIR /workspace
 COPY lean/ lean
 WORKDIR /workspace/lean
 RUN lake update
-RUN lake build
-RUN lake clean
+RUN lake exe cache get
 
 ###################################################
 
@@ -133,12 +132,11 @@ RUN echo 'export BENCHDATA=/workspace/data' >> ~/.bashrc
 
 COPY scripts /workspace/scripts
 COPY benchmark-results /workspace/benchmark-results
-COPY pdf /workspace/pdf
 COPY output-dir /workspace/output-dir
 
 WORKDIR /workspace
 
-COPY artifact-overview.md artifact-overview.md
+COPY README.md README.md
 
 ###################################################
 # Done
