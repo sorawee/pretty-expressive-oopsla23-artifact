@@ -124,6 +124,13 @@ WORKDIR /workspace/pretty-expressive-ocaml
 RUN eval $(opam config env) && dune build
 
 ###################################################
+
+# Get Z3 working
+COPY rosette /workspace/rosette
+WORKDIR /workspace/rosette
+RUN racket setup-z3.rkt
+
+###################################################
 # Copy data
 
 COPY data /workspace/data
