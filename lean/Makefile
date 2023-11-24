@@ -24,3 +24,4 @@ graph:
 	lake exe graph --to Pretty --reduce
 	racket scripts/process-graph.rkt
 	dot -Tpng import_graph.dot -o import_graph.png
+	rm import_graph.dot
