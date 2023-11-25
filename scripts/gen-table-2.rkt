@@ -24,6 +24,13 @@
 (module+ main
   (require racket/cmdline)
 
+  (define benchdata (getenv "BENCHDATA"))
+
+  (when (or (not benchdata)
+            (not (directory-exists? benchdata))
+            (not (absolute-path? benchdata)))
+    (raise-user-error "BENCHDATA is not set or does not exist or is not an absolute path" benchdata))
+
   (define iter 5)
   (define timeout 60)
 
