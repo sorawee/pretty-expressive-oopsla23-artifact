@@ -2,7 +2,7 @@ let param_memo_limit = ref 7
 
 type 's treeof =
   | One of 's
-  | Cons of ('s treeof) * ('s treeof)
+  | Cons of 's treeof * 's treeof
 
 let tree_flatten (t: 's treeof): 's list =
   let rec loop (t: 's treeof) (acc: 's list) =
@@ -34,14 +34,15 @@ module CorePrinter (C : Signature.CostFactory) = struct
       nl_cnt: int;
       mutable table: ((int, measure_set) Hashtbl.t) option }
   and doc_case =
-    | Fail
-    | Text of (string treeof) * int
-    | Newline of (string option)
+    | Text of string treeof * int
+    | Newline of string option
     | Concat of doc * doc
+    | Choice of doc * doc
     | Nest of int * doc
     | Align of doc
     | Reset of doc
-    | Choice of doc * doc
+    | Cost of C.t * doc
+    | Fail
 
   let init_memo_w = !param_memo_limit - 1
   let calc_weight (d : doc) = if d.memo_w = 0 then init_memo_w else d.memo_w - 1
@@ -60,7 +61,6 @@ module CorePrinter (C : Signature.CostFactory) = struct
       nl_cnt = 1;
       table = None }
 
-
   let make_text s l = { dc = Text (s, l);
                         id = next_id ();
                         memo_w = init_memo_w;
@@ -69,12 +69,26 @@ module CorePrinter (C : Signature.CostFactory) = struct
 
   let text s = make_text (One s) (String.length s)
 
-  let (<>) (d1 : doc) (d2 : doc) =
+  let rec cost c d =
+    match d.dc with
+    | Fail -> fail
+    | Cost (c2, d) -> cost (C.combine c c2) d
+    | _ ->
+      let memo_w = calc_weight d in
+      { dc = Cost (c, d);
+        id = next_id ();
+        memo_w = memo_w;
+        nl_cnt = d.nl_cnt;
+        table = init_table memo_w }
+
+  let rec (<>) (d1 : doc) (d2 : doc) =
     match (d1.dc, d2.dc) with
     | (Fail, _) | (_, Fail) -> fail
     | (Text (_, 0), _) -> d2
     | (_, Text (_, 0)) -> d1
     | (Text (s1, l1), Text (s2, l2)) -> make_text (Cons (s1, s2)) (l1 + l2)
+    | (_, Cost (c, d2)) -> cost c (d1 <> d2)
+    | (Cost (c, d1), _) -> cost c (d1 <> d2)
     | _ ->
       let memo_w = min (calc_weight d1) (calc_weight d2) in
       { dc = Concat (d1, d2);
@@ -83,9 +97,10 @@ module CorePrinter (C : Signature.CostFactory) = struct
         nl_cnt = d1.nl_cnt + d2.nl_cnt;
         table = init_table memo_w }
 
-  let nest (n : int) (d : doc) =
+  let rec nest (n : int) (d : doc) =
     match d.dc with
     | Fail | Align _ | Reset _ | Text _ -> d
+    | Cost (c, d) -> cost c (nest n d)
     | _ ->
       let memo_w = calc_weight d in
       { dc = Nest (n, d);
@@ -94,9 +109,10 @@ module CorePrinter (C : Signature.CostFactory) = struct
         nl_cnt = d.nl_cnt;
         table = init_table memo_w }
 
-  let reset (d : doc) =
+  let rec reset (d : doc) =
     match d.dc with
     | Fail | Align _ | Reset _ | Text _   -> d
+    | Cost (c, d) -> cost c (reset d)
     | _ ->
       let memo_w = calc_weight d in
       { dc = Reset d;
@@ -105,9 +121,10 @@ module CorePrinter (C : Signature.CostFactory) = struct
         nl_cnt = d.nl_cnt;
         table = init_table memo_w }
 
-  let align d =
+  let rec align d =
     match d.dc with
     | Fail | Align _ | Reset _ | Text _  -> d
+    | Cost (c, d) -> cost c (align d)
     | _ ->
       let memo_w = calc_weight d in
       { dc = Align d;
@@ -198,7 +215,6 @@ module CorePrinter (C : Signature.CostFactory) = struct
     let resolve self { dc; _ } (c : int) (i : int) : measure_set =
       let core () =
         match dc with
-        | Fail -> failwith "fails to render"
         | Text (s, len_s) ->
           MeasureSet [{ last = c + len_s;
                         cost = C.text c len_s;
@@ -209,12 +225,19 @@ module CorePrinter (C : Signature.CostFactory) = struct
                         layout = fun ss -> "\n" :: String.make i ' ' :: ss }]
         | Concat (d1, d2) ->
           process_concat (fun (m1 : measure) -> self d2 m1.last i) (self d1 c i)
+        | Choice (d1, d2) ->
+          if d1.nl_cnt < d2.nl_cnt then merge (self d2 c i) (self d1 c i)
+          else merge (self d1 c i) (self d2 c i)
         | Nest (n, d) -> self d c (i + n)
         | Align d -> self d c c
         | Reset d -> self d c 0
-        | Choice (d1, d2) ->
-          if d1.nl_cnt < d2.nl_cnt then merge (self d2 c i) (self d1 c i)
-          else merge (self d1 c i) (self d2 c i) in
+        | Cost (co, d) ->
+          let add_cost (m : measure) = { m with cost = C.combine co m.cost } in
+          (match self d c i with
+           | MeasureSet ms -> MeasureSet (List.map add_cost ms)
+           | Tainted mt -> Tainted (fun () -> add_cost (mt ())))
+        | Fail -> failwith "fails to render"
+      in
       let exceeds = match dc with
         | Text (_, len) -> (c + len > C.limit) || (i > C.limit)
         | _ -> (c > C.limit) || (i > C.limit) in
@@ -262,11 +285,8 @@ module Printer (C : Signature.CostFactory): Signature.PrinterT = struct
   let empty = text ""
   let space = text " "
 
-  let string_space = " "
-  let string_empty = ""
-
-  let nl = newline (Some string_space)
-  let break = newline (Some string_empty)
+  let nl = newline (Some " ")
+  let break = newline (Some "")
   let hard_nl = newline None
 
   let flatten : doc -> doc =
@@ -288,6 +308,9 @@ module Printer (C : Signature.CostFactory): Signature.PrinterT = struct
             let { id = b_idp; _ } as bp = flatten b in
             if a_idp = a_id && b_idp = b_id then d else ap <|> bp
           | Nest (_, d) | Align d | Reset d -> flatten d
+          | Cost (c, ({ id = id; _ } as d)) ->
+            let { id = idp; _ } as dp = flatten d in
+            if idp = id then d else cost c dp
         in
         Hashtbl.add cache id out;
         out
