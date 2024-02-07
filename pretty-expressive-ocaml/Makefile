@@ -2,7 +2,7 @@
 
 # Build everything
 build:
-	dune build
+	dune build --release
 
 # Generate HTML doc
 doc:

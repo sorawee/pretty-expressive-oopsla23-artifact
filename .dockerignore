@@ -1,7 +1,10 @@
 lean/build
 lean/lake-packages
+lean/Pretty.lean
 other-artifacts/Text
 other-artifacts/TextPatched
 pretty-expressive-racket
 fmt
 benchmark-results/*.dat
+pretty-expressive-ocaml/dune-project
+pretty-expressive-ocaml/pretty_expressive.opam

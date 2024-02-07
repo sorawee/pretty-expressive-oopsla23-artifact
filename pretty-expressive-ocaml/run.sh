@@ -2,4 +2,4 @@
 
 exe=${1%.ml}.exe
 shift
-dune exec --display=quiet "$exe" "$@"
+dune exec --release --display=quiet "$exe" "$@"

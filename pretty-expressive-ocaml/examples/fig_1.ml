@@ -1,10 +1,9 @@
-open Pretty.Printer
+open Pretty_expressive
 
 let print_three (width: int) =
-  let module P = Printer (DefaultCost (struct
-                            let computation_width = 100
-                            let page_width = width
-                          end)) in
+  let cf = Printer.default_cost_factory ~page_width:width () in
+
+  let module P = Printer.MakeCompat (val cf) in
   let open P in
 
   (* Page 2, Figure 1a *)

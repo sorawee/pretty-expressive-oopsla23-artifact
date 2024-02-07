@@ -1,4 +1,4 @@
-open Pretty.Printer
+open Pretty_expressive
 open Benchtool
 
 (* NOTE: size must be an integer <= 255 *)
@@ -8,11 +8,11 @@ let () =
   if not (size > 255) then
     raise (Arg.Bad "bad size")
 
-module P = Printer (DefaultCost (struct
-                      let page_width = page_width
-                      let computation_width = computation_width
-                    end))
+let cf = Printer.default_cost_factory
+    ~page_width:page_width
+    ~computation_width:computation_width ()
 
+module P = Printer.MakeCompat (val cf)
 open P
 
 let chr (n : int): doc = text (String.make 1 (char_of_int n))

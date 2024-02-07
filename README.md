@@ -91,11 +91,11 @@ As described in Section 6, we implemented PrettyExpressive in both OCaml and Rac
 and implemented a code formatter for Racket code using the Racket version of
 PrettyExpressive. The artifact contains all three implementations:
 
-| Name                                   | Path                                         |
-|----------------------------------------|----------------------------------------------|
-| OCaml PrettyExpressive pretty printer  | `/workspace/pretty-expressive-ocaml/pretty/` |
-| Racket PrettyExpressive pretty printer | `/workspace/pretty-expressive-racket/`       |
-| Racket code formatter                  | `/workspace/fmt/`                            |
+| Name                                   | Path                                      |
+|----------------------------------------|-------------------------------------------|
+| OCaml PrettyExpressive pretty printer  | `/workspace/pretty-expressive-ocaml/lib/` |
+| Racket PrettyExpressive pretty printer | `/workspace/pretty-expressive-racket/`    |
+| Racket code formatter                  | `/workspace/fmt/`                         |
 
 ### Evaluation 
 

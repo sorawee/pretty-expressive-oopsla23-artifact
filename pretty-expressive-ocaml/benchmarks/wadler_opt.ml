@@ -1,4 +1,4 @@
-open Pretty.Printer
+open Pretty_expressive
 open Benchtool
 
 let {page_width; computation_width; size; _} = setup ~page_width:5 ~size:0 "wadler-opt"
@@ -7,11 +7,11 @@ let () =
   if not (size = 0) then
     raise (Arg.Bad "Size must be zero")
 
-module P = Printer (DefaultCost (struct
-                      let page_width = page_width
-                      let computation_width = computation_width
-                    end))
+let cf = Printer.default_cost_factory
+    ~page_width:page_width
+    ~computation_width:computation_width ()
 
+module P = Printer.MakeCompat (val cf)
 open P
 
 let doc =

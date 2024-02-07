@@ -4,7 +4,7 @@ Please consults the artifact overview for details.
 
 ### Contents 
 
-- `pretty`: source code of the pretty printer
+- `lib`: source code of the pretty printer
 - `examples`: example programs that use the pretty printer
 - `benchmarks`: benchmarks from paper (and some more benchmark programs)
 - `benchtool`: benchmarking framework

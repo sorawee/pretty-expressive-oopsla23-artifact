@@ -1,4 +1,4 @@
-open Pretty.Printer
+open Pretty_expressive
 open Benchtool
 
 (* NOTE: May require `ulimit -s <larger-limit>` *)
@@ -11,11 +11,11 @@ let () =
   if not (size > 500) then
     raise (Arg.Bad "bad size")
 
-module P = Printer (DefaultCost (struct
-                      let page_width = page_width
-                      let computation_width = computation_width
-                    end))
+let cf = Printer.default_cost_factory
+    ~page_width:page_width
+    ~computation_width:computation_width ()
 
+module P = Printer.MakeCompat (val cf)
 open P
 
 (* Begin body *)

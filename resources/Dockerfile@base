@@ -53,7 +53,7 @@ RUN git checkout $BERNARDY_PRINTER_COMMIT
 # Setup OCaml and Racket
 
 RUN opam init -y
-RUN opam install -y odoc ppx_import yojson core_unix core dune stdio
+RUN opam install -y odoc ppx_import yojson core_unix core dune stdio mdx alcotest
 RUN echo 'eval $(opam config env)' >> ~/.bashrc
 
 # Workaround for the "docs failure: query-exec: unable to open the database file" issue
@@ -77,8 +77,7 @@ COPY lean/lake-manifest.json lake-manifest.json
 COPY lean/lakefile.lean lakefile.lean
 RUN touch Pretty.lean
 RUN lake update
-RUN lake build
-RUN rm Pretty.lean
+RUN lake exe cache get
 
 ###################################################
 

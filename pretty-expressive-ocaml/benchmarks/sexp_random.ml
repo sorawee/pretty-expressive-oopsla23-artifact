@@ -1,13 +1,13 @@
-open Pretty.Printer
+open Pretty_expressive
 open Benchtool
 
 let {page_width; computation_width; size; _} = setup ~size:1 "sexp-random"
 
-module P = Printer (DefaultCost (struct
-                      let page_width = page_width
-                      let computation_width = computation_width
-                    end))
+let cf = Printer.default_cost_factory
+    ~page_width:page_width
+    ~computation_width:computation_width ()
 
+module P = Printer.MakeCompat (val cf)
 open P
 
 let hsep  = fold_doc (fun x y -> x <+> space <+> y)

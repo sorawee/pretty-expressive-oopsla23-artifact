@@ -17,7 +17,13 @@
                sexp_full
                sexp_random
                fill_sep)
- (libraries pretty
+ (libraries pretty_expressive
             yojson
             benchtool
             stdio))
+
+(env
+ (dev
+  (flags (:standard)))
+ (release
+  (ocamlopt_flags (:standard -O3))))

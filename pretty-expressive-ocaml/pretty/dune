@@ -1,6 +1,0 @@
-(library
- (name pretty)
- (public_name pretty_expressive)
- (modules printer info signature)
- (libraries core)
- (modules_without_implementation signature))

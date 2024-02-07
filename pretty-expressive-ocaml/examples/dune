@@ -1,3 +1,3 @@
 (executables
  (names fig_1)
- (libraries pretty))
+ (libraries pretty_expressive))

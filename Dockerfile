@@ -18,32 +18,30 @@ RUN cabal build
 ###################################################
 
 WORKDIR /workspace/lean
-COPY lean/Pretty Pretty
-COPY lean/Makefile Makefile
-COPY lean/scripts scripts
-COPY lean/README.md README.md
-COPY lean/.gitignore .gitignore
-COPY lean/Pretty.lean Pretty.lean
+# merge
+COPY lean /workspace/lean
+RUN racket scripts/gen-main.rkt
 
 ###################################################
-# Clone implementations (fmt and pretty-expressive-racket)
+# Clone implementations
 
 WORKDIR /workspace
+RUN git clone https://github.com/sorawee/pretty-expressive-ocaml
 RUN git clone https://github.com/sorawee/pretty-expressive pretty-expressive-racket
 RUN git clone https://github.com/sorawee/fmt.git
+
+# merge
+COPY pretty-expressive-ocaml /workspace/pretty-expressive-ocaml
+
+WORKDIR /workspace/pretty-expressive-ocaml
+RUN opam install -y --working-dir . --with-test
+RUN eval $(opam config env) && dune build --release
 
 WORKDIR /workspace/pretty-expressive-racket
 RUN raco pkg install --auto --name pretty-expressive
 
 WORKDIR /workspace/fmt
 RUN raco pkg install --auto
-
-###################################################
-# Copy OCaml printer, benchmarks, and build them
-
-COPY pretty-expressive-ocaml /workspace/pretty-expressive-ocaml
-WORKDIR /workspace/pretty-expressive-ocaml
-RUN eval $(opam config env) && dune build
 
 ###################################################
 

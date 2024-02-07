@@ -1,4 +1,4 @@
-open Pretty.Printer
+open Pretty_expressive
 open Benchtool
 
 let {page_width; computation_width; size; _} = setup ~size:2 "json"
@@ -9,11 +9,11 @@ let json_file =
   | 2 -> "/10k.json"
   | _ -> raise (Arg.Bad "bad size")
 
-module P = Printer (DefaultCost (struct
-                      let page_width = page_width
-                      let computation_width = computation_width
-                    end))
+let cf = Printer.default_cost_factory
+    ~page_width:page_width
+    ~computation_width:computation_width ()
 
+module P = Printer.MakeCompat (val cf)
 open P
 
 (* NOTE: Bernardy's paper formats JSON in the Haskell style, *)

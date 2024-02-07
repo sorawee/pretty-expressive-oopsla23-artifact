@@ -1,7 +1,6 @@
 module Command = Core.Command
 
-open Pretty
-open Printer
+open Pretty_expressive
 
 let print_layout oc (s: string): unit =
   Printf.fprintf oc "%s\n" s
@@ -52,16 +51,9 @@ let setup ?(size = 0) ?(page_width = 80) ?(computation_width = 100) (program: st
            no_arg
            ~doc: " Output cost (default: no)"
 
-       and memo_limit =
-         flag
-           "--memo-limit"
-           (optional_with_default !param_memo_limit int)
-           ~doc: "int Memoization limit (default: 7)"
-
        in
        fun () ->
          Sys_unix.override_argv [| Sys.argv.(0) |];
-         param_memo_limit := memo_limit;
          param_out := out;
          param_view_cost := view_cost;
          param_page_width := page_width;
@@ -73,7 +65,7 @@ let setup ?(size = 0) ?(page_width = 80) ?(computation_width = 100) (program: st
     computation_width = !param_computation_width;
     size = !param_size }
 
-let do_bench (f : unit -> Info.info) =
+let do_bench (f : unit -> Util.info) =
   let at_init = Sys.time () in
   let out_info = f () in
   let at_end = Sys.time () in
@@ -134,11 +126,7 @@ let do_bench (f : unit -> Info.info) =
 
            S.List
              [S.Atom "tainted?";
-              S.Atom (if out_info.is_tainted then "true" else "false")];
-
-           S.List
-             [S.Atom "memo-limit";
-              S.Atom (string_of_int !param_memo_limit)]]))
+              S.Atom (if out_info.is_tainted then "true" else "false")]]))
 
 (* Core bench unfortunately doesn't meet the flexibility that I want. *)
 
