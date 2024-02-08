@@ -130,29 +130,20 @@ However, we do expect the _relative_ performance on the benchmarks to be approxi
 
 The only required installation is Docker. See https://docs.docker.com/install/ for details on how to install Docker.
 
-After installing Docker, you can download and run the Docker image.
-
-If you have an AArch64 machine (Mac M1 or M2), run (possibly with `sudo` if required):
+After installing Docker, you can download and run the Docker image with (possibly with `sudo` if required):
 
 ```
 # Download image (~15 GB download). 
-$ docker pull soraweep/pretty-expressive-oopsla23-artifact:latest-aarch64
-$ docker run -it --name pretty-artifact soraweep/pretty-expressive-oopsla23-artifact:latest-aarch64
-```
-
-If you have an x86-64 machine, run (possibly with `sudo` if required):
-
-```
-# Download image (~15 GB download). 
-$ docker pull soraweep/pretty-expressive-oopsla23-artifact:latest-amd64
-$ docker run -it --name pretty-artifact soraweep/pretty-expressive-oopsla23-artifact:latest-amd64
+$ docker pull soraweep/pretty-expressive-oopsla23-artifact:latest
+# Run the container
+$ docker run -it --name pretty-artifact soraweep/pretty-expressive-oopsla23-artifact:latest
 ```
 
 This will drop you into a shell inside the container, in the `/workspace` directory, the main directory containing Lean proofs, implementations, and benchmarks.
 
 We have installed `vim` into the container for convenience to edit and view files; you can also use Docker to copy files into and out of the container, see <https://docs.docker.com/engine/reference/commandline/cp/>.
 
-If you leave the container and wish to get back, you will need to restart it with the command `docker start -ia pretty-artifact`. If you wish to instead start from a fresh copy of the image, run `docker rm pretty-artifact` to remove the container and then follow the instructions for the first run of the container above.
+If you leave the container and wish to get back, you will need to restart it with the command `docker start -ia pretty-artifact`. If you wish to instead start from a fresh copy of the image, run `docker rm pretty-artifact` to remove the container and then repeat `docker run -it --name pretty-artifact soraweep/pretty-expressive-oopsla23-artifact:latest` to start a new container.
 
 ### Basic testing
 
@@ -501,6 +492,6 @@ $ make doc # This will take a long time, and could fail due to arch mismatch
 Although not a part of the artifact, these HTML documentations are also online at 
 
 - Lean formalization: https://sorawee.github.io/pretty-expressive-lean/Pretty.html
-- OCaml PrettyExpressive: https://sorawee.github.io/pretty-expressive-ocaml/pretty_expressive/Pretty/index.html
+- OCaml PrettyExpressive: https://ocaml.org/p/pretty_expressive/latest/doc/index.html
 - Racket PrettyExpressive: https://docs.racket-lang.org/pretty-expressive/
 - Racket code formatter: https://docs.racket-lang.org/fmt/

@@ -1,9 +1,12 @@
-name: Docker Image CI
-
 on:
-  push:
-    branches: [ "main" ]
-  workflow_dispatch:
+  workflow_call:
+    secrets:
+      DOCKERHUB_USERNAME:
+        description: Username
+        required: true
+      DOCKERHUB_TOKEN:
+        description: Token
+        required: true
 
 env:
   REGISTRY_IMAGE: soraweep/pretty-expressive-oopsla23-artifact

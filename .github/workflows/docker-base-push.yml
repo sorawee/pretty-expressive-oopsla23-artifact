@@ -1,6 +1,11 @@
 name: Docker Base Image Push
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths:
+      resources/Dockerfile@base
 
 env:
   REGISTRY_IMAGE: soraweep/pretty-expressive-oopsla23-artifact
@@ -87,3 +92,11 @@ jobs:
       - name: Inspect image
         run: |
           docker buildx imagetools inspect ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
+
+  push-main:
+    needs:
+      - merge
+    uses: ./.github/workflows/docker-main-push-core.yml
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

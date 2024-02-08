@@ -1,0 +1,28 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  should-push:
+    runs-on: ubuntu-latest
+    outputs:
+      block-path: ${{ steps.blocklist.outputs.path }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: blocklist
+        with:
+          filters: |
+            path:
+              - 'resources/Dockerfile@base'
+
+  push-main:
+    needs: should-push
+    if: needs.should-push.outputs.block-path != 'true'
+    uses: ./.github/workflows/docker-main-push-core.yml
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
